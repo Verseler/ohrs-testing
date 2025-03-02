@@ -14,7 +14,7 @@ class RoomController extends Controller
     {
         $query = Room::withCount([
             'beds',
-            'beds as available_bed' => fn($query) => $query->where('status', 'available')
+            'beds as available_beds' => fn($query) => $query->where('status', 'available')
         ]);
 
         // Search Filter
@@ -48,116 +48,130 @@ class RoomController extends Controller
     }
 
 
-
-    //     public function upsertForm($type, ?string $id = null)
-//     {
-//         $room = Room::where('id', $id)->with('beds')->first();
-
-    //         return Inertia::render('RoomManagement/UpsertRoom', ['room' => $room, 'type' => $type]);
-//     }
-
-    //     public function upsert(Request $request)
-//     {
-//         $validatedFields = $request->validate([
-//             'name' => ['required', 'string', 'min:2', 'max:20'],
-//             'eligible_gender' => ['required', Rule::in(['any', 'male', 'female'])],
-//             'beds' => ['required', 'array'],
-//             'beds.*.code' => ['required', 'string', 'max:8'],
-//             'beds.*.price' => ['required', 'numeric'],
-//         ]);
-
-    //         // Remove 'beds' from room data (because beds should be inserted separately)
-//         $beds = $validatedFields['beds'];
-//         unset($validatedFields['beds']);
-
-    //         $validatedFields['status'] = 'available';
-
-    //         //If type is create and the room name provided return an error
-//         if ($request->type === 'create') {
-//             $RoomNameAlreadyExisted = Room::where('name', $validatedFields['name'])->first();
-
-    //             if ($RoomNameAlreadyExisted) {
-//                 return back()->with('error', 'Room name already existed');
-//             }
-//         }
-
-    //         $room = Room::updateOrCreate(['id' => $request->id ?? null], $validatedFields);
-
-    //         if ($room) {
-//             foreach ($beds as $bed) {
-//                 Bed::updateOrCreate(
-//                     ['code' => $bed['code'], 'room_id' => $room->id],
-//                     [
-//                         'price' => $bed['price'],
-//                         'status' => 'available',
-//                         'room_id' => $room->id
-//                     ]
-//                 );
-//             }
-//         }
-
-    //         return to_route('room.list')->with('success', "Successfully");
-//     }
+    public function create(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:2', 'max:20'],
+            'eligible_gender' => ['required', Rule::in(['any', 'male', 'female'])],
+            'beds' => ['required', 'array', 'min:1'],
+            'beds.*.name' => ['required', 'string', 'max:8'],
+            'beds.*.price' => ['required', 'numeric'],
+        ]);
 
 
-    //     public function create(Request $request)
-//     {
-//         $validatedFields = $request->validate([
-//             'name' => ['required', 'string', 'min:2', 'max:20'],
-//             'eligible_gender' => ['required', Rule::in(['any', 'male', 'female'])],
-//             'beds' => ['required', 'array'],
-//             'beds.*.code' => ['required', 'string', 'max:8'],
-//             'beds.*.price' => ['required', 'numeric'],
-//         ]);
+        $roomNameAlreadyExisted = Room::where('name', $validated['name'])->first();
+        if ($roomNameAlreadyExisted) {
+            return redirect()->back()->with('error', 'Room name already existed.');
+        }
+
+        $room = Room::create([
+            'name' => $validated['name'],
+            'eligible_gender' => $validated['eligible_gender'],
+            'status' => 'available'
+        ]);
+
+        foreach ($validated['beds'] as $bed) {
+            $room->beds()->create([
+                'name' => $bed['name'],
+                'price' => $bed['price'],
+                'status' => 'available',
+            ]);
+        }
+
+        return to_route('room.list')->with('success', 'Successfully added new room.');
+    }
 
 
-    //         $roomAlreadyExisted = Room::where('name', $validatedFields['name'])->first();
-//         if ($roomAlreadyExisted) {
-//             return redirect()->back()->with('error', 'Room name already existed.');
-//         }
-
-    //         $room = Room::create([
-//             'name' => $validatedFields['name'],
-//             'eligible_gender' => $validatedFields['eligible_gender'],
-//             'status' => 'available'
-//         ]);
-
-    //         if ($room) {
-//             foreach ($validatedFields['beds'] as $bed) {
-//                 Bed::create([
-//                     'code' => $bed['code'],
-//                     'price' => $bed['price'],
-//                     'status' => 'available',
-//                     'room_id' => $room->id
-//                 ]);
-//             }
-//         }
-
-    //         return to_route('room.list')->with('success', 'Successfully added new room.');
-//     }
 
 
-    //     public function delete($id)
-//     {
-//         $room = Room::findOrFail($id);
-//         $room->delete();
-
-    //         return to_route('room.list')->with('success', "Successfully deleted $room->name room.");
-//     }
 
 
-    //     public function show($id)
-//     {
 
-    //         $room = Room::with([
-//             'beds'
-//         ])->withCount([
-//                     'beds',
-//                     'beds as occupied_bed' => fn($query) => $query->where('status', 'occupied'),
-//                     'beds as under_maintenance_bed' => fn($query) => $query->where('status', 'maintenance'),
-//                     'beds as available_bed' => fn($query) => $query->where('status', 'available')
-//                 ])->findOrFail($id);
 
-    //         return Inertia::render("RoomManagement/RoomDetails", ['room' => $room]);
-//     }
+
+    public function show($id)
+    {
+
+        $room = Room::with([
+            'beds'
+        ])->withCount([
+                    'beds',
+                    'beds as occupied_beds' => fn($query) => $query->where('status', 'occupied'),
+                    'beds as under_maintenance_beds' => fn($query) => $query->where('status', 'maintenance'),
+                    'beds as available_beds' => fn($query) => $query->where('status', 'available')
+                ])->findOrFail($id);
+
+        return Inertia::render("RoomManagement/RoomDetails", ['room' => $room]);
+    }
+
+    public function delete($id)
+    {
+        $room = Room::findOrFail($id);
+        $room->delete();
+
+        return to_route('room.list')->with('success', "Successfully deleted $room->name room.");
+    }
+
+
+    public function editForm($id)
+    {
+        $room = Room::with('beds')->findOrFail($id);
+        return Inertia::render('RoomManagement/EditRoom', ['room' => $room]);
+    }
+
+
+    public function edit(Request $request, Room $room)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'min:2', 'max:20'],
+            'eligible_gender' => ['required', Rule::in(['any', 'male', 'female'])],
+            'status' => ['required', Rule::in(['available', 'fully_occupied', 'maintenance'])],
+            'beds' => ['required', 'array', 'min:1'],
+            'beds.*.name' => ['required', 'string', 'max:8'],
+            'beds.*.price' => ['required', 'numeric', 'min:0'],
+            'beds.*.status' => ['required', Rule::in(['available', 'reserved', 'occupied', 'maintenance'])],
+        ]);
+
+        // Update the room
+        $room->update([
+            'name' => $validated['name'],
+            'eligible_gender' => $validated['eligible_gender'],
+            'status' => $validated['status'],
+        ]);
+
+        $existingBedIds = $room->beds->pluck('id')->toArray();
+        $submittedBedIds = [];
+
+        foreach ($validated['beds'] as $bedData) {
+            // Check if bed exists in the room
+            if (isset($bedData['id']) && in_array($bedData['id'], $existingBedIds)) {
+                // Update existing bed
+                $room->beds()
+                    ->where('id', $bedData['id'])
+                    ->update([
+                        'name' => $bedData['name'],
+                        'price' => $bedData['price'],
+                        'status' => $bedData['status'],
+                    ]);
+                $submittedBedIds[] = $bedData['id'];
+            } else {
+                // Create new bed (ignore client-side UUID)
+                $newBed = $room->beds()->create([
+                    'name' => $bedData['name'],
+                    'price' => $bedData['price'],
+                    'status' => $bedData['status'],
+                ]);
+                $submittedBedIds[] = $newBed->id;
+            }
+        }
+
+        // Delete beds not present in the submitted data
+        $room->beds()
+            ->whereNotIn('id', $submittedBedIds)
+            ->delete();
+
+
+        return to_route('room.list')->with('success', 'Room updated successfully.');
+    }
 }
+

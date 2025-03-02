@@ -18,8 +18,8 @@ class RoomFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'eligible_gender'=> $this->faker->randomElement(['any','male', 'female']),
-            'status'=> 'available'
+            'eligible_gender' => $this->faker->randomElement(['any', 'male', 'female']),
+            'status' => $this->faker->randomElement(['available', 'fully_occupied', 'maintenance'])
         ];
     }
 }
