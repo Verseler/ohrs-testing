@@ -18,9 +18,9 @@ class BedFactory extends Factory
     public function definition(): array
     {
         return [
+            'name' => $this->faker->randomNumber(1, 50),
             'price' => $this->faker->randomFloat(2, 50, 5000),
             'status' => 'available',
-            'code' => $this->faker->randomNumber(1, 50),
             'room_id' => Room::inRandomOrder()->first()->id
         ];
     }
