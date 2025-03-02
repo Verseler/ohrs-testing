@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Button from "@/Components/ui/button/Button.vue";
 import Checkbox from "@/Components/ui/checkbox/Checkbox.vue";
+import { InputError } from "@/Components/ui/input";
 import Input from "@/Components/ui/input/Input.vue";
 import Label from "@/Components/ui/label/Label.vue";
 import Message from "@/Components/ui/message/Message.vue";
@@ -48,9 +49,9 @@ function submit() {
                     autocomplete="email"
                     autofocus
                 />
-                <Message v-if="form.errors.email" severity="danger">
+                <InputError v-if="form.errors.email">
                     {{ form.errors.email }}
-                </Message>
+                </InputError>
             </div>
 
             <div class="flex flex-col gap-2">
@@ -64,9 +65,9 @@ function submit() {
                     autofocus
                 />
 
-                <Message v-if="form.errors.password" severity="danger">
+                <InputError>
                     {{ form.errors.password }}
-                </Message>
+                </InputError>
             </div>
 
             <div class="block mt-4">
