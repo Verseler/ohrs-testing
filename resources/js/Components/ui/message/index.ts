@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 export { default as Message } from './Message.vue';
 
 export const messageVariants = cva(
-    'p-2 border rounded-md',
+    'border',
   {
     variants: {
       severity: {
@@ -17,10 +17,18 @@ export const messageVariants = cva(
         secondary:
           'border-neutral-400 text-neutral-500 bg-neutral-50',
 
-      }
+      },
+      size: {
+        default: 'p-2 rounded-md',
+        xs: 'text-xs px-1.5 py-2 rounded-sm',
+        sm: 'text-sm p-2 rounded-sm',
+        md: 'text-md p-3 rounded-md',
+        lg: 'text-lg p-3 rounded-lg',
+      },
     },
     defaultVariants: {
         severity: 'default',
+        size: 'default'
     },
   },
 );

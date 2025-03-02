@@ -7,6 +7,7 @@ import { HtmlHTMLAttributes } from "vue";
 interface Props extends PrimitiveProps {
     severity?: MessageVariants["severity"];
     class?: HtmlHTMLAttributes["class"];
+    size?: MessageVariants["size"];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,7 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <div :class="cn(messageVariants({ severity }), props.class)">
+    <div :class="cn(messageVariants({ severity, size }), props.class)">
         <slot />
     </div>
 </template>
