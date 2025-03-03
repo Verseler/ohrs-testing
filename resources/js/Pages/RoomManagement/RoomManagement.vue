@@ -65,6 +65,7 @@ import { Button } from "@/components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
+import { debounce } from "@/lib/utils";
 
 const ROOMS_COLUMNS = [
     "name",
@@ -121,7 +122,7 @@ watch(
         () => form.sort_by,
         () => form.sort_order,
     ],
-    applyFilter
+    debounce(applyFilter, 300)
 );
 
 //Delete Confirmation Dialog
