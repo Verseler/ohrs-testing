@@ -3,6 +3,7 @@ import Button from "@/Components/ui/button/Button.vue";
 import Checkbox from "@/Components/ui/checkbox/Checkbox.vue";
 import { InputError } from "@/Components/ui/input";
 import Input from "@/Components/ui/input/Input.vue";
+import InputPassword from "@/Components/ui/input/InputPassword.vue";
 import Label from "@/Components/ui/label/Label.vue";
 import Message from "@/Components/ui/message/Message.vue";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
@@ -56,9 +57,8 @@ function submit() {
 
             <div class="flex flex-col gap-2">
                 <Label for="password">Password</Label>
-                <Input
+                <InputPassword
                     id="password"
-                    type="password"
                     v-model="form.password"
                     :invalid="!!form.errors.password"
                     autocomplete="current-password"
