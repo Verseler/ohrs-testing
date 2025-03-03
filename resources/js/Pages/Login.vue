@@ -45,7 +45,7 @@ function submit() {
                     id="email"
                     type="email"
                     v-model="form.email"
-                    :invalid="form.errors.email"
+                    :invalid="!!form.errors.email"
                     autocomplete="email"
                     autofocus
                 />
@@ -60,7 +60,7 @@ function submit() {
                     id="password"
                     type="password"
                     v-model="form.password"
-                    :invalid="form.errors.password"
+                    :invalid="!!form.errors.password"
                     autocomplete="current-password"
                     autofocus
                 />
