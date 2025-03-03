@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bed;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -34,7 +33,7 @@ class RoomController extends Controller
 
         // Sorting
         if ($request->filled('sort_by')) {
-            $sortBy = in_array($request->sort_by, ['name', 'status', 'eligible_gender', 'beds_count', 'available_bed']) ? $request->sort_by : 'name';
+            $sortBy = in_array($request->sort_by, ['name', 'status', 'eligible_gender', 'beds_count', 'available_beds']) ? $request->sort_by : 'name';
             $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
             $query->orderBy($sortBy, $sortOrder);
         }
@@ -109,7 +108,7 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
         $room->delete();
 
-        return to_route('room.list')->with('success', "Successfully deleted $room->name room.");
+        return redirect()->back()->withInput()->with('success', "Successfully deleted $room->name room.");
     }
 
 
@@ -155,7 +154,7 @@ class RoomController extends Controller
                     ]);
                 $submittedBedIds[] = $bedData['id'];
             } else {
-                // Create new bed (ignore client-side UUID)
+
                 $newBed = $room->beds()->create([
                     'name' => $bedData['name'],
                     'price' => $bedData['price'],
