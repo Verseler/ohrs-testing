@@ -64,6 +64,7 @@ import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
+import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 
 const ROOMS_COLUMNS = [
     "name",
@@ -308,29 +309,25 @@ function handleDeleteRoom() {
                                     </PopoverTrigger>
                                     <PopoverContent class="p-0 max-w-28">
                                         <div class="flex flex-col">
-                                            <Link
+                                            <PopoverLinkField
                                                 :href="
                                                     route('room.show', {
                                                         id: room.id,
                                                     })
                                                 "
                                             >
-                                                <PopoverField>
-                                                    <SquareArrowOutUpRight />View
-                                                </PopoverField>
-                                            </Link>
+                                                <SquareArrowOutUpRight />View
+                                            </PopoverLinkField>
 
-                                            <Link
+                                            <PopoverLinkField
                                                 :href="
                                                     route('room.editForm', {
                                                         id: room.id,
                                                     })
                                                 "
                                             >
-                                                <PopoverField>
-                                                    <Pencil />Edit
-                                                </PopoverField>
-                                            </Link>
+                                                <Pencil />Edit
+                                            </PopoverLinkField>
 
                                             <PopoverField
                                                 @click="
