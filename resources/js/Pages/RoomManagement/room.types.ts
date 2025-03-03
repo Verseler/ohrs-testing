@@ -5,7 +5,7 @@ export type RoomStatus = 'available' | 'fully_occupied' | 'maintenance';
 export type SortBy = 'beds_count' | 'available_beds' & keyof Pick<Room, 'eligible_gender' | 'name' | 'status'>
 
 export type Filters = {
-    search: string | null;
+    search: string | undefined;
     eligible_gender: RoomStatus | null;
     status: RoomStatus | null;
     sort_by: SortBy | null;

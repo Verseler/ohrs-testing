@@ -62,7 +62,7 @@ import type {
 } from "@/Pages/RoomManagement/room.types";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/components/ui/button";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 
 const ROOMS_COLUMNS = [
@@ -78,6 +78,7 @@ type RoomManagementProps = {
     filters: Filters;
 };
 
+// Rooms
 const { rooms, filters } = defineProps<RoomManagementProps>();
 
 const selectedRoom = ref<Room | null>(null);
@@ -94,8 +95,35 @@ const formHasValue = computed(
     () => form.search || form.eligible_gender || form.status || form.sort_by
 );
 
-const clearFilter = () => form.reset();
+//Room Filter
+const clearFilter = () => {
+    form.search = undefined;
+    form.eligible_gender = null;
+    form.status = null;
+    form.sort_by = null;
+    form.sort_by = null;
+};
 
+function applyFilter() {
+    form.get(route("room.list"), {
+        preserveScroll: true,
+        preserveState: true,
+        replace: true,
+    });
+}
+
+watch(
+    [
+        () => form.search,
+        () => form.eligible_gender,
+        () => form.status,
+        () => form.sort_by,
+        () => form.sort_order,
+    ],
+    applyFilter
+);
+
+//Delete Confirmation Dialog
 const deleteConfirmation = ref(false);
 
 function showDeleteConfirmation(room: Room) {
@@ -191,6 +219,9 @@ function handleDeleteRoom() {
                             Eligible Gender
                         </SelectItem>
                         <SelectItem value="beds_count"> Beds Count </SelectItem>
+                        <SelectItem value="available_beds">
+                            Available Beds
+                        </SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -206,8 +237,9 @@ function handleDeleteRoom() {
                 <FilterX />
             </Button>
 
-            <Searchbox class="ml-auto" />
+            <Searchbox class="ml-auto" v-model="form.search" />
         </div>
+
         <div class="border rounded">
             <Table>
                 <TableHeader>
