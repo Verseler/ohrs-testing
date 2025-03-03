@@ -27,7 +27,7 @@ const defaultPrice = ref(200.0);
 
 const DEFAULT_BEDS: Omit<Bed, "room_id">[] = [
     {
-        id: crypto.randomUUID(),
+        id: Date.now(),
         name: `Bed ${counter.value}`,
         price: defaultPrice.value,
         status: "available",
@@ -55,7 +55,7 @@ function addMoreBed() {
     counter.value++;
 
     form.beds.push({
-        id: crypto.randomUUID(),
+        id: Date.now(), //* temporary ID only, it will be replaced in the backend
         name: `Bed ${counter.value}`,
         price: defaultPrice.value,
         status: "available",
@@ -206,10 +206,12 @@ function showSubmitConfirmation() {
                             v-model="bed.name"
                             class="w-full"
                             maxlength="8"
-                            :invalid="!!form.errors[`beds.${index}.code`]"
+                            :invalid="!!(form.errors as any)[`beds.${index}.code`]"
                         />
 
-                        <InputError v-if="form.errors[`beds.${index}.code`]">
+                        <InputError
+                            v-if="(form.errors as any)[`beds.${index}.code`]"
+                        >
                             {{ "Field is required." }}
                         </InputError>
                     </div>
@@ -221,7 +223,7 @@ function showSubmitConfirmation() {
                                 id="bed-rice"
                                 type="number"
                                 step=".01"
-                                :invalid="!!form.errors[`beds.${index}.price`]"
+                                :invalid="!!(form.errors as any)[`beds.${index}.price`]"
                             />
                             <Button
                                 v-if="bedsLength > 1"
@@ -233,7 +235,7 @@ function showSubmitConfirmation() {
                                 <Trash />
                             </Button>
                         </div>
-                        <InputError v-if="form.errors[`beds.${index}.price`]">
+                        <InputError v-if="(form.errors as any)[`beds.${index}.price`]">
                             {{ "Price is required." }}
                         </InputError>
                     </div>
