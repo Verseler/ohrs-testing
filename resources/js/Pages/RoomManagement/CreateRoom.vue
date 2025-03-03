@@ -10,6 +10,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
+import { computed, ref, watch } from "vue";
 import { Input, InputError } from "@/Components/ui/input";
 import Label from "@/Components/ui/label/Label.vue";
 import { RadioGroup } from "@/Components/ui/radio-group";
@@ -17,10 +18,14 @@ import ValueAdjuster from "@/Components/ValueAdjuster.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import { Bed as BedIcon, Home, Trash } from "lucide-vue-next";
-import { computed, ref } from "vue";
 import { Bed, Room } from "@/Pages/RoomManagement/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
 import { Button } from "@/components/ui/button";
+import { usePage } from "@inertiajs/vue3";
+import { SharedData } from "@/types";
+import { toast } from "vue-sonner";
+
+const page = usePage<SharedData>();
 
 const counter = ref(1);
 const defaultPrice = ref(200.0);
@@ -55,7 +60,7 @@ function addMoreBed() {
     counter.value++;
 
     form.beds.push({
-        id: Date.now(), //* temporary ID only, it will be replaced in the backend
+        id: Date.now(), //* temporary ID only to make removeBed functionality works, it will be replaced in the backend
         name: `Bed ${counter.value}`,
         price: defaultPrice.value,
         status: "available",
@@ -73,6 +78,26 @@ function removeLastBed() {
         form.beds.pop();
     }
 }
+
+// Display flash success or error message as sonner or toast
+watch(
+    () => page.props.flash.error,
+    () => {
+        if (page.props.flash.error) {
+            toast.error(page.props.flash.error, {
+                style: {
+                    background: "#ef4444",
+                    color: "white",
+                },
+                position: "top-center",
+            });
+
+            setTimeout(() => {
+                page.props.flash.error = null;
+            }, 300);
+        }
+    }
+);
 
 function showSubmitConfirmation() {
     form.post(route("room.create"));
@@ -235,7 +260,9 @@ function showSubmitConfirmation() {
                                 <Trash />
                             </Button>
                         </div>
-                        <InputError v-if="(form.errors as any)[`beds.${index}.price`]">
+                        <InputError
+                            v-if="(form.errors as any)[`beds.${index}.price`]"
+                        >
                             {{ "Price is required." }}
                         </InputError>
                     </div>

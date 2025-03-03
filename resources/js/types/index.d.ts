@@ -5,12 +5,18 @@ export interface User {
     email_verified_at?: string;
 }
 
+export interface Flash {
+    success?: string | null;
+    error?: string | null;
+}
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
     auth: {
         user: User;
     };
+    flash: Flash
 };
 
 
@@ -18,6 +24,7 @@ export interface SharedData extends PageProps {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    flash: Flash
 }
 
 export type LaravelPagination<T> = {
