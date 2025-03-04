@@ -17,7 +17,7 @@ import ValueAdjuster from "@/Components/ValueAdjuster.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import { Bed as BedIcon, Home, Trash } from "lucide-vue-next";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Bed, Room, RoomWithBed } from "@/Pages/RoomManagement/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
 import { Button } from "@/components/ui/button";
@@ -30,10 +30,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
+import { usePage } from "@inertiajs/vue3";
+import { SharedData } from "@/types";
+import { toast } from 'vue-sonner';
 
 type UpsertRoomProps = {
     room: RoomWithBed | null;
 };
+
+const page = usePage<SharedData>();
 
 const { room } = defineProps<UpsertRoomProps>();
 const counter = ref(1);
@@ -83,6 +88,26 @@ function removeLastBed() {
         form.beds.pop();
     }
 }
+
+// Display flash success or error message as sonner or toast
+watch(
+    () => page.props.flash.error,
+    () => {
+        if (page.props.flash.error) {
+            toast.error(page.props.flash.error, {
+                style: {
+                    background: "#ef4444",
+                    color: "white",
+                },
+                position: "top-center",
+            });
+
+            setTimeout(() => {
+                page.props.flash.error = null;
+            }, 300);
+        }
+    }
+);
 
 function showSubmitConfirmation() {
     if (!room || !room.id) return;
@@ -276,7 +301,9 @@ function showSubmitConfirmation() {
                             </SelectContent>
                         </Select>
                         {{ (form.errors as any)[`beds.${index}.code`] }}
-                        <InputError v-if="(form.errors as any)[`beds.${index}.code`]">
+                        <InputError
+                            v-if="(form.errors as any)[`beds.${index}.code`]"
+                        >
                             {{ "Field is required." }}
                         </InputError>
                     </div>
@@ -301,7 +328,9 @@ function showSubmitConfirmation() {
                                 <Trash />
                             </Button>
                         </div>
-                        <InputError v-if="(form.errors as any)[`beds.${index}.price`]">
+                        <InputError
+                            v-if="(form.errors as any)[`beds.${index}.price`]"
+                        >
                             {{ "Price is required." }}
                         </InputError>
                     </div>

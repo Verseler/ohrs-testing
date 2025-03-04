@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -14,7 +15,7 @@ class RoomController extends Controller
         $query = Room::withCount([
             'beds',
             'beds as available_beds' => fn($query) => $query->where('status', 'available')
-        ]);
+        ])->where('office_id', Auth::user()->office_id);
 
         // Search Filter
         if ($request->filled('search')) {
@@ -66,7 +67,8 @@ class RoomController extends Controller
         $room = Room::create([
             'name' => $validated['name'],
             'eligible_gender' => $validated['eligible_gender'],
-            'status' => 'available'
+            'status' => 'available',
+            'office_id' => Auth::user()->office_id,
         ]);
 
         foreach ($validated['beds'] as $bed) {
@@ -79,12 +81,6 @@ class RoomController extends Controller
 
         return to_route('room.list')->with('success', 'Successfully added new room.');
     }
-
-
-
-
-
-
 
 
 
@@ -130,6 +126,19 @@ class RoomController extends Controller
             'beds.*.price' => ['required', 'numeric', 'min:0'],
             'beds.*.status' => ['required', Rule::in(['available', 'reserved', 'occupied', 'maintenance'])],
         ]);
+
+
+        $roomNameAlreadyExisted = Room::where([
+
+            ['id', '!=', $request->id],
+            [
+                'name',
+                $validated['name'],
+            ]
+        ])->first();
+        if ($roomNameAlreadyExisted) {
+            return redirect()->back()->with('error', 'Room name already existed.');
+        }
 
         // Update the room
         $room->update([
