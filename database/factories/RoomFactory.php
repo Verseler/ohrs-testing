@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Room>
  */
@@ -18,8 +19,9 @@ class RoomFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
-            'eligible_gender' => $this->faker->randomElement(['any', 'male', 'female']),
-            'status' => $this->faker->randomElement(['available', 'fully_occupied', 'maintenance'])
+            'eligible_gender' => 'any',//$this->faker->randomElement(['any', 'male', 'female']),
+            'status' => 'available',
+            'office_id' => 1, //!temporary
         ];
     }
 }

@@ -49,3 +49,10 @@ export type LaravelPagination<T> = {
 
 
   export type Severity = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'secondary'
+
+  export type Office = {
+        id: number;
+        name: string;
+        created_at: Date | string;
+        updated_at: Date | string;
+  }

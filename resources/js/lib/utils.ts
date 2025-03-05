@@ -28,3 +28,14 @@ export function debounce<T extends (...args: any[]) => void>(func: T, delay: num
     };
 }
 
+
+export function formatDate(date: Date | string | undefined) {
+    if (!date) return null;
+
+    const jsDate = new Date(date);
+    const year = jsDate.getFullYear();
+    const month = String(jsDate.getMonth() + 1).padStart(2, '0');
+    const day = String(jsDate.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}

@@ -13,11 +13,17 @@ class Room extends Model
     protected $fillable = [
         'name',
         'eligible_gender',
-        'status'
+        'status',
+        'office_id'
     ];
 
     public function beds()
     {
         return $this->hasMany(Bed::class);
+    }
+
+    public function office()
+    {
+        return $this->belongsTo(Office::class);
     }
 }

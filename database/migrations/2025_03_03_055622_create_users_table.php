@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('name');
             $table->string('password');
             $table->enum('role', ['admin', 'super_id'])->default('admin');
+            $table->foreignId('office_id')->constrained()->cascadeOnDelete();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
