@@ -20,7 +20,7 @@ import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import { Bed as BedIcon, Home, Trash } from "lucide-vue-next";
 import { Bed, Room } from "@/Pages/RoomManagement/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { usePage } from "@inertiajs/vue3";
 import { SharedData } from "@/types";
 import { toast } from "vue-sonner";

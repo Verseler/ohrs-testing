@@ -61,7 +61,7 @@ import type {
     RoomWithBedCounts,
 } from "@/Pages/RoomManagement/room.types";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";

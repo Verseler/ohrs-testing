@@ -20,7 +20,7 @@ import { Bed as BedIcon, Home, Trash } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import { Bed, Room, RoomWithBed } from "@/Pages/RoomManagement/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import {
     Select,
     SelectContent,
