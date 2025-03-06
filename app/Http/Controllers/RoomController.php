@@ -34,7 +34,7 @@ class RoomController extends Controller
 
         // Sorting
         if ($request->filled('sort_by')) {
-            $sortBy = in_array($request->sort_by, ['name', 'status', 'eligible_gender', 'beds_count', 'available_beds']) ? $request->sort_by : 'name';
+            $sortBy = in_array($request->sort_by, ['name', 'status', 'eligible_gender', 'beds_count', 'available_beds', 'bed_price_rate']) ? $request->sort_by : 'name';
             $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
             $query->orderBy($sortBy, $sortOrder);
         }
@@ -53,9 +53,8 @@ class RoomController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:20'],
             'eligible_gender' => ['required', Rule::in(['any', 'male', 'female'])],
-            'beds' => ['required', 'array', 'min:1'],
-            'beds.*.name' => ['required', 'string', 'max:8'],
-            'beds.*.price' => ['required', 'numeric'],
+            'bed_price_rate' => ['required', 'min:1', 'numeric'],
+            'number_of_beds' => ['required', 'min:1', 'numeric']
         ]);
 
 
@@ -67,14 +66,14 @@ class RoomController extends Controller
         $room = Room::create([
             'name' => $validated['name'],
             'eligible_gender' => $validated['eligible_gender'],
+            'bed_price_rate' => $validated['bed_price_rate'],
             'status' => 'available',
             'office_id' => Auth::user()->office_id,
         ]);
 
-        foreach ($validated['beds'] as $bed) {
+        for($i = 1; $i <= $validated['number_of_beds']; $i++) {
             $room->beds()->create([
-                'name' => $bed['name'],
-                'price' => $bed['price'],
+                'name' => "Bed #$i",
                 'status' => 'available',
             ]);
         }
@@ -121,15 +120,14 @@ class RoomController extends Controller
             'name' => ['required', 'string', 'min:2', 'max:20'],
             'eligible_gender' => ['required', Rule::in(['any', 'male', 'female'])],
             'status' => ['required', Rule::in(['available', 'fully_occupied', 'maintenance'])],
+            'bed_price_rate' => ['required', 'min:1', 'numeric'],
             'beds' => ['required', 'array', 'min:1'],
             'beds.*.name' => ['required', 'string', 'max:8'],
-            'beds.*.price' => ['required', 'numeric', 'min:0'],
             'beds.*.status' => ['required', Rule::in(['available', 'reserved', 'occupied', 'maintenance'])],
         ]);
 
 
         $roomNameAlreadyExisted = Room::where([
-
             ['id', '!=', $request->id],
             [
                 'name',
@@ -144,6 +142,7 @@ class RoomController extends Controller
         $room->update([
             'name' => $validated['name'],
             'eligible_gender' => $validated['eligible_gender'],
+            'bed_price_rate' => $validated['bed_price_rate'],
             'status' => $validated['status'],
         ]);
 
@@ -151,22 +150,20 @@ class RoomController extends Controller
         $submittedBedIds = [];
 
         foreach ($validated['beds'] as $bedData) {
-            // Check if bed exists in the room
+            // If bed already existed perform update
             if (isset($bedData['id']) && in_array($bedData['id'], $existingBedIds)) {
-                // Update existing bed
                 $room->beds()
                     ->where('id', $bedData['id'])
                     ->update([
                         'name' => $bedData['name'],
-                        'price' => $bedData['price'],
                         'status' => $bedData['status'],
                     ]);
                 $submittedBedIds[] = $bedData['id'];
-            } else {
-
+            }
+            // else create
+            else {
                 $newBed = $room->beds()->create([
                     'name' => $bedData['name'],
-                    'price' => $bedData['price'],
                     'status' => $bedData['status'],
                 ]);
                 $submittedBedIds[] = $newBed->id;

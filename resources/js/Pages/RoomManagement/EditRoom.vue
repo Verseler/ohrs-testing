@@ -34,15 +34,14 @@ import { usePage } from "@inertiajs/vue3";
 import { SharedData } from "@/types";
 import { toast } from 'vue-sonner';
 
-type UpsertRoomProps = {
+type InsertRoomProps = {
     room: RoomWithBed | null;
 };
 
-const page = usePage<SharedData>();
+const { room } = defineProps<InsertRoomProps>();
 
-const { room } = defineProps<UpsertRoomProps>();
-const counter = ref(1);
-const defaultPrice = ref(200.0);
+const page = usePage<SharedData>();
+const counter = ref(room?.beds.length ?? 1);
 
 type UpsertRoomForm = Partial<
     Room & {
@@ -56,6 +55,7 @@ const form: InertiaForm<UpsertRoomForm> = useForm({
     eligible_gender: room?.eligible_gender,
     beds: room?.beds,
     status: room?.status,
+    bed_price_rate: room?.bed_price_rate
 });
 
 const bedsLength = computed(() => {
@@ -71,8 +71,8 @@ function addMoreBed() {
 
     form.beds.push({
         id: Date.now(),
-        name: `Bed ${counter.value}`,
-        price: defaultPrice.value,
+        name: `Bed #${counter.value}`,
+        price: room.bed_price_rate,
         status: "available",
     });
 }
@@ -237,7 +237,7 @@ function showSubmitConfirmation() {
             </div>
 
             <!-- Bed Field -->
-            <div class="flex flex-col gap-2">
+            <div class="space-y-4">
                 <div class="grid grid-cols-3 gap-x-4">
                     <!-- Increment and decrement number of bed(s) -->
                     <div class="col-span-2 space-y-2">
@@ -249,15 +249,15 @@ function showSubmitConfirmation() {
                         />
                     </div>
 
-                    <!-- Default price field -->
+                    <!-- Bed price rate field -->
                     <div class="space-y-2">
-                        <Label for="default-price">Default Price</Label>
+                        <Label for="bed-price-rate">Bed Price Rate</Label>
                         <Input
-                            id="default-price"
+                            id="bed-price-rate"
                             class="w-full"
                             type="number"
                             step=".01"
-                            v-model="defaultPrice"
+                            v-model="form.bed_price_rate"
                         />
                     </div>
                 </div>
@@ -268,71 +268,62 @@ function showSubmitConfirmation() {
                 <div
                     id="name"
                     v-for="(bed, index) in form.beds"
-                    class="grid grid-cols-3 gap-x-4"
+                    class="grid flex-1 grid-cols-3 gap-x-2"
                 >
-                    <div class="grid flex-1 grid-cols-3 col-span-2 gap-x-2">
+                    <div class="col-span-2">
                         <Input
-                            v-model="bed.name"
-                            class="col-span-2"
-                            maxlength="8"
-                            :invalid="!!(form.errors as any)[`beds.${index}.code`]"
+                        v-model="bed.name"
+                        maxlength="8"
+                        :invalid="!!(form.errors as any)[`beds.${index}.name`]"
                         />
-
-                        <Select v-model="bed.status">
-                            <SelectTrigger class="col-span-1">
-                                <SelectValue placeholder="Select a status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>Status</SelectLabel>
-                                    <SelectItem value="available">
-                                        Available
-                                    </SelectItem>
-                                    <SelectItem value="reserved">
-                                        Reserved
-                                    </SelectItem>
-                                    <SelectItem value="occupied">
-                                        Occupied
-                                    </SelectItem>
-                                    <SelectItem value="maintenance">
-                                        Maintenance
-                                    </SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        {{ (form.errors as any)[`beds.${index}.code`] }}
                         <InputError
-                            v-if="(form.errors as any)[`beds.${index}.code`]"
+                        v-if="(form.errors as any)[`beds.${index}.name`]"
                         >
-                            {{ "Field is required." }}
-                        </InputError>
+                        {{ "Field is required." }}
+                    </InputError>
                     </div>
-                    <div>
-                        <div class="flex items-center gap-x-2">
-                            <Input
-                                class="flex-1"
-                                v-model="bed.price"
-                                id="bed-rice"
-                                type="number"
-                                step=".01"
-                                :invalid="!!(form.errors as any)[`beds.${index}.price`]"
-                            />
-                            <Button
-                                v-if="bedsLength > 1"
-                                @click="removeBed(bed.id)"
-                                size="icon"
-                                variant="ghost"
-                                type="button"
-                                class="text-red-500 hover:bg-red-50 hover:text-red-500"
+
+                    <div class="flex gap-x-2">
+                        <div class="flex-1">
+                            <Select v-model="bed.status">
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Status</SelectLabel>
+                                        <SelectItem value="available">
+                                            Available
+                                        </SelectItem>
+                                        <SelectItem value="reserved">
+                                            Reserved
+                                        </SelectItem>
+                                        <SelectItem value="occupied">
+                                            Occupied
+                                        </SelectItem>
+                                        <SelectItem value="maintenance">
+                                            Maintenance
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <InputError
+                                v-if="(form.errors as any)[`beds.${index}.code`]"
                             >
-                                <Trash />
-                            </Button>
+                                {{ "Field is required." }}
+                            </InputError>
                         </div>
-                        <InputError
-                            v-if="(form.errors as any)[`beds.${index}.price`]"
+
+                        <Button
+                            v-if="bedsLength > 1"
+                            @click="removeBed(bed.id)"
+                            size="icon"
+                            variant="ghost"
+                            type="button"
+                            class="text-red-500 hover:bg-red-50 hover:text-red-500"
                         >
-                            {{ "Price is required." }}
-                        </InputError>
+                            <Trash />
+                        </Button>
                     </div>
                 </div>
 

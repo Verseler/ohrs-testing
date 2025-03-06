@@ -17,6 +17,7 @@ export type Room = {
     name: string;
     eligible_gender: Gender;
     status: RoomStatus;
+    bed_price_rate: number;
 }
 
 export type BedStatus = 'available' | 'reserved' | 'occupied' | 'maintenance';
@@ -30,6 +31,7 @@ export type Bed = {
 }
 
 export type RoomWithBedCounts = Room & {
+    beds?: Bed[] | null;
     beds_count?: number | null;
     available_beds?: number | null;
     occupied_beds?: number | null;

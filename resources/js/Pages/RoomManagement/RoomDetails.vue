@@ -111,6 +111,14 @@ const { room } = defineProps<RoomDetailsProps>();
                                     )}`
                                 }}
                             </Badge>
+
+                            <Badge
+                                severity='secondary'
+                            >
+                                {{
+                                    `Bed Price Rate: ₱${room.bed_price_rate}`
+                                }}
+                            </Badge>
                         </div>
 
                         <Separator class="mt-4 mb-2" />

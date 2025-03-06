@@ -10,11 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('beds', function (Blueprint $table) {
+        Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('status', ['available', 'reserved', 'occupied', 'maintenance']);
-            $table->foreignId('room_id')->constrained()->cascadeOnDelete();
+            $table->string('bed_price_rate');
+            $table->enum('eligible_gender', ['any', 'male', 'female'])->default('any');
+            $table->enum('status', allowed: ['available', 'fully_occupied', 'maintenance'])->default('available');
+            $table->foreignId('office_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('beds');
+        Schema::dropIfExists('rooms');
     }
 };

@@ -10,73 +10,43 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
-import { computed, ref, watch } from "vue";
 import { Input, InputError } from "@/Components/ui/input";
 import Label from "@/Components/ui/label/Label.vue";
 import { RadioGroup } from "@/Components/ui/radio-group";
 import ValueAdjuster from "@/Components/ValueAdjuster.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
-import { Bed as BedIcon, Home, Trash } from "lucide-vue-next";
-import { Bed, Room } from "@/Pages/RoomManagement/room.types";
-import Separator from "@/Components/ui/separator/Separator.vue";
+import { Bed as BedIcon, Home } from "lucide-vue-next";
+import { Room } from "@/Pages/RoomManagement/room.types";
 import { Button } from "@/Components/ui/button";
 import { usePage } from "@inertiajs/vue3";
 import { SharedData } from "@/types";
 import { toast } from "vue-sonner";
+import { watch } from "vue";
 
 const page = usePage<SharedData>();
 
-const counter = ref(1);
-const defaultPrice = ref(200.0);
+type CreateRoomForm = Omit<Room, "id"> & {
+    number_of_beds: number
+};
 
-const DEFAULT_BEDS: Omit<Bed, "room_id">[] = [
-    {
-        id: Date.now(),
-        name: `Bed ${counter.value}`,
-        price: defaultPrice.value,
-        status: "available",
-    },
-];
-
-type UpsertRoomForm = Omit<Room, "id"> & { beds: Omit<Bed, "room_id">[] };
-
-const form: InertiaForm<UpsertRoomForm> = useForm({
+const form: InertiaForm<CreateRoomForm> = useForm({
     name: "",
     eligible_gender: "any",
     status: "available",
-    beds: DEFAULT_BEDS,
+    bed_price_rate: 200,
+    number_of_beds: 1
 });
 
-const bedsLength = computed(() => {
-    if (!form.beds) return 0;
 
-    return form.beds.length;
-});
-
-function addMoreBed() {
-    if (!form.beds) return;
-
-    counter.value++;
-
-    form.beds.push({
-        id: Date.now(), //* temporary ID only to make removeBed functionality works, it will be replaced in the backend
-        name: `Bed ${counter.value}`,
-        price: defaultPrice.value,
-        status: "available",
-    });
+function increaseBed() {
+    form.number_of_beds++;
 }
 
-function removeBed(id: number | string) {
-    if (!form.beds) return;
+function decreaseBed() {
+    if(form.number_of_beds <= 1) return;
 
-    form.beds = form.beds.filter((bed) => bed.id !== id);
-}
-
-function removeLastBed() {
-    if (form.beds && form.beds.length > 1) {
-        form.beds.pop();
-    }
+    form.number_of_beds--;
 }
 
 // Display flash success or error message as sonner or toast
@@ -199,85 +169,35 @@ function showSubmitConfirmation() {
                     <div class="col-span-2 space-y-2">
                         <Label>Number of Bed(s)</Label>
                         <ValueAdjuster
-                            :value="bedsLength"
-                            :on-decrease="removeLastBed"
-                            :on-increase="addMoreBed"
+                            :value="form.number_of_beds"
+                            :on-decrease="decreaseBed"
+                            :disable-decrease="form.number_of_beds <= 1"
+                            :on-increase="increaseBed"
                         />
                     </div>
 
-                    <!-- Default price field -->
+                    <!-- Bed price rate field -->
                     <div class="space-y-2">
-                        <Label for="default-price">Default Price</Label>
+                        <Label for="bed-price-rate">Bed Price Rate</Label>
                         <Input
-                            id="default-price"
+                            id="bed-price-rate"
                             class="w-full"
                             type="number"
                             step=".01"
-                            v-model="defaultPrice"
+                            v-model="form.bed_price_rate"
                         />
-                    </div>
-                </div>
-
-                <Separator class="my-2" />
-
-                <!-- List of bed fields -->
-                <div
-                    id="name"
-                    v-for="(bed, index) in form.beds"
-                    class="grid grid-cols-3 gap-x-4"
-                >
-                    <div class="flex-1 col-span-2">
-                        <Input
-                            v-model="bed.name"
-                            class="w-full"
-                            maxlength="8"
-                            :invalid="!!(form.errors as any)[`beds.${index}.code`]"
-                        />
-
-                        <InputError
-                            v-if="(form.errors as any)[`beds.${index}.code`]"
-                        >
-                            {{ "Field is required." }}
-                        </InputError>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-x-2">
-                            <Input
-                                class="flex-1"
-                                v-model="bed.price"
-                                id="bed-rice"
-                                type="number"
-                                step=".01"
-                                :invalid="!!(form.errors as any)[`beds.${index}.price`]"
-                            />
-                            <Button
-                                v-if="bedsLength > 1"
-                                @click="removeBed(bed.id)"
-                                size="icon"
-                                variant="ghost"
-                                class="text-red-500 hover:bg-red-50 hover:text-red-500"
-                            >
-                                <Trash />
-                            </Button>
-                        </div>
-                        <InputError
-                            v-if="(form.errors as any)[`beds.${index}.price`]"
-                        >
-                            {{ "Price is required." }}
+                        <InputError v-if="form.errors.bed_price_rate">
+                            {{ form.errors.bed_price_rate }}
                         </InputError>
                     </div>
                 </div>
-
-                <InputError v-if="form.errors.beds">
-                    {{ form.errors.beds }}
-                </InputError>
             </div>
 
             <div>
                 <Button
                     type="submit"
-                    class="w-full mt-4 text-md"
                     size="lg"
+                    class="w-full mt-4 text-md"
                     :disabled="form.processing"
                 >
                     Save

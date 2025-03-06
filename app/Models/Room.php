@@ -14,6 +14,7 @@ class Room extends Model
         'name',
         'eligible_gender',
         'status',
+        'bed_price_rate',
         'office_id'
     ];
 

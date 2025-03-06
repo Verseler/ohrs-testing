@@ -71,6 +71,7 @@ const ROOMS_COLUMNS = [
     "name",
     "eligible_gender",
     "status",
+    'bed_price_rate',
     "beds_count",
     "available_beds",
 ] as const;
@@ -224,6 +225,9 @@ function handleDeleteRoom() {
                         <SelectItem value="available_beds">
                             Available Beds
                         </SelectItem>
+                        <SelectItem value="bed_price_rate">
+                            Bed wPrice Rate
+                        </SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -254,6 +258,9 @@ function handleDeleteRoom() {
                         <TableHead class="text-white">Status</TableHead>
                         <TableHead class="text-white">
                             Eligible Gender
+                        </TableHead>
+                        <TableHead class="text-white">
+                            Bed Price Rate
                         </TableHead>
                         <TableHead class="text-right"></TableHead>
                     </TableRow>
@@ -298,6 +305,9 @@ function handleDeleteRoom() {
                                 >
                                     {{ room.eligible_gender }}
                                 </Badge>
+                            </TableCell>
+                            <TableCell>
+                               <span class="text-xs text-neutral-700">₱{{ room.bed_price_rate }}</span>
                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>

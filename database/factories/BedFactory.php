@@ -19,7 +19,6 @@ class BedFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'price' => $this->faker->randomFloat(2, 50, 5000),
             'status' => 'available',
             'room_id' => Room::inRandomOrder()->first()->id
         ];

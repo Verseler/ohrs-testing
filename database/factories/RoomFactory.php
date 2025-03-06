@@ -19,6 +19,7 @@ class RoomFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
+            'bed_price_rate' => 200,
             'eligible_gender' => 'any',//$this->faker->randomElement(['any', 'male', 'female']),
             'status' => 'available',
             'office_id' => 1, //!temporary
