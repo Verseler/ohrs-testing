@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { Users } from "lucide-vue-next";
+import { Info, Users } from "lucide-vue-next";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
-import ValueAdjuster from "./ValueAdjuster.vue";
-import { Separator } from "./ui/separator";
+import ValueAdjuster from "@/Components/ValueAdjuster.vue";
+import { Separator } from "@/Components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@/Components/ui/tooltip';
 
 type GuestFieldProps = {
     female: number;
@@ -32,7 +37,7 @@ const {
 
 <template>
     <Popover>
-        <PopoverTrigger class="w-full">
+        <PopoverTrigger class="relative w-full">
             <div
                 as="button"
                 class="flex items-center px-4 py-2 hover:bg-primary-50 gap-x-3"
@@ -76,6 +81,15 @@ const {
                     </p>
                 </div>
             </div>
+
+            <Tooltip>
+                <TooltipTrigger class="absolute top-1 right-1"><Info class="text-primary-500 size-4" /></TooltipTrigger>
+                <TooltipContent>
+                    <p class="text-sm">
+                        Please be advised that, in accordance with our hostel's policy, male and female guests are not permitted to share the same room.
+                    </p>
+                </TooltipContent>
+            </Tooltip>
         </PopoverTrigger>
         <PopoverContent>
             <p>Set total guests</p>
