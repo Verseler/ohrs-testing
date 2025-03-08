@@ -12,7 +12,7 @@ const { invalid = false } = defineProps<InputPasswordProps>();
 
 const model = defineModel<string>();
 
-const visibility = ref(false);
+const visibility = ref(true);
 
 function toggle() {
     visibility.value = !visibility.value;
