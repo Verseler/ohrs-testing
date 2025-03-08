@@ -18,6 +18,7 @@ class OfficeFactory extends Factory
     {
         return [
             "name" => $this->faker->name,
+            "has_hostel" => false
         ];
     }
 }

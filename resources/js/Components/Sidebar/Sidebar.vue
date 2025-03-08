@@ -6,7 +6,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import SidebarHeading from "@/Components/Sidebar/SidebarHeading.vue";
 import SidebarNavLink from "@/Components/Sidebar/SidebarNavLink.vue";
 import Button from "@/Components/ui/button/Button.vue";
-import { Bed, ChartColumnIncreasing, LogOut } from "lucide-vue-next";
+import { Bed, ChartColumnIncreasing, Hotel, LogOut } from "lucide-vue-next";
 import { capitalized } from "@/lib/utils";
 import type { NavItem } from "./sidebar.type";
 import { SharedData } from "@/types";
@@ -41,6 +41,12 @@ const nav = ref<Array<NavItem>>([
                 path: "/rooms",
                 icon: Bed,
             },
+            {
+                label: "Office",
+                route: "office.list",
+                path: "/offices",
+                icon: Hotel,
+            },
             //     {
             //         label: "Guest",
             //         route: "guest.list",
@@ -64,24 +70,24 @@ function handleLogout() {
 
 <template>
     <div
-        class="fixed z-10 flex flex-col min-h-screen border-r w-72 border-r-primary-600 bg-primary-500"
+        class="flex fixed z-10 flex-col w-72 min-h-screen border-r border-r-primary-600 bg-primary-500"
     >
         <div
-            class="flex flex-col items-center px-6 pt-4 text-white shrink-0 gap-x-2"
+            class="flex flex-col gap-x-2 items-center px-6 pt-4 text-white shrink-0"
         >
             <ApplicationLogo class="size-28" />
-            <p class="text-xl font-bold">
-                <span class="text-yellow-200">H</span>otel
+            <p class="text-[1.2rem] font-bold">
+                <span class="text-yellow-200">H</span>ostel
                 <span class="text-yellow-200">R</span>eservation
                 <span class="text-yellow-200">S</span>ystem
             </p>
         </div>
 
-        <div class="mt-12 overflow-y-auto">
+        <div class="overflow-y-auto mt-12">
             <ul class="px-4 space-y-8 list-none">
                 <li v-for="navSection of nav" :key="navSection.heading">
                     <SidebarHeading>{{ navSection.heading }}</SidebarHeading>
-                    <ul class="list-none space-y-1.5 overflow-hidden">
+                    <ul class="overflow-hidden space-y-1.5 list-none">
                         <li
                             v-for="navItem of navSection.items"
                             :key="navItem.path"
@@ -100,9 +106,9 @@ function handleLogout() {
         </div>
 
         <div
-            class="flex items-center justify-between p-2 mt-auto gap-x-2 bg-primary-600"
+            class="flex gap-x-2 justify-between items-center p-2 mt-auto bg-primary-600"
         >
-            <div class="flex items-center justify-between gap-x-2">
+            <div class="flex gap-x-2 justify-between items-center">
                 <Avatar>
                     <AvatarFallback>V</AvatarFallback>
                 </Avatar>

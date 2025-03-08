@@ -11,7 +11,8 @@ class Office extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name',
+        'has_hostel',
     ];
 
     public function users()
