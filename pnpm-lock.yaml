@@ -23,6 +23,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      html-to-image:
+        specifier: ^1.11.13
+        version: 1.11.13
       lucide-vue-next:
         specifier: ^0.476.0
         version: 0.476.0(vue@3.5.13(typescript@5.7.3))
@@ -55,7 +58,7 @@ importers:
         specifier: ^10.4.12
         version: 10.4.20(postcss@8.5.3)
       axios:
-        specifier: ^1.7.4
+        specifier: ^1.8.1
         version: 1.8.1
       concurrently:
         specifier: ^9.0.1
@@ -886,6 +889,9 @@ packages:
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
+
+  html-to-image@1.11.13:
+    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
 
   is-binary-path@2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
@@ -2181,6 +2187,8 @@ snapshots:
       function-bind: 1.1.2
 
   he@1.2.0: {}
+
+  html-to-image@1.11.13: {}
 
   is-binary-path@2.1.0:
     dependencies:

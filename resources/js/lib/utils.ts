@@ -39,3 +39,31 @@ export function formatDate(date: Date | string | undefined) {
 
     return `${year}-${month}-${day}`;
 }
+
+export function formatDateString(date: string | Date): string {
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) {
+        console.error("Invalid date input");
+        return "";
+    }
+
+    const options: Intl.DateTimeFormatOptions = { month: "long", day: "2-digit", year: "numeric" };
+    return d.toLocaleDateString("en-US", options).replace(",", ""); // Remove comma
+}
+
+
+export function getDaysDifference(startDate: string | Date, endDate: string | Date): number {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        console.error("Invalid date input");
+        return 0;
+    }
+
+    const differenceInTime = end.getTime() - start.getTime();
+    return Math.floor(differenceInTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+}
+
+
