@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('guests', function (Blueprint $table) {
+        Schema::create('reservation_assignments', function (Blueprint $table) {
             $table->id();
-            $table->string('display_name');
-            $table->enum('gender', ['male', 'female'])->default('any');
-            $table->foreignId('office_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('reservation_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('bed_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('guest_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-    });
+        });
     }
 
     /**
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('guests');
+        Schema::dropIfExists('reservation_assignment');
     }
 };

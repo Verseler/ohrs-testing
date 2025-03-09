@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
+            $table->string('reservation_code')->unique()->after('id');
             $table->date('check_in_date');
             $table->date('check_out_date');
             $table->double('current_balance');

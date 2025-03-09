@@ -1,0 +1,45 @@
+<script setup lang="ts">
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { Button } from '@/Components/ui/button';
+import { Link } from '@inertiajs/vue3';
+import { User } from '@/types';
+
+type HeaderProps = {
+    canLogin: boolean;
+    user: User | null
+}
+
+const { canLogin, user } = defineProps<HeaderProps>();
+
+</script>
+
+<template>
+    <header
+        class="container flex items-center justify-between w-full p-2 mx-auto bg-white md:px-4"
+    >
+        <Link href="/">
+            <div class="flex items-center gap-x-2">
+                <ApplicationLogo />
+                <p class="text-xl font-bold text-primary-500">
+                    <span class="text-yellow-300">H</span>ostel
+                    <span class="text-yellow-300">R</span>eservation
+                    <span class="text-yellow-300">S</span>ystem
+                </p>
+            </div>
+        </Link>
+
+        <div class="inline-flex items-center gap-2">
+            <nav v-if="canLogin">
+                <Link v-if="user" :href="route('dashboard')">
+                    <Button class="px-6">Dashboard</Button>
+                </Link>
+
+                <template v-else>
+                    <Link :href="route('login')">
+                        <Button class="px-6">Log in</Button>
+                    </Link>
+                </template>
+            </nav>
+        </div>
+    </header>
+</template>
