@@ -25,7 +25,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/rooms/create', [RoomController::class, 'create'])->name('room.create');
     Route::get('/rooms/edit/{id}', [RoomController::class, 'editForm'])->name('room.editForm');
     Route::put('/rooms/edit/{room}', [RoomController::class, 'edit'])->name('room.edit');
-    Route::get('/rooms/{id}', [RoomController::class, 'show'])->name('room.show');
     Route::delete('/rooms/{id}', [RoomController::class, 'delete'])->name('room.delete');
 });
 

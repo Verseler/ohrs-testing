@@ -9,7 +9,6 @@ import {
     Home,
     Pencil,
     Plus,
-    SquareArrowOutUpRight,
     Trash,
 } from "lucide-vue-next";
 import {
@@ -52,27 +51,27 @@ import {
 } from "@/Components/ui/popover";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
-import type { LaravelPagination } from "@/types/index";
+import type { LaravelPagination, SharedData } from "@/types/index";
 import type {
     Filters,
     Gender,
     Room,
-    RoomStatus,
     RoomWithBedCounts,
 } from "@/Pages/RoomManagement/room.types";
-import { Head, Link, router, useForm } from "@inertiajs/vue3";
+import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
-import { debounce } from "@/lib/utils";
+import { debounce, formatDate } from "@/lib/utils";
+import { toast } from "vue-sonner";
 
 const ROOMS_COLUMNS = [
     "name",
     "eligible_gender",
-    "status",
-    'bed_price_rate',
+    "bed_price_rate",
     "beds_count",
+    "status",
     "available_beds",
 ] as const;
 
@@ -84,26 +83,26 @@ type RoomManagementProps = {
 // Rooms
 const { rooms, filters } = defineProps<RoomManagementProps>();
 
+const page = usePage<SharedData>();
+
 const selectedRoom = ref<Room | null>(null);
 
 const form = useForm<Filters>({
+    selected_date: filters.selected_date ?? formatDate(new Date()),
     search: filters.search,
     eligible_gender: filters.eligible_gender,
-    status: filters.status,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
 const formHasValue = computed(
-    () => form.search || form.eligible_gender || form.status || form.sort_by
+    () => form.search || form.eligible_gender || form.sort_by
 );
 
 //Room Filter
 const clearFilter = () => {
     form.search = undefined;
-    form.eligible_gender = null;
-    form.status = null;
-    form.sort_by = null;
+    form.eligible_gender = null;;
     form.sort_by = null;
 };
 
@@ -117,9 +116,9 @@ function applyFilter() {
 
 watch(
     [
+        () => form.selected_date,
         () => form.search,
         () => form.eligible_gender,
-        () => form.status,
         () => form.sort_by,
         () => form.sort_order,
     ],
@@ -135,6 +134,27 @@ function showDeleteConfirmation(room: Room) {
     deleteConfirmation.value = true;
 }
 
+// Display flash success or error message as sonner or toast
+watch(
+    () => page.props.flash.error,
+    () => {
+        if (page.props.flash.error) {
+            toast.error(page.props.flash.error, {
+                style: {
+                    background: "#ef4444",
+                    color: "white",
+                },
+                position: "top-center",
+            });
+
+            setTimeout(() => {
+                page.props.flash.error = null;
+            }, 300);
+        }
+    }
+);
+
+
 function handleDeleteRoom() {
     if (!selectedRoom.value) return;
 
@@ -142,6 +162,10 @@ function handleDeleteRoom() {
         method: "delete",
         preserveScroll: true,
         preserveState: true,
+        onSuccess: () => {
+            deleteConfirmation.value = false;
+            selectedRoom.value = null;
+        }
     });
 }
 </script>
@@ -176,7 +200,8 @@ function handleDeleteRoom() {
         </PageHeader>
 
         <!-- Search, Filter and Sort -->
-        <div class="flex mb-2 gap-x-2">
+        <div class="flex gap-x-2 mb-2">
+            <input class="py-0 text-sm rounded shadow-sm border-neutral-200" type="date" v-model="form.selected_date" />
             <Select v-model="form.eligible_gender as Gender">
                 <SelectTrigger class="w-40">
                     <SelectValue placeholder="Select a gender" />
@@ -191,24 +216,6 @@ function handleDeleteRoom() {
                 </SelectContent>
             </Select>
 
-            <Select v-model="form.status as RoomStatus">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Status</SelectLabel>
-                        <SelectItem value="available"> Available </SelectItem>
-                        <SelectItem value="fully_occupied">
-                            Fully Occupied
-                        </SelectItem>
-                        <SelectItem value="maintenance">
-                            Maintenance
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
             <Select v-model="form.sort_by as string">
                 <SelectTrigger class="w-40">
                     <SelectValue placeholder="Sort by" />
@@ -217,7 +224,6 @@ function handleDeleteRoom() {
                     <SelectGroup>
                         <SelectLabel>Sort by</SelectLabel>
                         <SelectItem value="name"> Name </SelectItem>
-                        <SelectItem value="status"> Status </SelectItem>
                         <SelectItem value="eligible_gender">
                             Eligible Gender
                         </SelectItem>
@@ -226,7 +232,7 @@ function handleDeleteRoom() {
                             Available Beds
                         </SelectItem>
                         <SelectItem value="bed_price_rate">
-                            Bed wPrice Rate
+                            Bed Price Rate
                         </SelectItem>
                     </SelectGroup>
                 </SelectContent>
@@ -246,7 +252,7 @@ function handleDeleteRoom() {
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="border rounded">
+        <div class="rounded border">
             <Table>
                 <TableHeader>
                     <TableRow class="bg-primary-500 hover:bg-primary-600">
@@ -255,7 +261,9 @@ function handleDeleteRoom() {
                         <TableHead class="text-white">
                             Available Beds
                         </TableHead>
-                        <TableHead class="text-white">Status</TableHead>
+                        <TableHead class="text-white">
+                            Status
+                        </TableHead>
                         <TableHead class="text-white">
                             Eligible Gender
                         </TableHead>
@@ -265,7 +273,6 @@ function handleDeleteRoom() {
                         <TableHead class="text-right"></TableHead>
                     </TableRow>
                 </TableHeader>
-
                 <TableBody>
                     <template v-if="rooms.data.length > 0">
                         <TableRow
@@ -280,17 +287,15 @@ function handleDeleteRoom() {
                             <TableCell>{{ room.available_beds }}</TableCell>
                             <TableCell>
                                 <Badge
+                                    v-if="room.available_beds !== null && room.available_beds !== undefined"
                                     :severity="
-                                        room.status === 'available'
-                                            ? 'success'
-                                            : room.status === 'fully_occupied'
+                                        room.available_beds <= 0
                                             ? 'danger'
-                                            : room.status === 'maintenance'
-                                            ? 'warning'
-                                            : 'secondary'
+                                            : 'success'
                                     "
                                 >
-                                    {{ room.status }}
+
+                                {{ room.available_beds <= 0 ? 'Fully Occupied' : 'Available' }}
                                 </Badge>
                             </TableCell>
                             <TableCell>
@@ -320,16 +325,6 @@ function handleDeleteRoom() {
                                     </PopoverTrigger>
                                     <PopoverContent class="p-0 max-w-28">
                                         <div class="flex flex-col">
-                                            <PopoverLinkField
-                                                :href="
-                                                    route('room.show', {
-                                                        id: room.id,
-                                                    })
-                                                "
-                                            >
-                                                <SquareArrowOutUpRight />View
-                                            </PopoverLinkField>
-
                                             <PopoverLinkField
                                                 :href="
                                                     route('room.editForm', {

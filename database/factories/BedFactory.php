@@ -18,8 +18,7 @@ class BedFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name(),
-            'status' => 'available',
+            'name' => $this->faker->unique()->regexify('[A-Za-z0-9]{1,8}'),
             'room_id' => Room::inRandomOrder()->first()->id
         ];
     }

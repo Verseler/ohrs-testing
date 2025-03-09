@@ -21,15 +21,6 @@ import { computed, ref, watch } from "vue";
 import { Bed, Room, RoomWithBed } from "@/Pages/RoomManagement/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
 import { Button } from "@/Components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
 import { usePage } from "@inertiajs/vue3";
 import { SharedData } from "@/types";
 import { toast } from 'vue-sonner';
@@ -45,7 +36,7 @@ const counter = ref(room?.beds.length ?? 1);
 
 type UpsertRoomForm = Partial<
     Room & {
-        beds: Pick<Bed, "id" | "status" | "price" | "name">[];
+        beds: Pick<Bed, "id" | "price" | "name">[];
     }
 >;
 
@@ -54,7 +45,6 @@ const form: InertiaForm<UpsertRoomForm> = useForm({
     name: room?.name,
     eligible_gender: room?.eligible_gender,
     beds: room?.beds,
-    status: room?.status,
     bed_price_rate: room?.bed_price_rate
 });
 
@@ -72,8 +62,7 @@ function addMoreBed() {
     form.beds.push({
         id: Date.now(),
         name: `Bed #${counter.value}`,
-        price: room.bed_price_rate,
-        status: "available",
+        price: room.bed_price_rate
     });
 }
 
@@ -150,7 +139,7 @@ function showSubmitConfirmation() {
 
         <form
             @submit.prevent="showSubmitConfirmation"
-            class="max-w-2xl space-y-4"
+            class="space-y-4 max-w-2xl"
         >
             <!-- Name Field -->
             <div class="flex flex-col gap-2">
@@ -167,39 +156,6 @@ function showSubmitConfirmation() {
                 </InputError>
             </div>
 
-            <!-- Room Status Field -->
-            <div class="flex flex-col gap-2">
-                <Label for="name">Status</Label>
-                <RadioGroup v-model="form.status" default-value="option-one">
-                    <div class="flex w-full gap-4">
-                        <RadioButtonCard
-                            id="available"
-                            value="available"
-                            label="Available"
-                            :active="form.status === 'available'"
-                            class="flex-1"
-                        />
-                        <RadioButtonCard
-                            id="fully_occupied"
-                            value="fully_occupied"
-                            label="Fully Occupied"
-                            :active="form.status === 'fully_occupied'"
-                            class="flex-1"
-                        />
-                        <RadioButtonCard
-                            id="maintenance"
-                            value="maintenance"
-                            label="Maintenance"
-                            :active="form.status === 'maintenance'"
-                            class="flex-1"
-                        />
-                    </div>
-                </RadioGroup>
-                <InputError v-if="form.errors.status">
-                    {{ form.errors.status }}
-                </InputError>
-            </div>
-
             <!-- Eligible Gender Field -->
             <div class="flex flex-col gap-2">
                 <Label for="name">Eligible Gender</Label>
@@ -207,7 +163,7 @@ function showSubmitConfirmation() {
                     v-model="form.eligible_gender"
                     default-value="option-one"
                 >
-                    <div class="flex w-full gap-4">
+                    <div class="flex gap-4 w-full">
                         <RadioButtonCard
                             id="any"
                             value="any"
@@ -263,14 +219,13 @@ function showSubmitConfirmation() {
                 </div>
 
                 <Separator class="my-2" />
-
                 <!-- List of bed fields -->
                 <div
                     id="name"
                     v-for="(bed, index) in form.beds"
-                    class="grid flex-1 grid-cols-3 gap-x-2"
+                    class="flex flex-1 gap-x-2"
                 >
-                    <div class="col-span-2">
+                    <div class="flex-1">
                         <Input
                         v-model="bed.name"
                         maxlength="8"
@@ -283,48 +238,16 @@ function showSubmitConfirmation() {
                     </InputError>
                     </div>
 
-                    <div class="flex gap-x-2">
-                        <div class="flex-1">
-                            <Select v-model="bed.status">
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Status</SelectLabel>
-                                        <SelectItem value="available">
-                                            Available
-                                        </SelectItem>
-                                        <SelectItem value="reserved">
-                                            Reserved
-                                        </SelectItem>
-                                        <SelectItem value="occupied">
-                                            Occupied
-                                        </SelectItem>
-                                        <SelectItem value="maintenance">
-                                            Maintenance
-                                        </SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <InputError
-                                v-if="(form.errors as any)[`beds.${index}.code`]"
-                            >
-                                {{ "Field is required." }}
-                            </InputError>
-                        </div>
-
-                        <Button
-                            v-if="bedsLength > 1"
-                            @click="removeBed(bed.id)"
-                            size="icon"
-                            variant="ghost"
-                            type="button"
-                            class="text-red-500 hover:bg-red-50 hover:text-red-500"
-                        >
+                    <Button
+                        v-if="bedsLength > 1"
+                        @click="removeBed(bed.id)"
+                        size="icon"
+                        variant="ghost"
+                        type="button"
+                        class="text-red-500 hover:bg-red-50 hover:text-red-500"
+                    >
                             <Trash />
                         </Button>
-                    </div>
                 </div>
 
                 <InputError v-if="form.errors.beds">
@@ -335,7 +258,7 @@ function showSubmitConfirmation() {
             <div>
                 <Button
                     type="submit"
-                    class="w-full mt-4 text-md"
+                    class="mt-4 w-full text-md"
                     size="lg"
                     :disabled="form.processing"
                 >

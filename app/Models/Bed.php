@@ -12,13 +12,17 @@ class Bed extends Model
 
     protected $fillable = [
         'name',
-        'status',
         'room_id'
     ];
 
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function reservationAssignments()
+    {
+        return $this->hasMany(ReservationAssignments::class);
     }
 
     public function guest()

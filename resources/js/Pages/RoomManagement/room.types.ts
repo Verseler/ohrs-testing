@@ -2,21 +2,20 @@ export type Gender = 'any' | 'male' | 'female';
 
 export type RoomStatus = 'available' | 'fully_occupied' | 'maintenance';
 
-export type SortBy = 'beds_count' | 'available_beds' & keyof Pick<Room, 'eligible_gender' | 'name' | 'status'>
+export type SortBy = 'beds_count' | 'available_beds' & keyof Pick<Room, 'eligible_gender' | 'name'>
 
 export type Filters = {
-    search: string | undefined;
-    eligible_gender: RoomStatus | null;
-    status: RoomStatus | null;
-    sort_by: SortBy | null;
-    sort_order: 'asc' | 'desc';
+    selected_date?: Date | string | null;
+    search?: string | undefined;
+    eligible_gender?: RoomStatus | null;
+    sort_by?: SortBy | null;
+    sort_order?: 'asc' | 'desc';
 }
 
 export type Room = {
     id: number;
     name: string;
     eligible_gender: Gender;
-    status: RoomStatus;
     bed_price_rate: number;
 }
 
@@ -26,8 +25,11 @@ export type Bed = {
     id: number | string;
     name: string;
     price: number;
-    status: BedStatus;
     room_id: number;
+}
+
+export type BedWithRoom = Bed & {
+    room: Room;
 }
 
 export type RoomWithBedCounts = Room & {

@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->string('name');
             $table->string('bed_price_rate');
             $table->enum('eligible_gender', ['any', 'male', 'female'])->default('any');
-            $table->enum('status', allowed: ['available', 'fully_occupied', 'maintenance'])->default('available');
             $table->foreignId('office_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
