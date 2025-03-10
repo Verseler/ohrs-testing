@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationSubmissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,6 +17,11 @@ Route::middleware('guest')->group(function () {
     Route::get('/reservation', [ReservationSubmissionController::class, 'form'])->name('reservation.form');
     Route::post('/reservation', [ReservationSubmissionController::class, 'create'])->name('reservation.create');
     Route::get('/reservation/confirmation', [ReservationSubmissionController::class, 'confirmation'])->name('reservation.confirmation');
+});
+
+//* Admin Reservation Management
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
 });
 
 //* Rooms

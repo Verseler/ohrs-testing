@@ -43,9 +43,11 @@ class ReservationSubmissionController extends Controller
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['required', 'regex:/(9)[0-9]{9}/'],
             'guest_office_id' => ['required', 'numeric'],
+            'host_office_id' => ['required', 'numeric'],
             'employee_identification' => ['required', 'string'],
             'purpose_of_stay' => ['nullable', 'string']
         ]);
+
 
         // Validate guest count
         if ($validated['total_guests'] !== ($validated['total_males'] + $validated['total_females'])) {
@@ -62,7 +64,7 @@ class ReservationSubmissionController extends Controller
 
                 // Add additional data to validated array for confirmation page
                 $validated['reservation_code'] = $reservation->reservation_code;
-                $validated['total_amount'] = $totalAmount;
+                $validated['total_billing'] = $totalAmount;
                 $validated['bed_price_rate'] ??= 0;
                 $validated['book_by'] = $validated['first_name'] . ' ' . $validated['last_name'];
 
@@ -83,7 +85,7 @@ class ReservationSubmissionController extends Controller
             'check_out_date'    => $validated['check_out_date'],
             'reserved_rooms'     => $validated['reserved_rooms'],
             'bed_price_rate'    => $validated['bed_price_rate'],
-            'total_amount'      => $validated['total_amount'],
+            'total_billing'      => $validated['total_billing'],
             'total_guests'      => $validated['total_guests'],
         ])->with('success', 'Reservation successfully created!');
     }
@@ -122,8 +124,8 @@ class ReservationSubmissionController extends Controller
             'reservation_code' => $this->generateReservationCode(),
             'check_in_date' => $validated['check_in_date'],
             'check_out_date' => $validated['check_out_date'],
-            'total_amount' => $totalAmount,
-            'current_balance' => $totalAmount,
+            'total_billing' => $totalAmount,
+            'remaining_balance' => $totalAmount,
             'status' => 'pending',
             'first_name' => $validated['first_name'],
             'middle_initial' => $validated['middle_initial'] ?? null,
@@ -131,6 +133,7 @@ class ReservationSubmissionController extends Controller
             'phone' => $validated['phone'],
             'email' => $validated['email'] ?? null,
             'guest_office_id' => $validated['guest_office_id'],
+            'host_office_id' => $validated['host_office_id'],
             'employee_identification' => $validated['employee_identification'],
             'purpose_of_stay' => $validated['purpose_of_stay'] ?? null,
         ]);

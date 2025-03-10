@@ -14,8 +14,8 @@ class Reservation extends Model
         'reservation_code',
         'check_in_date',
         'check_out_date',
-        'total_amount',
-        'current_balance',
+        'total_billing',
+        'remaining_balance',
         'status',
         'first_name',
         'middle_initial',
@@ -23,6 +23,7 @@ class Reservation extends Model
         'phone',
         'email',
         'guest_office_id',
+        'host_office_id',
         'employee_identification',
         'purpose_of_stay',
     ];
@@ -32,5 +33,13 @@ class Reservation extends Model
         return $this->belongsToMany(Guest::class, 'reservation_assignments');
     }
 
+    public function guestOffice()
+    {
+        return $this->belongsTo(Office::class, 'guest_office_id');
+    }
 
+    public function hostOffice()
+    {
+        return $this->belongsTo(Office::class, 'host_office_id');
+    }
 }

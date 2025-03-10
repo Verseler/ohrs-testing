@@ -15,15 +15,16 @@ return new class extends Migration {
             $table->string('reservation_code')->unique()->after('id');
             $table->date('check_in_date');
             $table->date('check_out_date');
-            $table->double('current_balance');
-            $table->double('total_amount');
+            $table->double('remaining_balance');
+            $table->double('total_billing');
             $table->enum('status', allowed: ['pending', 'canceled', 'checked_in', 'checked_out'])->default('pending');
             $table->string('first_name');
             $table->string('middle_initial')->nullable();
             $table->string('last_name');
             $table->string('phone');
             $table->string('email')->nullable();
-            $table->foreignId('guest_office_id')->constrained('offices')->cascadeOnDelete();#
+            $table->foreignId('guest_office_id')->constrained('offices')->cascadeOnDelete();
+            $table->foreignId('host_office_id')->constrained('offices')->cascadeOnDelete();
             //Employee ID image
             $table->string('employee_identification');
             $table->text('purpose_of_stay')->nullable();
