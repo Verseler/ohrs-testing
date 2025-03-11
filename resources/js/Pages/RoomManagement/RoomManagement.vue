@@ -104,6 +104,7 @@ const clearFilter = () => {
     form.search = undefined;
     form.eligible_gender = null;;
     form.sort_by = null;
+    form.sort_order = "asc";
 };
 
 function applyFilter() {
@@ -200,7 +201,7 @@ function handleDeleteRoom() {
         </PageHeader>
 
         <!-- Search, Filter and Sort -->
-        <div class="flex gap-x-2 mb-2">
+        <div class="flex mb-2 gap-x-2">
             <input class="py-0 text-sm rounded shadow-sm border-neutral-200" type="date" v-model="form.selected_date" />
             <Select v-model="form.eligible_gender as Gender">
                 <SelectTrigger class="w-40">
@@ -252,7 +253,7 @@ function handleDeleteRoom() {
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="rounded border">
+        <div class="border rounded">
             <Table>
                 <TableHeader>
                     <TableRow class="bg-primary-500 hover:bg-primary-600">
