@@ -48,6 +48,8 @@ class ReservationSubmissionController extends Controller
             'purpose_of_stay' => ['nullable', 'string']
         ]);
 
+        $hostOffice = Office::where('has_hostel', true)->findOrFail($validated['host_office_id']);
+
 
         // Validate guest count
         if ($validated['total_guests'] !== ($validated['total_males'] + $validated['total_females'])) {
@@ -56,26 +58,24 @@ class ReservationSubmissionController extends Controller
 
         try {
             DB::transaction(function () use (&$validated) {
-                // Calculate total billing amount
-                $totalAmount = $this->calculateTotalAmount( $validated);
-
                 // Create reservation
-                $reservation = $this->createReservation($validated, $totalAmount);
-
-                // Add additional data to validated array for confirmation page
-                $validated['reservation_code'] = $reservation->reservation_code;
-                $validated['total_billing'] = $totalAmount;
-                $validated['bed_price_rate'] ??= 0;
-                $validated['book_by'] = $validated['first_name'] . ' ' . $validated['last_name'];
+                $reservation = $this->createReservation($validated);
 
                 // Assign beds and group by room
-                $validated['reserved_rooms'] = $this->assignAndGroupBeds($validated, $reservation);
+                $validated['reserved_rooms'] = $this->assignAndGroupBeds(
+                    $validated['total_females'],
+                    $validated['total_males'],
+                    $reservation
+                );
 
+                // Add additional data to be pass to confirmation page
+                $validated['reservation_code'] = $reservation->reservation_code;
+                $validated['total_billing'] = $reservation->total_billing;
+                $validated['book_by'] = $validated['first_name'] . ' ' . $validated['last_name'];
             });
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
-
 
         return to_route('reservation.confirmation', [
             'reservation_code'  => $validated['reservation_code'],
@@ -83,49 +83,22 @@ class ReservationSubmissionController extends Controller
             'phone'             => $validated['phone'],
             'check_in_date'     => $validated['check_in_date'],
             'check_out_date'    => $validated['check_out_date'],
-            'reserved_rooms'     => $validated['reserved_rooms'],
-            'bed_price_rate'    => $validated['bed_price_rate'],
-            'total_billing'      => $validated['total_billing'],
-            'total_guests'      => $validated['total_guests'],
+            'reserved_rooms'    => $validated['reserved_rooms'],
+            'total_billing'     => $validated['total_billing'],
+            'host_office_name'  => $hostOffice->name,
         ])->with('success', 'Reservation successfully created!');
     }
 
-    private function generateReservationCode(): string
-    {
-        $date = now()->format('Ymd');
-        $latestReservation = Reservation::where('reservation_code', 'like', "RES-{$date}-%")
-            ->orderBy('reservation_code', 'desc')
-            ->first();
-
-        $sequence = 1;
-        if ($latestReservation) {
-            $parts = explode('-', $latestReservation->reservation_code);
-            $sequence = isset($parts[2]) ? (int)$parts[2] + 1 : 1;
-        }
-
-        return "RES-{$date}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
-    }
-
-    private function calculateTotalAmount( array $validated): float
-    {
-        //! Temporary
-        $bedPriceRate = 200;
-        $checkInDate = Carbon::parse($validated['check_in_date']);
-        $checkOutDate = Carbon::parse($validated['check_out_date']);
-        $daysOfStay = $checkOutDate->diff($checkInDate)->days + 1;
-
-        return $bedPriceRate * $validated['total_guests'] * $daysOfStay;
-    }
 
 
-    private function createReservation(array $validated, float $totalAmount): Reservation
+    private function createReservation(array $validated): Reservation
     {
         return Reservation::create([
             'reservation_code' => $this->generateReservationCode(),
             'check_in_date' => $validated['check_in_date'],
             'check_out_date' => $validated['check_out_date'],
-            'total_billing' => $totalAmount,
-            'remaining_balance' => $totalAmount,
+            'total_billing' => 0,
+            'remaining_balance' => 0,
             'status' => 'pending',
             'first_name' => $validated['first_name'],
             'middle_initial' => $validated['middle_initial'] ?? null,
@@ -139,31 +112,32 @@ class ReservationSubmissionController extends Controller
         ]);
     }
 
-    private function assignAndGroupBeds(array $validated, Reservation $reservation): string
-{
-    $femaleBedsReserved = $this->assignBeds(
-        $validated['total_females'],
-        'female',
-        $reservation
-    );
+    private function assignAndGroupBeds(float $totalFemales, float $totalMales, Reservation $reservation): string
+    {
+        $femaleBedsReserved = $this->assignBeds(
+            $totalFemales,
+            'female',
+            $reservation
+        );
 
-    $maleBedsReserved = $this->assignBeds(
-        $validated['total_males'],
-        'male',
-        $reservation
-    );
+        $maleBedsReserved = $this->assignBeds(
+            $totalMales,
+            'male',
+            $reservation
+        );
 
-    $bedsReserved = collect(array_merge($femaleBedsReserved, $maleBedsReserved))
-        ->groupBy('room.id')
-        ->map(function ($beds) {
-            $room = $beds->first()->room->toArray();
-            $room['total_beds'] = $beds->count();
-            return $room;
-        })
-        ->values();
+        $bedsReserved = collect(array_merge($femaleBedsReserved, $maleBedsReserved))
+            ->groupBy('room.id')
+            ->map(function ($beds) {
+                $room = $beds->first()->room->toArray();
+                $room['total_beds'] = $beds->count();
+                $room['total_price'] = $beds->sum('price');
+                return $room;
+            })
+            ->values();
 
-    return json_encode($bedsReserved);
-}
+        return json_encode($bedsReserved);
+    }
 
 
     // Assign each guest to a bed based on their gender.
@@ -172,12 +146,14 @@ class ReservationSubmissionController extends Controller
         $bedsReserved = [];
         $checkInDate = $reservation->check_in_date;
         $checkOutDate = $reservation->check_out_date;
+        $lengthOfStay = Carbon::parse($checkInDate)->diffInDays(Carbon::parse($checkOutDate)) + 1;
+        $totalPrice = 0;
 
         if ($count === 0) {
             return [];
         }
 
-         // Get beds that are not reserved during the requested dates
+        // Get beds that are not reserved during the requested dates
         $reservedBedIds = ReservationAssignments::whereHas('reservation', function ($query) use ($checkInDate, $checkOutDate) {
             $query->where('check_out_date', '>', $checkInDate)
                 ->where('check_in_date', '<', $checkOutDate)
@@ -196,9 +172,10 @@ class ReservationSubmissionController extends Controller
             throw new \Exception("Not enough available beds for {$gender} guests.");
         }
 
-        //assign each guest to a bed
+        // Calculate total price and assign each guest to a bed
         foreach ($beds as $bed) {
             $room = $bed->room;
+            $totalPrice += $bed->price;
 
             /**
              * If the room currently accepts any gender, update its eligible gender.
@@ -227,23 +204,57 @@ class ReservationSubmissionController extends Controller
             $bedsReserved[] = $bed;
         }
 
+        // Update reservation billing
+        $total_billing_amount = $totalPrice * $lengthOfStay;
+        $reservation->total_billing = $total_billing_amount;
+        $reservation->remaining_balance = $total_billing_amount;
+        $reservation->save();
+
         return $bedsReserved;
     }
+
+
+    private function generateReservationCode(): string
+    {
+        $date = now()->format('Ymd');
+        $maxAttempts = 100;
+        $attempt = 0;
+
+        while ($attempt < $maxAttempts) {
+            $randomNumber = random_int(1000, 9999);
+            $code = "RES-{$date}-{$randomNumber}";
+
+            // Check if code already exists
+            if (!Reservation::where('reservation_code', $code)->exists()) {
+                return $code;
+            }
+
+            $attempt++;
+        }
+
+        // Fallback to sequential if random fails after max attempts
+        $latestReservation = Reservation::where('reservation_code', 'like', "RES-{$date}-%")
+            ->orderBy('reservation_code', 'desc')
+            ->first();
+
+        $sequence = $latestReservation ? (int)explode('-', $latestReservation->reservation_code)[2] + 1 : 1;
+        return "RES-{$date}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+    }
+
 
     //Slip page that generates reservation confirmation image
     public function confirmation(Request $request)
     {
         return Inertia::render('ReservationProcess/ReservationConfirmation', [
-            'canLogin' => Route::has('login'),
-            'reservation_code' => $request->reservation_code,
-            'booked_by' => $request->booked_by,
-            'phone' => $request->phone,
-            'check_in_date' => $request->check_in_date,
-            'check_out_date' => $request->check_out_date,
-            'reserved_rooms' => json_decode($request->reserved_rooms),
-            'bed_price_rate' => $request->bed_price_rate,
-            'total_amount' => $request->total_amount,
-            'total_guests' => $request->total_guests,
+            'canLogin'          => Route::has('login'),
+            'reservation_code'  => $request->reservation_code,
+            'booked_by'         => $request->booked_by,
+            'phone'             => $request->phone,
+            'check_in_date'     => $request->check_in_date,
+            'check_out_date'    => $request->check_out_date,
+            'reserved_rooms'    => json_decode($request->reserved_rooms),
+            'total_billing'     => $request->total_billing,
+            'host_office_name'  => $request->host_office_name,
         ]);
     }
 }

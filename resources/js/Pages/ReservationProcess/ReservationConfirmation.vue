@@ -15,6 +15,7 @@ import { onMounted } from "vue";
 
 type ReservedRoom = Room & {
     total_beds: number;
+    total_price: number;
 };
 
 
@@ -26,9 +27,8 @@ type LandingPageProps = {
     check_in_date: string | Date;
     check_out_date: string | Date;
     reserved_rooms: ReservedRoom[];
-    bed_price_rate: number;
-    total_amount: number;
-    total_guests: number;
+    total_billing: number;
+    host_office_name: string;
 };
 
 const {
@@ -39,12 +39,13 @@ const {
     check_in_date,
     check_out_date,
     reserved_rooms,
-    bed_price_rate,
-    total_amount,
-    total_guests
+    total_billing,
+    host_office_name
 } = defineProps<LandingPageProps>();
 
 const lengthOfStay = getDaysDifference(check_in_date, check_out_date) + 1;
+
+const totalBedPrice = reserved_rooms.reduce((total, room) => total + room.total_price, 0);
 
 const page = usePage<SharedData>();
 
@@ -80,7 +81,7 @@ onMounted(() => {
     <div class="w-full min-h-screen">
         <Header :can-login="canLogin" :user="page.props.auth.user" />
         <div
-            class="flex flex-col items-center p-4 mt-10 min-h-screen"
+            class="flex flex-col items-center min-h-screen p-4 mt-10"
         >
             <Card
                 id="confirmation"
@@ -112,16 +113,17 @@ onMounted(() => {
                         <table class="flex w-full">
                             <thead>
                                 <tr
-                                    class="flex flex-col space-y-1 min-w-max text-sm pe-3 bg-neutral-100 text-neutral-500"
+                                    class="flex flex-col space-y-1 text-sm min-w-max pe-3 bg-neutral-100 text-neutral-500"
                                 >
                                     <td>Booked By</td>
                                     <td>Phone #</td>
                                     <td>Check-in Date</td>
                                     <td>Check-out Date</td>
+                                    <td>Hostel</td>
                                 </tr>
                             </thead>
                             <tbody class="w-full text-sm text-neutral-800">
-                                <tr class="flex flex-col space-y-1 w-full ps-2">
+                                <tr class="flex flex-col w-full space-y-1 ps-2">
                                     <td class="border-b">{{ booked_by }}</td>
                                     <td class="border-b">{{ phone }}</td>
                                     <td class="border-b">
@@ -130,6 +132,7 @@ onMounted(() => {
                                     <td class="border-b">
                                         {{ formatDateString(check_out_date) }}
                                     </td>
+                                    <td class="border-b">{{ host_office_name }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -140,17 +143,23 @@ onMounted(() => {
                                     class="text-sm bg-neutral-100 text-neutral-500"
                                 >
                                     <td>Room</td>
-                                    <td>Total Beds</td>
-                                    <td>Bed Price Rate</td>
                                     <td>Eligible Gender</td>
+                                    <td>Reserved Beds</td>
+                                    <td>Total Price</td>
                                 </tr>
                             </thead>
                             <tbody class="text-sm text-neutral-800">
                                 <tr v-for="room in reserved_rooms" :key="room.id"  class="border-b">
                                     <td>{{ room.name }}</td>
-                                    <td>{{ room.total_beds }}</td>
-                                    <td>₱{{ room.bed_price_rate }}</td>
                                     <td>{{ room.eligible_gender }}</td>
+                                    <td>{{ room.total_beds }}</td>
+                                    <td>₱{{ room.total_price }}</td>
+                                </tr>
+                                <tr class="font-bold">
+                                    <td />
+                                    <td />
+                                    <td>Total</td>
+                                    <td>₱{{ totalBedPrice }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -162,15 +171,9 @@ onMounted(() => {
                             <div class="space-y-2">
                                 <div class="flex justify-between">
                                     <span class="text-muted-foreground">
-                                        Bed Rate
+                                        Total Bed Price
                                     </span>
-                                    <span>₱{{ bed_price_rate }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-muted-foreground">
-                                        Total Guests
-                                    </span>
-                                    <span>{{ total_guests ?? 0 }}</span>
+                                    <span>₱{{ totalBedPrice }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-muted-foreground" >
@@ -180,16 +183,16 @@ onMounted(() => {
                                         {{ lengthOfStay }}
                                     </span>
                                 </div>
-                                <div class="my-2 h-px bg-border"></div>
-                                <div class="flex justify-between font-bold">
+                                <div class="h-px my-2 bg-border"></div>
+                                <div class="flex justify-between text-base font-bold text-black">
                                     <span>Total Amount</span>
-                                    <span>{{ total_amount }}</span>
+                                    <span>₱{{ total_billing }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pt-6 mt-8 border-t">
+                    <div class="pt-6 mt-8">
                         <p class="text-sm text-center text-muted-foreground">
                             A confirmation email has been sent to your
                             registered email address. If you have any questions,
@@ -199,7 +202,7 @@ onMounted(() => {
                 </div>
             </Card>
 
-            <Button size="lg" @click="downloadConfirmation" class="mt-2 w-full max-w-2xl rounded">
+            <Button size="lg" @click="downloadConfirmation" class="w-full max-w-2xl mt-2 rounded">
                 <Download class="w-4 h-4" />
                 Download
             </Button>

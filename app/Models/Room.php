@@ -13,7 +13,6 @@ class Room extends Model
     protected $fillable = [
         'name',
         'eligible_gender',
-        'bed_price_rate',
         'office_id'
     ];
 

@@ -19,6 +19,7 @@ class BedFactory extends Factory
     {
         return [
             'name' => $this->faker->unique()->regexify('[A-Za-z0-9]{1,8}'),
+            'price' => 200,
             'room_id' => Room::inRandomOrder()->first()->id
         ];
     }
