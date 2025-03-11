@@ -8,6 +8,7 @@ import { onMounted, ref, watch } from "vue";
 import { formatDate } from "@/lib/utils";
 import { toast } from "vue-sonner";
 import axios from "axios";
+import GenderBadge from "@/Components/GenderBadge.vue";
 
 const selectedDate = ref<Date | null>(new Date());
 
@@ -55,40 +56,15 @@ watch(() => selectedDate.value, (newDate) => {
                     <div
                     v-for="room in availableRooms"
                     :key="room.id"
-                    class="overflow-hidden rounded-lg border"
+                    class="overflow-hidden border rounded-lg"
                     >
                         <div class="flex flex-col gap-1 p-4 sm:flex-row lg:flex-row sm:gap-4">
                             <h3 class="font-medium">{{ room.name }}</h3>
-                            <div class="flex gap-2 items-center">
-                                <Badge
-                                    variant="outline"
-                                    class="gap-x-1 place-content-center px-2 h-6 font-normal min-w-16 border-neutral-200"
-                                    >
-                                        ₱{{ room.bed_price_rate }}
-                                    </Badge>
-                                <Badge
-                                    variant="outline"
-                                    class="gap-x-1 place-content-center px-2 h-6 font-normal min-w-16 border-neutral-200"
-                                    :severity="room.eligible_gender === 'male'
-                                            ? 'info'
-                                            : room.eligible_gender === 'female'
-                                            ? 'danger'
-                                            : 'success'"
-                                >
-                                    <Mars
-                                        v-if="room.eligible_gender === 'female'"
-                                        class="size-3.5"
-                                    />
-                                    <Venus
-                                        v-else-if="room.eligible_gender === 'male'"
-                                        class="size-3.5"
-                                    />
-                                    <VenusAndMars v-else class="size-3.5" />
-                                    {{ room.eligible_gender }}
-                                </Badge>
+                            <div class="flex items-center gap-2">
+                                <GenderBadge :gender="room.eligible_gender" />
                                 <Badge
                                     v-if="room.beds"
-                                    class="px-2 h-6 font-normal text-center text-white"
+                                    class="h-6 px-2 font-normal text-center text-white"
                                     :class="
                                         room.beds.length > 0
                                             ? 'bg-green-500 hover:bg-green-600'
