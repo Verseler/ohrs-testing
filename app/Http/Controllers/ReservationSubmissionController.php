@@ -114,17 +114,29 @@ class ReservationSubmissionController extends Controller
 
     private function assignAndGroupBeds(float $totalFemales, float $totalMales, Reservation $reservation): string
     {
+        $totalBedPrice = 0;
+        $lengthOfStay = Carbon::parse($reservation->check_in_date)->diffInDays(Carbon::parse($reservation->check_out_date)) + 1;
+
         $femaleBedsReserved = $this->assignBeds(
             $totalFemales,
             'female',
-            $reservation
+            $reservation,
+            $totalBedPrice
         );
 
         $maleBedsReserved = $this->assignBeds(
             $totalMales,
             'male',
-            $reservation
+            $reservation,
+            $totalBedPrice
         );
+       
+        // Calculate total billing
+        $totalBillingAmount = $totalBedPrice * $lengthOfStay;
+
+        $reservation->total_billing =  $totalBillingAmount;
+        $reservation->remaining_balance =  $totalBillingAmount;
+        $reservation->save();
 
         $bedsReserved = collect(array_merge($femaleBedsReserved, $maleBedsReserved))
             ->groupBy('room.id')
@@ -141,13 +153,11 @@ class ReservationSubmissionController extends Controller
 
 
     // Assign each guest to a bed based on their gender.
-    private function assignBeds(int $count, string $gender, Reservation $reservation): array
+    private function assignBeds(int $count, string $gender, Reservation $reservation, float &$totalBedPrice): array
     {
         $bedsReserved = [];
         $checkInDate = $reservation->check_in_date;
         $checkOutDate = $reservation->check_out_date;
-        $lengthOfStay = Carbon::parse($checkInDate)->diffInDays(Carbon::parse($checkOutDate)) + 1;
-        $totalPrice = 0;
 
         if ($count === 0) {
             return [];
@@ -171,11 +181,11 @@ class ReservationSubmissionController extends Controller
         if ($beds->count() < $count) {
             throw new \Exception("Not enough available beds for {$gender} guests.");
         }
-
+       
         // Calculate total price and assign each guest to a bed
         foreach ($beds as $bed) {
             $room = $bed->room;
-            $totalPrice += $bed->price;
+            $totalBedPrice += $bed->price;
 
             /**
              * If the room currently accepts any gender, update its eligible gender.
@@ -203,13 +213,7 @@ class ReservationSubmissionController extends Controller
 
             $bedsReserved[] = $bed;
         }
-
-        // Update reservation billing
-        $total_billing_amount = $totalPrice * $lengthOfStay;
-        $reservation->total_billing = $total_billing_amount;
-        $reservation->remaining_balance = $total_billing_amount;
-        $reservation->save();
-
+    
         return $bedsReserved;
     }
 
