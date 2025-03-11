@@ -83,7 +83,7 @@ const {
             </div>
 
             <Tooltip>
-                <TooltipTrigger class="absolute top-1 right-1"><Info class="text-primary-500 size-4" /></TooltipTrigger>
+                <TooltipTrigger type="button" class="absolute top-1 right-1"><Info class="text-primary-500 size-4" /></TooltipTrigger>
                 <TooltipContent>
                     <p class="text-sm">
                         Please be advised that, in accordance with our hostel's policy, male and female guests are not permitted to share the same room.
