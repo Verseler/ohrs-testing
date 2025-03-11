@@ -22,6 +22,7 @@ Route::middleware('guest')->group(function () {
 //* Admin Reservation Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
+    Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
 });
 
 //* Rooms

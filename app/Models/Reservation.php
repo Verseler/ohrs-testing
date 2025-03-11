@@ -42,4 +42,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(Office::class, 'host_office_id');
     }
+
+    public function beds()
+    {
+        return $this->belongsToMany(Bed::class, 'reservation_assignments');
+    }
 }

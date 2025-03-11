@@ -31,8 +31,6 @@ export type ReservationWithRoom = {
     guests: Guest[];
     guest_office_id: number;
     host_office_id: number;
-    host_office: Office;
-    guest_office: Office;
 }
 
 

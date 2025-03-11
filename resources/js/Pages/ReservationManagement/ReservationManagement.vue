@@ -1,18 +1,18 @@
 <script setup lang="ts">
-    import { Head, useForm, usePage } from "@inertiajs/vue3";
-    import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-    import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
-    import PageHeader from "@/Components/PageHeader.vue";
-    import { Home, CalendarCheck, Ellipsis, Pencil, FilterX } from "lucide-vue-next";
-    import {
-    Table,
-    TableBody,
-    TableFooter,
-    TableEmpty,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+import { Head, useForm, usePage } from "@inertiajs/vue3";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/Components/ui/breadcrumb";
+import PageHeader from "@/Components/PageHeader.vue";
+import { Home, CalendarCheck, Ellipsis, Pencil, FilterX, Maximize } from "lucide-vue-next";
+import {
+Table,
+TableBody,
+TableFooter,
+TableEmpty,
+TableCell,
+TableHead,
+TableHeader,
+TableRow,
 } from "@/Components/ui/table";
 import {
     Paginator,
@@ -38,6 +38,7 @@ import {
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import { debounce } from "@/lib/utils";
+import { Office } from "@/Pages/OfficeManagement/office.types";
 
 
 const RESERVATIONS_COLUMNS = [
@@ -52,8 +53,13 @@ const RESERVATIONS_COLUMNS = [
     "status",
 ] as const;
 
+type Reservation = Omit<ReservationWithRoom, 'guest_office_id' | 'host_office_id'> & {
+    guest_office: Office;
+    host_office: Office;
+}
+
 type ReservationManagementProps = {
-    reservations: LaravelPagination<ReservationWithRoom>;
+    reservations: LaravelPagination<Reservation>;
     filters: Filters;
 };
 
@@ -61,7 +67,7 @@ const { reservations, filters } = defineProps<ReservationManagementProps>();
 
 const page = usePage<SharedData>();
 
-const selectedReservation = ref<ReservationWithRoom | null>(null);
+const selectedReservation = ref<Reservation | null>(null);
 
 const form = useForm<Filters>({
     status: filters.status,
@@ -82,7 +88,7 @@ const clearFilter = () => {
     form.balance = null;
     form.search = undefined;
     form.sort_by = null;
-    form.sort_order = null;
+    form.sort_order = "asc";
 };
 
 function applyFilter() {
@@ -265,6 +271,15 @@ watch(
                                     </PopoverTrigger>
                                     <PopoverContent class="p-0 max-w-28">
                                         <div class="flex flex-col">
+                                          <PopoverLinkField
+                                                :href="
+                                                    route('reservation.show', {
+                                                        id: reservation.id,
+                                                    })
+                                                "
+                                            >
+                                                <Maximize />Show
+                                            </PopoverLinkField>
                                           <PopoverLinkField
                                                 :href="
                                                     route('reservation.editForm', {

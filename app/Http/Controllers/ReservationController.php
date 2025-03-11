@@ -63,6 +63,21 @@ class ReservationController extends Controller
         ]);
     }
 
+    public function show(int $id)
+    {
+        $reservation = Reservation::with(['guestOffice', 'hostOffice', 'beds.room'])->findOrFail($id);
 
+        return Inertia::render("ReservationManagement/ReservationDetails", [
+            'reservation' => $reservation,
+        ]);
+    }
+
+    public function editForm(int $id)
+    {
+        $reservations = Reservation::findOrFail($id);
+        return Inertia::render('ReservationManagement/EditReservationForm', [
+            'reservation' => $reservations
+        ]);
+    }
 
 }
