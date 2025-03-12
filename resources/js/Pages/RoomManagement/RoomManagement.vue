@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import Badge from "@/Components/ui/badge/Badge.vue";
 import {
-    Bed,
+    Bed as BedIcon,
     Ellipsis,
     FilterX,
     Home,
@@ -53,6 +53,7 @@ import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import type { LaravelPagination, SharedData } from "@/types/index";
 import type {
+    Bed,
     Filters,
     Gender,
     Room,
@@ -69,7 +70,7 @@ import { toast } from "vue-sonner";
 const ROOMS_COLUMNS = [
     "name",
     "eligible_gender",
-    "bed_price_rate",
+    "bed price",
     "beds_count",
     "status",
     "available_beds",
@@ -82,6 +83,18 @@ type RoomManagementProps = {
 
 // Rooms
 const { rooms, filters } = defineProps<RoomManagementProps>();
+
+
+function getBedPrice(beds: Bed[]) {
+    const minPrice = Math.min(...beds.map(bed => bed.price));
+    const maxPrice = Math.max(...beds.map(bed => bed.price));
+
+    if (minPrice === maxPrice) {
+        return `${minPrice}`;
+    }
+
+    return `${minPrice} - ${maxPrice}`;
+}
 
 const page = usePage<SharedData>();
 
@@ -196,7 +209,7 @@ function handleDeleteRoom() {
         </div>
 
         <PageHeader>
-            <template #icon><Bed /></template>
+            <template #icon><BedIcon /></template>
             <template #title>Room Management</template>
         </PageHeader>
 
@@ -232,8 +245,8 @@ function handleDeleteRoom() {
                         <SelectItem value="available_beds">
                             Available Beds
                         </SelectItem>
-                        <SelectItem value="bed_price_rate">
-                            Bed Price Rate
+                        <SelectItem value="bed_price">
+                            Bed Price
                         </SelectItem>
                     </SelectGroup>
                 </SelectContent>
@@ -269,11 +282,12 @@ function handleDeleteRoom() {
                             Eligible Gender
                         </TableHead>
                         <TableHead class="text-white">
-                            Bed Price Rate
+                            Bed Price
                         </TableHead>
                         <TableHead class="text-right"></TableHead>
                     </TableRow>
                 </TableHeader>
+
                 <TableBody>
                     <template v-if="rooms.data.length > 0">
                         <TableRow
@@ -313,7 +327,7 @@ function handleDeleteRoom() {
                                 </Badge>
                             </TableCell>
                             <TableCell>
-                               <span class="text-xs text-neutral-700">₱{{ room.bed_price_rate }}</span>
+                               <span class="text-xs text-neutral-700">₱{{ getBedPrice(room.beds ?? []) }}</span>
                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>

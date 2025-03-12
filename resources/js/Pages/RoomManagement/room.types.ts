@@ -16,7 +16,6 @@ export type Room = {
     id: number;
     name: string;
     eligible_gender: Gender;
-    bed_price_rate: number;
 }
 
 export type BedStatus = 'available' | 'reserved' | 'occupied' | 'maintenance';

@@ -26,8 +26,9 @@ import { watch } from "vue";
 
 const page = usePage<SharedData>();
 
-type CreateRoomForm = Omit<Room, "id"> & {
-    number_of_beds: number
+type CreateRoomForm = Omit<Room, "id" | "bed_prices"> & {
+    number_of_beds: number,
+    bed_price_rate: number
 };
 
 const form: InertiaForm<CreateRoomForm> = useForm({

@@ -45,7 +45,6 @@ const form: InertiaForm<UpsertRoomForm> = useForm({
     name: room?.name,
     eligible_gender: room?.eligible_gender,
     beds: room?.beds,
-    bed_price_rate: room?.bed_price_rate
 });
 
 const bedsLength = computed(() => {
@@ -62,7 +61,7 @@ function addMoreBed() {
     form.beds.push({
         id: Date.now(),
         name: `Bed #${counter.value}`,
-        price: room.bed_price_rate
+        price: form.beds[0].price
     });
 }
 
@@ -139,7 +138,7 @@ function showSubmitConfirmation() {
 
         <form
             @submit.prevent="showSubmitConfirmation"
-            class="space-y-4 max-w-2xl"
+            class="max-w-xl space-y-4"
         >
             <!-- Name Field -->
             <div class="flex flex-col gap-2">
@@ -163,7 +162,7 @@ function showSubmitConfirmation() {
                     v-model="form.eligible_gender"
                     default-value="option-one"
                 >
-                    <div class="flex gap-4 w-full">
+                    <div class="flex w-full gap-4">
                         <RadioButtonCard
                             id="any"
                             value="any"
@@ -194,28 +193,14 @@ function showSubmitConfirmation() {
 
             <!-- Bed Field -->
             <div class="space-y-4">
-                <div class="grid grid-cols-3 gap-x-4">
-                    <!-- Increment and decrement number of bed(s) -->
-                    <div class="col-span-2 space-y-2">
-                        <Label>Number of Bed(s)</Label>
-                        <ValueAdjuster
-                            :value="bedsLength"
-                            :on-decrease="removeLastBed"
-                            :on-increase="addMoreBed"
-                        />
-                    </div>
-
-                    <!-- Bed price rate field -->
-                    <div class="space-y-2">
-                        <Label for="bed-price-rate">Bed Price Rate</Label>
-                        <Input
-                            id="bed-price-rate"
-                            class="w-full"
-                            type="number"
-                            step=".01"
-                            v-model="form.bed_price_rate"
-                        />
-                    </div>
+                <!-- Increment and decrement number of bed(s) -->
+                <div class="space-y-2">
+                    <Label>Number of Bed(s)</Label>
+                    <ValueAdjuster
+                        :value="bedsLength"
+                        :on-decrease="removeLastBed"
+                        :on-increase="addMoreBed"
+                    />
                 </div>
 
                 <Separator class="my-2" />
@@ -234,8 +219,24 @@ function showSubmitConfirmation() {
                         <InputError
                         v-if="(form.errors as any)[`beds.${index}.name`]"
                         >
-                        {{ "Field is required." }}
+                        {{ (form.errors as any)[`beds.${index}.name`] }}
                     </InputError>
+                    </div>
+
+                    <div>
+                        <Input
+                            class="flex-1"
+                            v-model.number="bed.price"
+                            id="bed-rice"
+                            type="number"
+                            step=".01"
+                            :invalid="!!(form.errors as any)[`beds.${index}.price`]"
+                        />
+                        <InputError
+                            v-if="(form.errors as any)[`beds.${index}.price`]"
+                        >
+                            {{ (form.errors as any)[`beds.${index}.price`] }}
+                        </InputError>
                     </div>
 
                     <Button
@@ -258,7 +259,7 @@ function showSubmitConfirmation() {
             <div>
                 <Button
                     type="submit"
-                    class="mt-4 w-full text-md"
+                    class="w-full mt-4 text-md"
                     size="lg"
                     :disabled="form.processing"
                 >
