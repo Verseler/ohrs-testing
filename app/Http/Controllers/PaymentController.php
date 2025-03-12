@@ -118,4 +118,14 @@ class PaymentController extends Controller
             'latestBalance'      => $request->latest_balance
         ]);
     }
+
+    public function paymentHistory(int $id)
+    {   
+        $reservationPaymentHistory = Reservation::where('id', $id)->with('payments')->first();
+
+
+        return Inertia::render('ReservationManagement/ReservationPaymentHistory', [
+            'reservationPaymentHistory'=> $reservationPaymentHistory
+        ]);
+    }
 }

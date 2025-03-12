@@ -41,15 +41,35 @@ export function formatDate(date: Date | string | undefined) {
 }
 
 export function formatDateString(date: string | Date): string {
-    const d = new Date(date);
+    const d = typeof date === 'string' ? new Date(date) : date;
 
     if (isNaN(d.getTime())) {
         console.error("Invalid date input");
         return "";
     }
 
-    const options: Intl.DateTimeFormatOptions = { month: "long", day: "2-digit", year: "numeric" };
-    return d.toLocaleDateString("en-US", options).replace(",", ""); // Remove comma
+    return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+}
+
+export function formatDateTimeString(date: string | Date): string {
+    const d = typeof date === 'string' ? new Date(date) : date;
+
+    if (isNaN(d.getTime())) {
+        console.error("Invalid date input");
+        return "";
+    }
+
+    return d.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
 }
 
 

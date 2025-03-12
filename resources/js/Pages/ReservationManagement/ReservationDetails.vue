@@ -101,7 +101,12 @@ const { reservation } = defineProps<ReservationDetailsProps>();
                     </Badge>
 
                     <div class="ml-auto space-x-2">
-                      
+                        <Link :href="route('reservation.paymentHistory', reservation.id)">
+                            <Button class="bg-yellow-500 hover:bg-yellow-600">
+                                <History class="mr-1" />
+                                Payment History
+                            </Button>
+                        </Link>
                         
                         <Link v-if="reservation.remaining_balance > 0" :href="route('reservation.paymentForm', reservation.id)">
                             <Button>

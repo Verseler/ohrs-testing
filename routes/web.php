@@ -29,8 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/reservations/edit/{reservation}', [ReservationController::class, 'edit'])->name('reservation.edit');
     Route::get('/reservations/payment/receipt', [PaymentController::class, 'paymentReceipt'])->name('reservation.paymentReceipt');
     Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
+    Route::get('/reservations/payment/history/{id}', [PaymentController::class, 'paymentHistory'])->name('reservation.paymentHistory');
     Route::post('/reservations/payment', [PaymentController::class, 'payment'])->name('reservation.payment');
-   
 });
 
 //* Admin Room Management
