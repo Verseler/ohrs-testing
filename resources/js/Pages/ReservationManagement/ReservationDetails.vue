@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ReservationStatus, ReservationWithRoom } from '@/Pages/ReservationManagement/reservations.types'
+import { ReservationStatus, Reservation } from '@/Pages/ReservationManagement/reservations.types'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import type { Office } from '@/Pages/OfficeManagement/office.types'
 import { formatCurrency, formatDateString } from '@/lib/utils'
 import { Badge, BadgeVariants } from '@/Components/ui/badge'
-import { CalendarCheck, CreditCard, Pencil } from 'lucide-vue-next'
+import { CalendarCheck, CreditCard, History, Home, Pencil } from 'lucide-vue-next'
 import { Separator } from '@/Components/ui/separator'
 import PageHeader from '@/Components/PageHeader.vue'
 import { Button } from '@/Components/ui/button'
@@ -19,9 +19,18 @@ CardTitle
 import { capitalize } from 'vue'
 import { Bed, Room } from '@/Pages/RoomManagement/room.types'
 import GenderBadge from '@/Components/GenderBadge.vue'
+import { 
+    Breadcrumb, 
+    BreadcrumbItem, 
+    BreadcrumbLink, 
+    BreadcrumbList, 
+    BreadcrumbSeparator, 
+    BreadcrumbPage 
+} from '@/Components/ui/breadcrumb'
+import BackLink from '@/Components/BackLink.vue'
 
 type ReservationDetailsProps = {
-    reservation: Omit<ReservationWithRoom, 'guest_office_id' | 'host_office_id'> & {
+    reservation: Omit<Reservation, 'guest_office_id' | 'host_office_id'> & {
     guest_office: Office;
     host_office: Office;
     beds: (Bed & {room: Room})[];
@@ -51,6 +60,30 @@ const { reservation } = defineProps<ReservationDetailsProps>();
     <Head title="Reservation Details" />
 
     <AuthenticatedLayout>
+        <div class="flex justify-between min-h-12">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink :href="route('dashboard')">
+                            <Home class="size-4" />
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink :href="route('reservation.list')">
+                            Reservation Management
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Reservation Details</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+
+            <BackLink :href="route('reservation.list')" />
+        </div>
+        
         <PageHeader>
             <template #icon><CalendarCheck /></template>
             <template #title>Reservation Details</template>
@@ -68,16 +101,19 @@ const { reservation } = defineProps<ReservationDetailsProps>();
                     </Badge>
 
                     <div class="ml-auto space-x-2">
-                        <Link :href="route('reservation.editForm', reservation.id)">
-                            <Button class="bg-blue-500 hover:bg-blue-600">
-                                <Pencil class="w-4 h-4 mr-2" />
-                                Edit
+                      
+                        
+                        <Link v-if="reservation.remaining_balance > 0" :href="route('reservation.paymentForm', reservation.id)">
+                            <Button>
+                                <CreditCard class="mr-1" />
+                                Pay Balance
                             </Button>
                         </Link>
+                        
                         <Link :href="route('reservation.editForm', reservation.id)">
-                            <Button>
-                                <CreditCard class="w-4 h-4 mr-2" />
-                                Make a payment
+                            <Button class="bg-blue-500 hover:bg-blue-600">
+                                <Pencil class="mr-1" />
+                                Edit
                             </Button>
                         </Link>
                     </div>
@@ -113,7 +149,12 @@ const { reservation } = defineProps<ReservationDetailsProps>();
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Remaining Balance</p>
-                            <p class="font-medium">₱{{ formatCurrency(reservation.remaining_balance) }}</p>
+                            <p 
+                            class="font-medium"
+                            :class="{
+                                'text-red-500': reservation.remaining_balance > 0,
+                                'text-green-500': reservation.remaining_balance <= 0
+                            }">₱{{ formatCurrency(reservation.remaining_balance) }}</p>
                         </div>
                         </div>
                     </div>
