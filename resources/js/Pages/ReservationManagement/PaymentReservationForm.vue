@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReservationStatus, ReservationWithRoom } from '@/Pages/ReservationManagement/reservations.types'
+import type { ReservationStatus, Reservation } from '@/Pages/ReservationManagement/reservations.types'
 import { ref, watch, capitalize } from 'vue'
 import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
@@ -7,7 +7,7 @@ import { Label } from '@/Components/ui/label'
 import { Badge, BadgeVariants } from '@/Components/ui/badge'
 import { Separator } from '@/Components/ui/separator'
 import { CheckCircleIcon, CircleIcon, CreditCard, Home } from 'lucide-vue-next'
-import { Head, router, useForm, usePage } from '@inertiajs/vue3'
+import { Head, useForm, usePage } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import PageHeader from '@/Components/PageHeader.vue'
 import { formatCurrency, formatDateString } from '@/lib/utils'
@@ -33,7 +33,7 @@ import {
 import BackLink from '@/Components/BackLink.vue'
 
 type ReservationDetailsProps = {
-    reservation: ReservationWithRoom;
+    reservation: Reservation;
 }
 
 const { reservation } = defineProps<ReservationDetailsProps>();
@@ -245,9 +245,9 @@ const page = usePage<SharedData>();
                             v-model.number="form.amount"
                             :max="reservation.remaining_balance" 
                             :invalid="!!form.errors.amount"
-                            class="h-12 mt-1 text-lg ps-7 border-neutral-600"
+                            class="h-12 mt-1 text-lg ps-7 text-primary-900 border-primary-600"
                         />
-                        <span class="absolute text-lg top-2.5 left-2.5 text-neutral-500">₱</span>
+                        <span class="absolute text-lg top-2.5 left-2.5 text-primary-600">₱</span>
                     </div>
                 </div>
                 <div v-if="form.errors.amount" class="text-red-500">

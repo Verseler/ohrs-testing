@@ -19,7 +19,7 @@ import {
     PaginatorButton,
     PaginatorInfo,
 } from "@/Components/ui/paginator";
-import { Filters, ReservationWithRoom } from "@/Pages/ReservationManagement/reservations.types";
+import { Filters, Reservation as ReservationWithBeds } from "@/Pages/ReservationManagement/reservations.types";
 import type { LaravelPagination, SharedData } from "@/types/index";
 import Badge from "@/Components/ui/badge/Badge.vue";
 import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
@@ -53,7 +53,7 @@ const RESERVATIONS_COLUMNS = [
     "status",
 ] as const;
 
-type Reservation = Omit<ReservationWithRoom, 'guest_office_id' | 'host_office_id'> & {
+type Reservation = Omit<ReservationWithBeds, 'guest_office_id' | 'host_office_id'> & {
     guest_office: Office;
     host_office: Office;
 }

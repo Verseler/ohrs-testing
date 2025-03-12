@@ -1,5 +1,4 @@
 import type { Gender } from "@/Pages/RoomManagement/room.types";
-import type { Office } from "@/Pages/OfficeManagement/office.types";
 
 export type Guest = {
     id: number;
@@ -12,7 +11,7 @@ export type Guest = {
 
 export type ReservationStatus = 'pending' | 'canceled' | 'checked_in' | 'checked_out';
 
-export type ReservationWithRoom = {
+export type Reservation = {
     id: number;
     reservation_code: string;
     check_in_date: string;
@@ -32,7 +31,6 @@ export type ReservationWithRoom = {
     guest_office_id: number;
     host_office_id: number;
 }
-
 
 export type Filters = {
     status: ReservationStatus | null;
