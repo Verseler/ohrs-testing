@@ -63,6 +63,9 @@ function downloadConfirmation() {
 }
 
 onMounted(() => {
+    downloadConfirmation();
+
+    //remind guest to download confirmation if ever they have not downloaded it yet
     toast.info("Remember to download your confirmation before leaving.",
             {
                 style: {
