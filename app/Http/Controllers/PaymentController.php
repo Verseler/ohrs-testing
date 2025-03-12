@@ -121,8 +121,11 @@ class PaymentController extends Controller
 
     public function paymentHistory(int $id)
     {   
-        $reservationPaymentHistory = Reservation::where('id', $id)->with('payments')->first();
-
+        $reservationPaymentHistory = Reservation::where('id', $id)
+            ->with(['payments' => function($query) {
+                $query->orderBy('payment_date', 'desc');
+            }])
+            ->first();
 
         return Inertia::render('ReservationManagement/ReservationPaymentHistory', [
             'reservationPaymentHistory'=> $reservationPaymentHistory
