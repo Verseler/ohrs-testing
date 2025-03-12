@@ -1,16 +1,18 @@
 <?php
 
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationSubmissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-//* Guests
+//* All
 Route::get('/', function () {
 return Inertia::render('LandingPage');
 });
+
 
 //* Guest Reservation
 Route::middleware('guest')->group(function () {
@@ -23,9 +25,15 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
     Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
+    Route::get('/reservations/form/{id}', [ReservationController::class, 'editForm'])->name('reservation.editForm');
+    Route::put('/reservations/edit/{reservation}', [ReservationController::class, 'edit'])->name('reservation.edit');
+    Route::get('/reservations/payment/receipt', [PaymentController::class, 'paymentReceipt'])->name('reservation.paymentReceipt');
+    Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
+    Route::post('/reservations/payment', [PaymentController::class, 'payment'])->name('reservation.payment');
+   
 });
 
-//* Rooms
+//* Admin Room Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/rooms', [RoomController::class, 'list'])->name('room.list');
     Route::inertia('/rooms/create', 'RoomManagement/CreateRoom')->name('room.createForm');
@@ -36,7 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-//* Offices
+//* Admin Office Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/offices', [OfficeController::class, 'list'])->name('office.list');
     Route::get('/offices/form/{id?}', [OfficeController::class, 'upsertForm'])->name('office.upsertForm');

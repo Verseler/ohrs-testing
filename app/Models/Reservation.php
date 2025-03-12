@@ -47,4 +47,9 @@ class Reservation extends Model
     {
         return $this->belongsToMany(Bed::class, 'reservation_assignments');
     }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }
