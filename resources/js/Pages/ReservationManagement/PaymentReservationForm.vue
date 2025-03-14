@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { ReservationStatus, Reservation } from '@/Pages/ReservationManagement/reservations.types'
-import { ref, watch, capitalize } from 'vue'
+import type { Reservation } from '@/Pages/ReservationManagement/reservations.types'
+import { ref, watch } from 'vue'
 import { Button } from '@/Components/ui/button'
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
-import { Badge, BadgeVariants } from '@/Components/ui/badge'
 import { Separator } from '@/Components/ui/separator'
 import { CheckCircleIcon, CircleIcon, CreditCard, Home } from 'lucide-vue-next'
 import { Head, useForm, usePage } from '@inertiajs/vue3'
@@ -22,15 +21,16 @@ import {
   } from '@/Components/ui/card'
 import { SharedData } from '@/types'
 import { toast } from 'vue-sonner'
-import { 
-    Breadcrumb, 
-    BreadcrumbItem, 
-    BreadcrumbLink, 
-    BreadcrumbList, 
-    BreadcrumbSeparator, 
-    BreadcrumbPage 
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+    BreadcrumbPage
 } from '@/Components/ui/breadcrumb'
 import BackLink from '@/Components/BackLink.vue'
+import StatusBadge from '@/Components/StatusBadge.vue'
 
 type ReservationDetailsProps = {
     reservation: Reservation;
@@ -70,21 +70,6 @@ const page = usePage<SharedData>();
     }
   });
 
-
-  const getSeverity = (status: ReservationStatus): BadgeVariants["severity"] => {
-    switch (status) {
-      case 'pending':
-        return 'warning'
-      case 'checked_in':
-        return 'success'
-      case 'checked_out':
-        return 'secondary'
-      case 'canceled':
-        return 'danger'
-      default:
-        return 'secondary'
-    }
-  }
 
   //Delete Confirmation Dialog
     const paymentConfirmation = ref(false);
@@ -152,7 +137,7 @@ const page = usePage<SharedData>();
 
             <BackLink :href="route('reservation.show', { id: reservation.id })"  />
         </div>
-        
+
         <PageHeader>
             <template #icon><CreditCard /></template>
             <template #title>Reservation Payment</template>
@@ -172,9 +157,7 @@ const page = usePage<SharedData>();
             <div class="p-4 rounded-lg bg-muted">
                 <div class="flex items-center justify-between mb-4">
                 <h3 class="font-medium">Reservation Summary</h3>
-                <Badge :severity="getSeverity(reservation.status)">
-                        {{  capitalize(reservation.status) }}
-                </Badge>
+                <StatusBadge :status="reservation.status" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 text-sm">
@@ -197,12 +180,12 @@ const page = usePage<SharedData>();
                 </div>
             </div>
 
-         
+
 
             <!-- Payment Options -->
             <template  v-if="reservation.remaining_balance > 0">
                 <Separator />
-                
+
                 <h3 class="mb-4 font-medium">Select Payment Option</h3>
 
                 <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
@@ -243,7 +226,7 @@ const page = usePage<SharedData>();
                         <Input
                             type="number"
                             v-model.number="form.amount"
-                            :max="reservation.remaining_balance" 
+                            :max="reservation.remaining_balance"
                             :invalid="!!form.errors.amount"
                             class="h-12 mt-1 text-lg ps-7 text-primary-900 border-primary-600"
                         />

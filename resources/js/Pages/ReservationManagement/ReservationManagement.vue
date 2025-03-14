@@ -21,7 +21,6 @@ import {
 } from "@/Components/ui/paginator";
 import { Filters, Reservation as ReservationWithBeds } from "@/Pages/ReservationManagement/reservations.types";
 import type { LaravelPagination, SharedData } from "@/types/index";
-import Badge from "@/Components/ui/badge/Badge.vue";
 import { Popover, PopoverContent, PopoverTrigger } from "@/Components/ui/popover";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
@@ -39,6 +38,7 @@ import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import { debounce } from "@/lib/utils";
 import { Office } from "@/Pages/OfficeManagement/office.types";
+import StatusBadge from "@/Components/StatusBadge.vue";
 
 
 const RESERVATIONS_COLUMNS = [
@@ -246,19 +246,7 @@ watch(
                                 {{ reservation.guest_office.name  }}
                             </TableCell>
                             <TableCell>
-                                <Badge
-                                    :severity="
-                                        reservation.status === 'checked_in'
-                                            ? 'success'
-                                            : reservation.status === 'checked_out'
-                                            ? 'secondary'
-                                            : reservation.status === 'canceled'
-                                            ? 'danger'
-                                            : 'warning' //status: pending
-                                    "
-                                >
-                                {{ reservation.status }}
-                                </Badge>
+                               <StatusBadge :status="reservation.status" />
                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>

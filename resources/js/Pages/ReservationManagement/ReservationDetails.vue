@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ReservationStatus, Reservation } from '@/Pages/ReservationManagement/reservations.types'
+import { Reservation } from '@/Pages/ReservationManagement/reservations.types'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import type { Office } from '@/Pages/OfficeManagement/office.types'
 import { formatCurrency, formatDateString } from '@/lib/utils'
-import { Badge, BadgeVariants } from '@/Components/ui/badge'
 import { CalendarCheck, CreditCard, History, Home, Pencil } from 'lucide-vue-next'
 import { Separator } from '@/Components/ui/separator'
 import PageHeader from '@/Components/PageHeader.vue'
@@ -16,43 +15,28 @@ CardContent,
 CardHeader,
 CardTitle
 } from '@/Components/ui/card'
-import { capitalize } from 'vue'
 import { Bed, Room } from '@/Pages/RoomManagement/room.types'
 import GenderBadge from '@/Components/GenderBadge.vue'
-import { 
-    Breadcrumb, 
-    BreadcrumbItem, 
-    BreadcrumbLink, 
-    BreadcrumbList, 
-    BreadcrumbSeparator, 
-    BreadcrumbPage 
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+    BreadcrumbPage
 } from '@/Components/ui/breadcrumb'
 import BackLink from '@/Components/BackLink.vue'
+import StatusBadge from '@/Components/StatusBadge.vue'
 
 type ReservationDetailsProps = {
     reservation: Omit<Reservation, 'guest_office_id' | 'host_office_id'> & {
     guest_office: Office;
     host_office: Office;
     beds: (Bed & {room: Room})[];
-}
+    }
 }
 
 const { reservation } = defineProps<ReservationDetailsProps>();
-
-  const getSeverity = (status: ReservationStatus): BadgeVariants["severity"] => {
-    switch (status) {
-      case 'pending':
-        return 'warning'
-      case 'checked_in':
-        return 'success'
-      case 'checked_out':
-        return 'secondary'
-      case 'canceled':
-        return 'danger'
-      default:
-        return 'secondary'
-    }
-  }
   </script>
 
 
@@ -83,7 +67,7 @@ const { reservation } = defineProps<ReservationDetailsProps>();
 
             <BackLink :href="route('reservation.list')" />
         </div>
-        
+
         <PageHeader>
             <template #icon><CalendarCheck /></template>
             <template #title>Reservation Details</template>
@@ -96,9 +80,7 @@ const { reservation } = defineProps<ReservationDetailsProps>();
                     <div>
                         <p class="font-bold">CODE: <span class="text-lg font-normal">{{ reservation.reservation_code }}</span></p>
                     </div>
-                    <Badge :severity="getSeverity(reservation.status)">
-                        {{  capitalize(reservation.status) }}
-                    </Badge>
+                    <StatusBadge :status="reservation.status" />
 
                     <div class="ml-auto space-x-2">
                         <Link :href="route('reservation.paymentHistory', reservation.id)">
@@ -107,14 +89,14 @@ const { reservation } = defineProps<ReservationDetailsProps>();
                                 Payment History
                             </Button>
                         </Link>
-                        
+
                         <Link v-if="reservation.remaining_balance > 0" :href="route('reservation.paymentForm', reservation.id)">
                             <Button>
                                 <CreditCard class="mr-1" />
                                 Pay Balance
                             </Button>
                         </Link>
-                        
+
                         <Link :href="route('reservation.editForm', reservation.id)">
                             <Button class="bg-blue-500 hover:bg-blue-600">
                                 <Pencil class="mr-1" />
@@ -154,7 +136,7 @@ const { reservation } = defineProps<ReservationDetailsProps>();
                         </div>
                         <div>
                             <p class="text-sm text-muted-foreground">Remaining Balance</p>
-                            <p 
+                            <p
                             class="font-medium"
                             :class="{
                                 'text-red-500': reservation.remaining_balance > 0,
