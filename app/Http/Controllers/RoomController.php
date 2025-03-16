@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bed;
+use App\Models\EligibleGenderSchedule;
 use App\Models\ReservationAssignments;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -216,24 +216,23 @@ class RoomController extends Controller
               ->where('check_out_date', '>=', $date)
               ->whereNotIn('status', ['canceled', 'checked_out']);
     })->pluck('bed_id');
-
+  
     // Get all rooms with their beds
-    $rooms = Room::with('beds')->get()->map(function (Room $room) use ($reservedBedIds) {
-        //get all available beds of the current room
-        $beds = $room->beds
-            ->whereNotIn('id', $reservedBedIds)
-            ->map(function (Bed $bed) use ($room) {
-                return $bed;
-            })
-            ->toArray();
+    $rooms = Room::with('beds', 'eligibleGenderSchedules')->get()->map(function (Room $room) use ($reservedBedIds, $date) {
+        $eligibleGenderSchedule = EligibleGenderSchedule::where('room_id', $room->id)->where('start_date', '<=', $date)->where('end_date', '>=', $date)->first();
+        $roomEligibleGender = $eligibleGenderSchedule->eligible_gender ?? $room->eligible_gender;
 
+        //get all available beds of the current room
+        $bedCount = $room->beds
+            ->whereNotIn('id', $reservedBedIds)
+            ->count();
 
         //structure the data so that we get the room with its available beds
         return [
             'id' => $room->id,
             'name' => $room->name,
-            'eligible_gender' => $room->eligible_gender,
-            'beds' => array_values($beds)
+            'eligible_gender' => $roomEligibleGender,
+            'beds_count' => $bedCount
         ];
     });
 

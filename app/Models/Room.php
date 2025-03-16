@@ -25,4 +25,17 @@ class Room extends Model
     {
         return $this->belongsTo(Office::class);
     }
+
+    public function EligibleGenderSchedules()
+    {
+        return $this->hasMany(EligibleGenderSchedule::class);
+    }
+
+    public function availableBeds($checkInDate, $checkOutDate)
+    {
+        return $this->beds()->whereDoesntHave('reservationAssignments.reservation', function ($query) use ($checkInDate, $checkOutDate) {
+            $query->where('check_in_date', '<', $checkOutDate)
+                  ->where('check_out_date', '>', $checkInDate);
+        });
+    }
 }

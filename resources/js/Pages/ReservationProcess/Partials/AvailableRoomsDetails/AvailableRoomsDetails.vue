@@ -1,18 +1,18 @@
 <script setup lang="ts">
+import AvailableRoomCard from "@/Pages/ReservationProcess/Partials/AvailableRoomsDetails/AvailableRoomCard.vue";
 import AvailableRoomCalendar from "@/Pages/ReservationProcess/Partials/AvailableRoomCalendar.vue";
-import type { Bed, RoomWithBedCounts } from "@/Pages/RoomManagement/room.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { VenusAndMars, Venus, Mars } from "lucide-vue-next";
-import { Badge } from "@/Components/ui/badge";
+import type { RoomWithBedCounts } from "@/Pages/RoomManagement/room.types";
 import { onMounted, ref, watch } from "vue";
 import { formatDate } from "@/lib/utils";
 import { toast } from "vue-sonner";
 import axios from "axios";
-import GenderBadge from "@/Components/GenderBadge.vue";
 
 const selectedDate = ref<Date | null>(new Date());
 
-const availableRooms = ref<RoomWithBedCounts[]>([]);
+const availableRooms = ref<(Omit<RoomWithBedCounts, 'beds'> & {
+        beds_count: number;
+    })[]>([]);
 
 async function getAvailableRooms(date: Date | null) {
     if(!date) return;
@@ -53,34 +53,16 @@ watch(() => selectedDate.value, (newDate) => {
         <CardContent>
             <div class="space-y-4">
                 <template v-if="availableRooms && availableRooms.length > 0">
-                    <div
-                    v-for="room in availableRooms"
-                    :key="room.id"
-                    class="overflow-hidden border rounded-lg"
-                    >
-                        <div class="flex flex-col gap-1 p-4 sm:flex-row lg:flex-row sm:gap-4">
-                            <h3 class="font-medium">{{ room.name }}</h3>
-                            <div class="flex items-center gap-2">
-                                <GenderBadge :gender="room.eligible_gender" />
-                                <Badge
-                                    v-if="room.beds"
-                                    class="h-6 px-2 font-normal text-center text-white"
-                                    :class="
-                                        room.beds.length > 0
-                                            ? 'bg-green-500 hover:bg-green-600'
-                                            : 'bg-red-500 hover:bg-red-600'
-                                    "
-                                >
-                                    <span v-if="room.beds.length > 0">
-                                        {{ room.beds.length }} available
-                                    </span>
-                                    <span v-else>fully booked</span>
-                                </Badge>
-                            </div>
-                        </div>
-                    </div>
+                    <AvailableRoomCard
+                        v-for="room in availableRooms"
+                        :key="room.id"
+                        :room="room"
+                    />
                 </template>
 
+                <div v-else class="py-5 text-sm font-normal text-center text-neutral-100">
+                    <p>No available rooms/beds</p>
+                </div>
                 <div v-else class="py-5 text-sm font-normal text-center text-neutral-100">
                     <p>No available rooms/beds</p>
                 </div>
