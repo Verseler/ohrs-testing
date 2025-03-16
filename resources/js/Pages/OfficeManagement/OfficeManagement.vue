@@ -43,7 +43,7 @@ import {
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import type { LaravelPagination } from "@/types/index";
-import { Office, Filters } from "@/Pages/OfficeManagement/office.types";
+import { Office, Filters, Region } from "@/Pages/OfficeManagement/office.types";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
@@ -53,29 +53,32 @@ import { debounce } from "@/lib/utils";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
 const OFFICES_COLUMNS = [
+    'region',
     "name",
-    "has_hostel"
 ] as const;
 
 type OfficeManagementProps = {
     offices: LaravelPagination<Office>;
     filters: Filters;
+    regions: Region[];
 };
 
-const { offices, filters } = defineProps<OfficeManagementProps>();
+const { offices, filters, regions } = defineProps<OfficeManagementProps>();
 
 const selectedOffice = ref<Office | null>(null);
 
 const form = useForm<Filters>({
+    region_id: filters.region_id,
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
-const formHasValue = computed(() => form.search || form.sort_by);
+const formHasValue = computed(() => form.region_id || form.search || form.sort_by);
 
 //Room Filter
 function clearFilter() {
+    form.region_id = undefined;
     form.search = undefined;
     form.sort_by = undefined;
     form.sort_order = "asc";
@@ -91,6 +94,7 @@ function applyFilter() {
 
 watch(
     [
+        () => form.region_id,
         () => form.search,
         () => form.sort_by,
         () => form.sort_order,
@@ -151,15 +155,33 @@ function handleDeleteOffice() {
 
         <!-- Search, Filter and Sort -->
         <div class="flex gap-x-2 mb-2">
-            <Select v-model="form.sort_by as string">
+            <Select v-model="form.region_id">
+                <SelectTrigger class="w-40">
+                    <SelectValue placeholder="Select a region" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectLabel>Region</SelectLabel>
+                        <SelectItem
+                        v-for="region in regions"
+                        :key="region.id"
+                        :value="region.id"
+                        >
+                            {{ region.name }}
+                        </SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+
+            <Select v-model="form.sort_by">
                 <SelectTrigger class="w-40">
                     <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>Sort by</SelectLabel>
+                        <SelectItem value="region_id"> Region </SelectItem>
                         <SelectItem value="name"> Name </SelectItem>
-                        <SelectItem value="has_hostel"> Has Hostel </SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -182,8 +204,8 @@ function handleDeleteOffice() {
             <Table>
                 <TableHeader>
                     <TableRow class="bg-primary-500 hover:bg-primary-600">
+                        <TableHead class="text-white"> Region </TableHead>
                         <TableHead class="text-white"> Name </TableHead>
-                        <TableHead class="text-white"> Has Hostel </TableHead>
                         <TableHead class="text-right"></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -194,19 +216,12 @@ function handleDeleteOffice() {
                             :key="office.id"
                             class="text-neutral-800"
                         >
-                            <TableCell class="font-medium">
+                            <TableCell>
+                                {{ office.region.name }}
+                             </TableCell>
+                             <TableCell class="font-medium">
                                 {{ office.name }}
                             </TableCell>
-                            <TableCell>
-                                <Badge
-                                    :severity=" office.has_hostel
-                                            ? 'success'
-                                            : 'secondary'
-                                    "
-                                >
-                                 {{ office.has_hostel ? "Yes" : "No" }}
-                                </Badge>
-                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>
                                     <PopoverTrigger as-child>

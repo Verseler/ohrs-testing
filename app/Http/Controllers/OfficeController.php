@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Office;
-use Brick\Math\BigInteger;
+use App\Models\Region;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,43 +11,55 @@ class OfficeController extends Controller
 {
     public function list(Request $request)
     {
-        $query = Office::query();
+        $query = Office::query()->with('region');
 
         // Search Filter
         if ($request->filled('search')) {
             $query->where('name', 'ILIKE', "%{$request->search}%");
         }
 
+        // Region Filter
+        if ($request->filled('region_id')) {
+            $query->where('region_id', $request->region_id);
+        }
+
         // Sorting
         if ($request->filled('sort_by')) {
-            $sortBy = in_array($request->sort_by, ['name', 'has_hostel']) ? $request->sort_by : 'name';
+            $sortBy = in_array($request->sort_by, ['name']) ? $request->sort_by : 'name';
             $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
             $query->orderBy($sortBy, $sortOrder);
         }
 
         $offices = $query->paginate(10)->withQueryString();
-
+        $regions = Region::all();
 
         return Inertia::render("OfficeManagement/OfficeManagement", [
             'offices' => $offices,
-            'filters'=> $request->only(['search', 'has_hostel', 'sort_by', 'sort_order'])
+            'regions'=> $regions,
+            'filters'=> $request->only(['search', 'has_hostel', 'sort_by', 'sort_order', 'region_id'])
         ]);
     }
 
     public function upsertForm(?int $id = null)
     {
         $office = Office::find($id);
+        $regions = Region::all();
         return Inertia::render("OfficeManagement/UpsertOffice", [
-            'office' => $office
+            'office' => $office,
+            'regions' => $regions
         ]);
     }
 
     public function upsert(Request $request)
     {
         $validated = $request->validate([
+            'region_id' => 'required|exists:regions,id',
             'name' => 'required|string|max:255',
             'has_hostel' => 'required|boolean',
         ]);
+
+        //verify if selected region exists
+        Region::findOrFail($validated['region_id']);
 
         $office = Office::find($request->id);
         if (!$office) {
@@ -55,6 +67,7 @@ class OfficeController extends Controller
         }
 
 
+        $office->region_id = $validated['region_id'];
         $office->name = $validated['name'];
         $office->has_hostel = $validated['has_hostel'];
         $office->save();

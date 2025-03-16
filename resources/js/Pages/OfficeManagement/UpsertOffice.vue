@@ -17,9 +17,15 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import {  Home, Hotel } from "lucide-vue-next";
 import { Button } from "@/Components/ui/button";
-import { Office } from "@/Pages/OfficeManagement/office.types";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import type { Office, Region } from "@/Pages/OfficeManagement/office.types";
 
-const { office } = defineProps<{ office: Office | null }>();
+type UpsertOfficeProps = {
+    office: Office | null;
+    regions: Region[];
+}
+
+const { office, regions } = defineProps<UpsertOfficeProps>();
 
 
 type UpsertOfficeForm = Pick<Office, "name" | "has_hostel">;
@@ -27,6 +33,7 @@ type UpsertOfficeForm = Pick<Office, "name" | "has_hostel">;
 const form: InertiaForm<UpsertOfficeForm> = useForm({
     id: office?.id ?? null,
     name: office?.name ?? '',
+    region_id: office?.region_id ?? null,
     has_hostel: office?.has_hostel ?? false
 });
 
@@ -84,6 +91,31 @@ function showSubmitConfirmation() {
 
                 <InputError v-if="form.errors.name">
                     {{ form.errors.name }}
+                </InputError>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <Label for="name">Region</Label>
+                <Select v-model="form.region_id" :invalid="!!form.errors.region_id">
+                <SelectTrigger class="w-full h-10">
+                    <SelectValue placeholder="Select a region" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectLabel>Region</SelectLabel>
+                        <SelectItem
+                        v-for="region in regions"
+                        :key="region.id"
+                        :value="region.id"
+                        >
+                            {{ region.name }}
+                        </SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
+
+                <InputError v-if="form.errors.region_id">
+                    {{ form.errors.region_id }}
                 </InputError>
             </div>
 
