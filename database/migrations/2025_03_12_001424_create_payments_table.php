@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->decimal('amount');
-            $table->dateTimeTz('payment_date');
             $table->string('or_number')->unique();
+            $table->date('or_date');
+            $table->string('transaction_id')->unique();
+            $table->enum('payment_method', ['cash','online']);
             $table->foreignId('reservation_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

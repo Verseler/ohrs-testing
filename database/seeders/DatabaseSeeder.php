@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
        $this->call([
         RegionSeeder::class,
         OfficeSeeder::class,
-        RoomSeeder::class,
-        BedSeeder::class
+        //RoomSeeder::class,
+        //BedSeeder::class
     ]);
 
         User::factory()->create([

@@ -12,18 +12,15 @@ class Payment extends Model
 
     protected $fillable = [
         "amount",
-        "payment_date",
+        "payment_method",
+        "transaction_id",
         "or_number",
+        "or_date",
         "reservation_id",
     ];
 
     public function reservation()
     {
         return $this->belongsTo(Reservation::class);
-    }
-
-    public function orNumber()
-    {
-        return $this->belongsTo(ORNumber::class, 'or_number', 'or_number');
     }
 }

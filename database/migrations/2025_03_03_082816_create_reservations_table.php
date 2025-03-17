@@ -16,17 +16,17 @@ return new class extends Migration {
             $table->date('check_in_date');
             $table->date('check_out_date');
             $table->double('remaining_balance');
-            $table->double('total_billing');
-            $table->enum('status', allowed: ['pending', 'canceled', 'checked_in', 'checked_out'])->default('pending');
+            $table->double('total_billings');
+            $table->enum('status', allowed: ['pending', 'confirmed', 'canceled', 'checked_in', 'checked_out'])->default('pending');
+            $table->enum('payment_type', ['full_payment', 'pay_later']);
             $table->string('first_name');
             $table->string('middle_initial')->nullable();
             $table->string('last_name');
             $table->string('phone');
-            $table->string('email')->nullable();
+            $table->string('email');
             $table->foreignId('guest_office_id')->constrained('offices')->cascadeOnDelete();
-            $table->foreignId('host_office_id')->constrained('offices')->cascadeOnDelete();
-            //Employee ID image
-            $table->string('employee_identification');
+            $table->foreignId('hostel_office_id')->constrained('offices')->cascadeOnDelete();
+            $table->string('employee_id');
             $table->text('purpose_of_stay')->nullable();
             $table->timestamps();
         });

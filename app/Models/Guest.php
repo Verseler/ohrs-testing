@@ -23,18 +23,13 @@ class Guest extends Model
         return $this->belongsTo(Office::class);
     }
 
-    public function bed()
-    {
-        return $this->belongsTo(Bed::class);
-    }
-
     public function reservation()
     {
         return $this->belongsTo(Reservation::class);
     }
 
-    public function reservationAssignments()
+    public function GuestBeds()
     {
-        return $this->hasMany(ReservationAssignments::class);
+        return $this->hasMany(GuestBeds::class);
     }
 }

@@ -21,13 +21,8 @@ class Bed extends Model
         return $this->belongsTo(Room::class);
     }
 
-    public function reservationAssignments()
+    public function GuestBeds()
     {
-        return $this->hasMany(ReservationAssignments::class);
-    }
-
-    public function guest()
-    {
-        return $this->hasOne(Guest::class);
+        return $this->hasMany(GuestBeds::class);
     }
 }
