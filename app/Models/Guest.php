@@ -29,7 +29,7 @@ class Guest extends Model
         return $this->belongsTo(Reservation::class);
     }
 
-    public function GuestBeds()
+    public function guestBeds()
     {
         return $this->hasMany(GuestBeds::class);
     }
