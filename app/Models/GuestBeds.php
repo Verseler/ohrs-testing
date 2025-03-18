@@ -10,11 +10,11 @@ class GuestBeds extends Model
 
     public function guest()
     {
-        return $this->belongsTo(GuestBeds::class);
+        return $this->belongsTo(Guest::class);
     }
 
     public function bed()
     {
-        return $this->belongsTo(GuestBeds::class);
+        return $this->belongsTo(Bed::class);
     }
 }

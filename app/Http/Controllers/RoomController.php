@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EligibleGenderSchedule;
-use App\Models\ReservationAssignments;
+use App\Models\GuestBeds;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -27,10 +27,12 @@ class RoomController extends Controller
         $date = $request->selected_date ? Carbon::parse($request->selected_date) : Carbon::today();
 
         // Get all beds reserved for the selected date
-        $reservedBedIds = ReservationAssignments::whereHas('reservation', function ($query) use ($date) {
+        $reservedBedIds = GuestBeds::whereHas('guest', function ($query) use ($date) {
+            $query->whereHas('reservation', function ($query) use ($date) {
             $query->where('check_in_date', '<=', $date)
                 ->where('check_out_date', '>=', $date)
                 ->whereNotIn('status', ['canceled', 'checked_out']);
+            });
         })->pluck('bed_id');
 
         $query = Room::withCount([
@@ -73,7 +75,7 @@ class RoomController extends Controller
 
         $rooms = $query->paginate(10)->withQueryString();
 
-        return Inertia::render("RoomManagement/RoomManagement", [
+        return Inertia::render("Admin/Room/RoomManagement", [
             'rooms' => $rooms,
             'filters' => $request->only(['selected_date', 'search', 'eligible_gender', 'status', 'sort_by', 'sort_order'])
         ]);
@@ -115,7 +117,7 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
 
         // Check if any beds in this room have future reservations
-        $hasFutureReservations = $room->beds()->whereHas('reservationAssignments.reservation', function($query) {
+        $hasFutureReservations = $room->beds()->whereHas('guestBeds.guest.reservation', function($query) {
             $query->where('check_out_date', '>=', Carbon::today());
         })->exists();
 
@@ -133,7 +135,7 @@ class RoomController extends Controller
     public function editForm($id)
     {
         $room = Room::with(['beds'])->findOrFail($id);
-        return Inertia::render('RoomManagement/EditRoom', ['room' => $room]);
+        return Inertia::render('Admin/Room/EditRoom', ['room' => $room]);
     }
 
 
@@ -211,12 +213,8 @@ class RoomController extends Controller
     $date = Carbon::parse($validated['selected_date']);
 
     // Get all beds with active reservations for the target date
-    $reservedBedIds = ReservationAssignments::whereHas('reservation', function ($query) use ($date) {
-        $query->where('check_in_date', '<=', $date)
-              ->where('check_out_date', '>=', $date)
-              ->whereNotIn('status', ['canceled', 'checked_out']);
-    })->pluck('bed_id');
-  
+    $reservedBedIds = GuestBeds::reservedOnDate($date)->pluck('bed_id');
+
     // Get all rooms with their beds
     $rooms = Room::with('beds', 'eligibleGenderSchedules')->get()->map(function (Room $room) use ($reservedBedIds, $date) {
         $eligibleGenderSchedule = EligibleGenderSchedule::where('room_id', $room->id)->where('start_date', '<=', $date)->where('end_date', '>=', $date)->first();

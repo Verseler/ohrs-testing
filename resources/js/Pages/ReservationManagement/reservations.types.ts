@@ -1,4 +1,4 @@
-import type { Gender } from "@/Pages/RoomManagement/room.types";
+import type { Gender } from "@/Pages/Admin/Room/room.types";
 
 export type Guest = {
     id: number;

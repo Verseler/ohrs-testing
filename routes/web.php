@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //* Admin Room Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/rooms', [RoomController::class, 'list'])->name('room.list');
-    Route::inertia('/rooms/create', 'RoomManagement/CreateRoom')->name('room.createForm');
+    Route::inertia('/rooms/create', 'Admin/Room/CreateRoom')->name('room.createForm');
     Route::post('/rooms/create', [RoomController::class, 'create'])->name('room.create');
     Route::get('/rooms/edit/{id}', [RoomController::class, 'editForm'])->name('room.editForm');
     Route::put('/rooms/edit/{room}', [RoomController::class, 'edit'])->name('room.edit');

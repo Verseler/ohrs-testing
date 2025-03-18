@@ -54,11 +54,11 @@ import Searchbox from "@/Components/Searchbox.vue";
 import type { LaravelPagination, SharedData } from "@/types/index";
 import type {
     Bed,
-    Filters,
+    RoomFilters,
     Gender,
     Room,
     RoomWithBedCounts,
-} from "@/Pages/RoomManagement/room.types";
+} from "@/Pages/Admin/Room/room.types";
 import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
@@ -66,6 +66,7 @@ import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import { debounce, formatDate } from "@/lib/utils";
 import { toast } from "vue-sonner";
+import DatePicker from '@/Components/DatePicker.vue';
 
 const ROOMS_COLUMNS = [
     "name",
@@ -78,16 +79,15 @@ const ROOMS_COLUMNS = [
 
 type RoomManagementProps = {
     rooms: LaravelPagination<RoomWithBedCounts>;
-    filters: Filters;
+    filters: RoomFilters;
 };
 
 // Rooms
 const { rooms, filters } = defineProps<RoomManagementProps>();
 
-
 function getBedPrice(beds: Bed[]) {
-    const minPrice = Math.min(...beds.map(bed => bed.price));
-    const maxPrice = Math.max(...beds.map(bed => bed.price));
+    const minPrice = Math.min(...beds.map((bed) => bed.price));
+    const maxPrice = Math.max(...beds.map((bed) => bed.price));
 
     if (minPrice === maxPrice) {
         return `${minPrice}`;
@@ -100,7 +100,7 @@ const page = usePage<SharedData>();
 
 const selectedRoom = ref<Room | null>(null);
 
-const form = useForm<Filters>({
+const form = useForm<RoomFilters>({
     selected_date: filters.selected_date ?? formatDate(new Date()),
     search: filters.search,
     eligible_gender: filters.eligible_gender,
@@ -115,7 +115,7 @@ const formHasValue = computed(
 //Room Filter
 const clearFilter = () => {
     form.search = undefined;
-    form.eligible_gender = null;;
+    form.eligible_gender = null;
     form.sort_by = null;
     form.sort_order = "asc";
 };
@@ -168,7 +168,6 @@ watch(
     }
 );
 
-
 function handleDeleteRoom() {
     if (!selectedRoom.value) return;
 
@@ -179,7 +178,7 @@ function handleDeleteRoom() {
         onSuccess: () => {
             deleteConfirmation.value = false;
             selectedRoom.value = null;
-        }
+        },
     });
 }
 </script>
@@ -215,7 +214,11 @@ function handleDeleteRoom() {
 
         <!-- Search, Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
-            <input class="py-0 text-sm rounded shadow-sm border-neutral-200" type="date" v-model="form.selected_date" />
+            <input
+                class="py-0 text-sm rounded shadow-sm border-neutral-200"
+                type="date"
+                v-model="form.selected_date"
+            />
             <Select v-model="form.eligible_gender as Gender">
                 <SelectTrigger class="w-40">
                     <SelectValue placeholder="Select a gender" />
@@ -245,9 +248,7 @@ function handleDeleteRoom() {
                         <SelectItem value="available_beds">
                             Available Beds
                         </SelectItem>
-                        <SelectItem value="bed_price">
-                            Bed Price
-                        </SelectItem>
+                        <SelectItem value="bed_price"> Bed Price </SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -275,15 +276,11 @@ function handleDeleteRoom() {
                         <TableHead class="text-white">
                             Available Beds
                         </TableHead>
-                        <TableHead class="text-white">
-                            Status
-                        </TableHead>
+                        <TableHead class="text-white"> Status </TableHead>
                         <TableHead class="text-white">
                             Eligible Gender
                         </TableHead>
-                        <TableHead class="text-white">
-                            Bed Price
-                        </TableHead>
+                        <TableHead class="text-white"> Bed Price </TableHead>
                         <TableHead class="text-right"></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -302,15 +299,21 @@ function handleDeleteRoom() {
                             <TableCell>{{ room.available_beds }}</TableCell>
                             <TableCell>
                                 <Badge
-                                    v-if="room.available_beds !== null && room.available_beds !== undefined"
+                                    v-if="
+                                        room.available_beds !== null &&
+                                        room.available_beds !== undefined
+                                    "
                                     :severity="
                                         room.available_beds <= 0
                                             ? 'danger'
                                             : 'success'
                                     "
                                 >
-
-                                {{ room.available_beds <= 0 ? 'Fully Occupied' : 'Available' }}
+                                    {{
+                                        room.available_beds <= 0
+                                            ? "Fully Occupied"
+                                            : "Available"
+                                    }}
                                 </Badge>
                             </TableCell>
                             <TableCell>
@@ -327,7 +330,9 @@ function handleDeleteRoom() {
                                 </Badge>
                             </TableCell>
                             <TableCell>
-                               <span class="text-xs text-neutral-700">₱{{ getBedPrice(room.beds ?? []) }}</span>
+                                <span class="text-xs text-neutral-700"
+                                    >₱{{ getBedPrice(room.beds ?? []) }}</span
+                                >
                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>

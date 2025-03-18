@@ -1,11 +1,11 @@
-export type Gender = 'any' | 'male' | 'female';
+import { Gender } from '@/Pages/Guest/guest.types';
 
 export type RoomStatus = 'available' | 'fully_occupied' | 'maintenance';
 
 export type SortBy = 'beds_count' | 'available_beds' & keyof Pick<Room, 'eligible_gender' | 'name'>
 
-export type Filters = {
-    selected_date?: Date | string | null;
+export type RoomFilters = {
+    selected_date?: Date | string | null | undefined;
     search?: string | undefined;
     eligible_gender?: RoomStatus | null;
     sort_by?: SortBy | null;
