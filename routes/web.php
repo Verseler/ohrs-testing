@@ -11,7 +11,7 @@ use Inertia\Inertia;
 
 //* All
 Route::get('/', function () {
-return Inertia::render('LandingPage');
+    return Inertia::render('LandingPage');
 });
 
 
@@ -27,12 +27,13 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
     Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
-    Route::get('/reservations/form/{id}', [ReservationController::class, 'editForm'])->name('reservation.editForm');
-    Route::put('/reservations/edit/{reservation}', [ReservationController::class, 'edit'])->name('reservation.edit');
     Route::get('/reservations/payment/receipt', [PaymentController::class, 'paymentReceipt'])->name('reservation.paymentReceipt');
     Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
     Route::get('/reservations/payment/history/{id}', [PaymentController::class, 'paymentHistory'])->name('reservation.paymentHistory');
     Route::post('/reservations/payment', [PaymentController::class, 'payment'])->name('reservation.payment');
+    Route::get('/reservations/extend/{id}', [ReservationController::class, 'extendForm'])->name('reservation.extendForm');
+    Route::get('reservations/edit-status/{id}', [ReservationController::class, 'editStatusForm'])->name('reservation.editStatusForm');
+    Route::get('reservations/edit-bed-assignment/{id}', [ReservationController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');
 });
 
 //* Admin Room Management

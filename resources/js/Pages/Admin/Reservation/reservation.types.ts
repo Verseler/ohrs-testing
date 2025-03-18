@@ -1,15 +1,20 @@
-import { Guest } from '@/Pages/Guest/guest.types';
+import type { Guest } from '@/Pages/Guest/guest.types';
+import type { Bed, Room } from '@/Pages/Admin/Room/room.types';
+import type { Office } from '@/Pages/Admin/Office/office.types';
 
 export type ReservationStatus = 'pending' | 'canceled' | 'checked_in' | 'checked_out';
+
+export type PaymentType = 'full_payment' | 'pay_later'
 
 export type Reservation = {
     id: number;
     reservation_code: string;
     check_in_date: string;
     check_out_date: string;
-    total_billing: number;
     remaining_balance: number;
+    total_billings: number;
     status: ReservationStatus;
+    payment_type: PaymentType;
     first_name: string;
     middle_initial: string | null;
     last_name: string;
@@ -20,4 +25,22 @@ export type Reservation = {
     guests: Guest[];
     guest_office_id: number;
     hostel_office_id: number;
+    reserved_beds: Bed[]
 }
+
+export type ReservationFilters = {
+    status: ReservationStatus | null;
+    balance: 'paid' | 'has_balance' | null;
+    search: string | undefined;
+    sort_by: string | null;
+    sort_order: 'asc' | 'desc' | null;
+}
+
+export type ReservationWithBeds = Omit<
+    Reservation,
+    "guest_office_id" | "host_office_id"
+> & {
+    guest_office: Office;
+    hostel_office: Office;
+    beds: (Bed & { room: Room })[];
+};

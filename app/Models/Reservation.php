@@ -31,7 +31,7 @@ class Reservation extends Model
 
     public function guests()
     {
-        return $this->belongsToMany(Guest::class, 'reservation_assignments');
+        return $this->hasMany(Guest::class);
     }
 
     public function guestOffice()
@@ -39,9 +39,9 @@ class Reservation extends Model
         return $this->belongsTo(Office::class, 'guest_office_id');
     }
 
-    public function hostOffice()
+    public function hostelOffice()
     {
-        return $this->belongsTo(Office::class, 'host_office_id');
+        return $this->belongsTo(Office::class, 'hostel_office_id');
     }
 
     public function beds()
@@ -52,5 +52,10 @@ class Reservation extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function reservedBeds()
+    {
+        return $this->hasManyThrough(Bed::class, GuestBeds::class, 'guest_id', 'id', 'id', 'bed_id');
     }
 }
