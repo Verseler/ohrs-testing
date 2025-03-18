@@ -55,9 +55,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-//* Admins
+//* Other Admin pages
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('/dashboard', 'Dashboard')->name('dashboard');
+    Route::inertia('/dashboard', 'Admin/Dashboard/Dashboard')->name('dashboard');
 });
 
 require __DIR__ . '/auth.php';
