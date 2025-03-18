@@ -55,10 +55,10 @@ import type { LaravelPagination, SharedData } from "@/types/index";
 import type {
     Bed,
     RoomFilters,
-    Gender,
     Room,
     RoomWithBedCounts,
 } from "@/Pages/Admin/Room/room.types";
+import type { Gender } from "@/Pages/Guest/guest.types";
 import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
