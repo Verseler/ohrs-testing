@@ -15,7 +15,7 @@ class PaymentController extends Controller
     public function paymentForm($id)
     {
         $reservation = Reservation::findOrFail($id);
-        return Inertia::render('Admin/Reservation/PaymentForm/PaymentForm', [
+        return Inertia::render('Admin/Payment/PaymentForm/PaymentForm', [
             'reservation' => $reservation
         ]);
     }
@@ -90,7 +90,7 @@ class PaymentController extends Controller
 
     public function paymentReceipt(Request $request)
     {
-        return Inertia::render('Admin/Reservation/PaymentReceipt', [
+        return Inertia::render('Admin/Payment/PaymentReceipt', [
             'hostel' => $request->hostel,
             'paymentReceipt' => $request->payment_receipt,
             'dateIssued' => $request->date_issued,
@@ -114,7 +114,7 @@ class PaymentController extends Controller
             ])
             ->first();
 
-        return Inertia::render('Admin/Reservation/ReservationPaymentHistory/ReservationPaymentHistory', [
+        return Inertia::render('Admin/Payment/ReservationPaymentHistory/ReservationPaymentHistory', [
             'reservationPaymentHistory' => $reservationPaymentHistory
         ]);
     }

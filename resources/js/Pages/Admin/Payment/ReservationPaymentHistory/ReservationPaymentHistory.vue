@@ -29,14 +29,14 @@ import {
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import type { Payment } from "@/Pages/PaymentHistoryManagement/payment.types";
+import type { Payment } from "@/Pages/Admin/Payment/payment.types";
 import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import {
     formatCurrency,
     formatDateString,
     formatDateTimeString,
 } from "@/lib/utils";
-import AmountCard from "@/Pages/Admin/Reservation/ReservationPaymentHistory/Partials/AmountCard.vue";
+import AmountCard from "@/Pages/Admin/Payment/ReservationPaymentHistory/Partials/AmountCard.vue";
 
 type ReservationPaymentHistoryProps = {
     reservationPaymentHistory: Reservation & {
