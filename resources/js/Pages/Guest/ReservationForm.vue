@@ -1,19 +1,11 @@
 <script setup lang="ts">
-import AvailableRoomsDetails from "@/Pages/ReservationProcess/Partials/AvailableRoomsDetails/AvailableRoomsDetails.vue";
-import type { Office } from "@/Pages/OfficeManagement/office.types";
-import { Table, TableRow, TableCell } from "@/Components/ui/table";
-import { Input, InputError } from "@/Components/ui/input";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
-import DatePicker from "@/Components/DatePicker.vue";
-import GuestField from "@/Components/GuestField.vue";
-import { Textarea } from "@/Components/ui/textarea";
-import { Toaster } from "@/Components/ui/sonner";
-import { Button } from "@/Components/ui/button";
-import { Label } from "@/Components/ui/label";
 import Header from "@/Components/Header.vue";
-import type  { SharedData } from "@/types";
-import { toast } from "vue-sonner";
-import { watch } from "vue";
+import { Table, TableCell, TableRow } from "@/Components/ui/table";
+import TableSectionHeading from "@/Pages/Guest/Partials/TableSectionHeading.vue";
+import { Textarea } from "@/Components/ui/textarea";
+import { Input, InputError } from "@/Components/ui/input";
+import InputLabel from "@/Components/ui/input/InputLabel.vue";
 import {
     Select,
     SelectContent,
@@ -22,83 +14,91 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
+import type { Office, Region } from "@/Pages/Admin/Office/office.types";
+import type { SharedData } from "@/types";
+import { computed, ref, watch } from "vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import { yesterdayDate } from "@/lib/utils";
+import GuestsDetailsInput from "@/Pages/Guest/Partials/GuestsDetailsInput.vue";
+import { Button } from "@/Components/ui/button";
 
-const yesterdayDate = new Date(Date.now() - 1000 * 60 * 60 * 24);
-
-type LandingPageProps = {
+type ReservationFormProps = {
     canLogin: boolean;
+    regions: Region[];
     offices: Office[];
-    hostOffice: Office;
+    hostelOffice: Office;
 };
 
-const { canLogin, offices, hostOffice } =
-    defineProps<LandingPageProps>();
+const { canLogin, offices, hostelOffice } = defineProps<ReservationFormProps>();
 
 const page = usePage<SharedData>();
 
+const DEFAULT_FIRST_GUEST = {
+    first_name: undefined,
+    last_name: undefined,
+    gender: undefined,
+    phone: null,
+};
+
+// const form = useForm({
+//     //reservation details
+//     check_in_date: undefined,
+//     check_out_date: undefined,
+//     hostel_office_id: hostelOffice.id,
+//     guests: [DEFAULT_FIRST_GUEST],
+
+//     //contact info
+//     first_name: "",
+//     middle_initial: undefined,
+//     last_name: "",
+//     email: "",
+//     phone: undefined,
+//     guest_office_id: undefined,
+//     employee_id: "",
+//     purpose_of_stay: "",
+// });
+
 const form = useForm({
-    total_guests: 0,
-    total_males: 0,
-    total_females: 0,
-    check_in_date: null,
-    check_out_date: null,
-    host_office_id: hostOffice.id,
+    //reservation details
+    check_in_date: new Date("2025-03-18"),
+    check_out_date: new Date("2025-03-18"),
+    hostel_office_id: hostelOffice.id,
+    guests: [
+        {
+            first_name: 'guest',
+            last_name: '1',
+            gender: 'male',
+            phone: null,
+        },
+        {
+            first_name: 'guest',
+            last_name: '2',
+            gender: 'female',
+            phone: null,
+        },
+    ],
 
     //contact info
-    first_name: "",
+    first_name: "V",
     middle_initial: undefined,
-    last_name: "",
-    phone: undefined,
-    email: "",
+    last_name: "H",
+    email: "vh@gmail.com",
+    phone: 9059609327,
     guest_office_id: undefined,
-    employee_identification: "",
-    purpose_of_stay: undefined,
+    employee_id: "1",
+    purpose_of_stay: "",
 });
 
-function increaseFemales() {
-    form.total_females++;
-    form.total_guests++;
-}
+const selectedRegionId = ref<Region["id"] | null>(null);
 
-function decreaseFemales() {
-    if (form.total_females > 0) {
-        form.total_females--;
-        form.total_guests--;
-    }
-}
-
-function increaseMales() {
-    form.total_males++;
-    form.total_guests++;
-}
-
-function decreaseMales() {
-    if (form.total_males > 0) {
-        form.total_males--;
-        form.total_guests--;
-    }
-}
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.warning(page.props.flash.error, {
-                style: {
-                    background: "#eab308",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
+const officesInARegion = computed(() =>
+    offices.filter((office) => office.region_id === selectedRegionId.value)
 );
 
+//clear selected office if region is changed
+watch(selectedRegionId, () => {
+    form.guest_office_id = undefined;
+});
 
 function submit() {
     form.post(route("reservation.create"));
@@ -111,85 +111,49 @@ function submit() {
     <div class="w-full min-h-screen">
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
-        <div
-            class="container grid gap-16 px-2 py-4 mx-auto lg:gap-4 lg:grid-cols-5 md:p-8"
-        >
-            <form class="lg:col-span-3" @submit.prevent="submit">
+        <div class="px-2 py-4 md:p-8">
+            <form @submit.prevent="submit">
                 <Table class="max-w-3xl">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
-                            {{ hostOffice.name }} Reservation
+                            {{ hostelOffice.name }} Reservation
                         </TableCell>
                     </TableRow>
-                    <TableRow
-                        class="grid mt-3 rounded border-t md:grid-cols-3 border-e border-s border-primary-700"
-                    >
-                        <TableCell class="p-0 border-e border-primary-700">
-                            <GuestField
-                                :female="form.total_females"
-                                :increase-female="increaseFemales"
-                                :decrease-female="decreaseFemales"
-                                :male="form.total_males"
-                                :increase-male="increaseMales"
-                                :decrease-male="decreaseMales"
-                                :error-total-guests="!!form.errors.total_guests"
-                                :error-total-females="
-                                    !!form.errors.total_females
-                                "
-                                :error-total-males="!!form.errors.total_males"
-                            />
-                        </TableCell>
 
-                        <TableCell class="p-0 border-e border-primary-700">
+                    <TableRow class="grid border-none md:grid-cols-2">
+                        <TableCell class="space-y-2">
+                            <InputLabel>Check In</InputLabel>
                             <DatePicker
                                 v-model="form.check_in_date"
-                                label="Check-in"
-                                class="hover:bg-primary-50"
                                 :invalid="!!form.errors.check_in_date"
                                 :min-value="yesterdayDate"
                                 :max-value="form.check_out_date"
                             />
-                        </TableCell>
-                        <TableCell class="p-0">
-                            <DatePicker
-                                v-model="form.check_out_date"
-                                label="Check-out"
-                                class="hover:bg-primary-50"
-                                :invalid="!!form.errors.check_out_date"
-                                :min-value="form.check_in_date"
-                            />
-                        </TableCell>
-                    </TableRow>
-
-                    <TableRow class="grid grid-cols-3 border-none">
-                        <TableCell>
-                            <InputError v-if="form.errors.total_guests">
-                                {{ form.errors.total_guests }}
-                            </InputError>
-                        </TableCell>
-                        <TableCell>
                             <InputError v-if="form.errors.check_in_date">
                                 {{ form.errors.check_in_date }}
                             </InputError>
                         </TableCell>
-                        <TableCell>
+                        <TableCell class="space-y-2">
+                            <InputLabel>Check Out</InputLabel>
+                            <DatePicker
+                                v-model="form.check_out_date"
+                                :invalid="!!form.errors.check_out_date"
+                                :min-value="form.check_in_date"
+                            />
                             <InputError v-if="form.errors.check_out_date">
                                 {{ form.errors.check_out_date }}
                             </InputError>
                         </TableCell>
                     </TableRow>
 
-                    <TableRow class="border-none">
-                        <TableCell class="pt-5 text-lg font-bold">
-                            Contact Info
-                        </TableCell>
-                    </TableRow>
-
+                    <TableSectionHeading>
+                        Contact Person Info
+                    </TableSectionHeading>
                     <TableRow
                         class="grid grid-cols-1 border-none md:grid-cols-5"
                     >
                         <TableCell class="col-span-2 space-y-2">
-                            <Label>First Name</Label>
+                            <InputLabel>First Name</InputLabel>
                             <Input
                                 v-model="form.first_name"
                                 class="h-12 rounded-sm shadow-none border-primary-700"
@@ -201,16 +165,12 @@ function submit() {
                         </TableCell>
 
                         <TableCell class="col-span-1 space-y-2">
-                            <Label>
-                                M.I.
-                                <span class="text-xs italic text-neutral-500">
-                                    (optional)
-                                </span>
-                            </Label>
+                            <InputLabel optional>M.I.</InputLabel>
                             <Input
                                 v-model="form.middle_initial"
                                 class="h-12 rounded-sm shadow-none border-primary-700"
                                 :invalid="!!form.errors.middle_initial"
+                                maxlength="1"
                             />
                             <InputError v-if="form.errors.middle_initial">
                                 {{ form.errors.middle_initial }}
@@ -218,7 +178,7 @@ function submit() {
                         </TableCell>
 
                         <TableCell class="col-span-2 space-y-2">
-                            <Label>Last Name</Label>
+                            <InputLabel>Last Name</InputLabel>
                             <Input
                                 v-model="form.last_name"
                                 class="h-12 rounded-sm shadow-none border-primary-700"
@@ -232,7 +192,7 @@ function submit() {
 
                     <TableRow class="grid border-none md:grid-cols-2">
                         <TableCell class="space-y-2">
-                            <Label>Phone #</Label>
+                            <InputLabel>Phone #</InputLabel>
                             <Input
                                 type="number"
                                 v-model.number="form.phone"
@@ -244,12 +204,7 @@ function submit() {
                             </InputError>
                         </TableCell>
                         <TableCell class="space-y-2">
-                            <Label>
-                                Email
-                                <span class="text-xs italic text-neutral-500">
-                                    (optional)
-                                </span>
-                            </Label>
+                            <InputLabel>Email</InputLabel>
 
                             <Input
                                 v-model="form.email"
@@ -262,10 +217,40 @@ function submit() {
                         </TableCell>
                     </TableRow>
 
-                    <TableRow class="grid pb-5 border-none md:grid-cols-2">
+                    <TableRow class="grid border-none md:grid-cols-2">
                         <TableCell class="space-y-2">
-                            <Label>Guest's Office</Label>
-                            <Select v-model="form.guest_office_id">
+                            <InputLabel>Guest's Region</InputLabel>
+                            <Select v-model="selectedRegionId">
+                                <SelectTrigger
+                                    class="h-12 rounded-sm shadow-none border-primary-700"
+                                    :invalid="!!form.errors.guest_office_id"
+                                >
+                                    <SelectValue
+                                        placeholder="Select guest's region"
+                                    />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem
+                                            v-for="region in regions"
+                                            :Key="region.id"
+                                            :value="region.id"
+                                        >
+                                            {{ region.name }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <InputError v-if="form.errors.guest_office_id">
+                                {{ form.errors.guest_office_id }}
+                            </InputError>
+                        </TableCell>
+                        <TableCell class="space-y-2">
+                            <InputLabel>Guest's Office</InputLabel>
+                            <Select
+                                v-model="form.guest_office_id"
+                                :disabled="Boolean(selectedRegionId) === false"
+                            >
                                 <SelectTrigger
                                     class="h-12 rounded-sm shadow-none border-primary-700"
                                     :invalid="!!form.errors.guest_office_id"
@@ -277,7 +262,7 @@ function submit() {
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectItem
-                                            v-for="office in offices"
+                                            v-for="office in officesInARegion"
                                             :Key="office.id"
                                             :value="office.id"
                                         >
@@ -290,51 +275,57 @@ function submit() {
                                 {{ form.errors.guest_office_id }}
                             </InputError>
                         </TableCell>
-
+                    </TableRow>
+                    <TableRow class="grid border-none">
                         <TableCell class="space-y-2">
-                            <Label>Employee ID</Label>
+                            <InputLabel>Employee ID</InputLabel>
                             <Input
-                                v-model="form.employee_identification"
+                                v-model="form.employee_id"
                                 class="h-12 rounded-sm shadow-none border-primary-700"
-                                :invalid="!!form.errors.employee_identification"
+                                :invalid="!!form.errors.employee_id"
                             />
-                            <InputError
-                                v-if="form.errors.employee_identification"
-                            >
-                                {{ form.errors.employee_identification }}
+                            <InputError v-if="form.errors.employee_id">
+                                {{ form.errors.employee_id }}
                             </InputError>
                         </TableCell>
                     </TableRow>
 
                     <TableRow class="grid border-none">
                         <TableCell class="space-y-2">
-                            <Label
-                                >Purpose of stay
-                                <span class="text-xs italic text-neutral-500">
-                                    (optional)
-                                </span>
-                            </Label>
+                            <InputLabel optional>Purpose of stay</InputLabel>
                             <Textarea
                                 v-model="form.purpose_of_stay"
                                 class="border border-primary-800"
                                 rows="4"
                                 cols="50"
-                                placeholder="Purpose of stay . . ."
                             />
                         </TableCell>
                     </TableRow>
 
-                    <TableRow>
+                    <TableSectionHeading>
+                        <div class="flex items-center justify-between gap-x-1">
+                            <p>Guests Details</p>
+                            <p
+                                class="text-xs text-center pt-1.5 text-white rounded h-7 min-w-7 p-2 bg-primary-500"
+                            >
+                                {{ form.guests.length }}
+                            </p>
+                        </div>
+                    </TableSectionHeading>
+
+                    <GuestsDetailsInput :form="form" />
+
+                    <TableRow class="border-b-0">
                         <TableCell>
-                            <Button size="lg" class="w-full">Submit</Button>
+                            <Button
+                                type="submit"
+                                class="w-full h-12 mt-4 text-base"
+                                >Submit</Button
+                            >
                         </TableCell>
                     </TableRow>
                 </Table>
             </form>
-
-            <AvailableRoomsDetails class="lg:col-span-2" />
         </div>
-
-        <Toaster />
     </div>
 </template>

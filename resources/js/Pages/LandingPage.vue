@@ -6,7 +6,7 @@ import { Link } from "@inertiajs/vue3";
 <template>
     <div class="grid min-h-screen place-content-center">
         <div class='space-x-4'>
-        <Link :href="route('reservation.form', { host_office_id: 1 })">
+        <Link :href="route('reservation.form', { hostel_office_id: 1 })">
             <Button>Regional Executive Office - Region 10</Button>
         </LInk>
         <Button disabled>Other Office</Button>

@@ -4,6 +4,7 @@ use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReservationProcessController;
 use App\Http\Controllers\ReservationSubmissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,9 +17,10 @@ return Inertia::render('LandingPage');
 
 //* Guest Reservation
 Route::middleware('guest')->group(function () {
-    Route::get('/reservation', [ReservationSubmissionController::class, 'form'])->name('reservation.form');
-    Route::post('/reservation', [ReservationSubmissionController::class, 'create'])->name('reservation.create');
-    Route::get('/reservation/confirmation', [ReservationSubmissionController::class, 'confirmation'])->name('reservation.confirmation');
+    Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
+    Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
+    Route::get('/reservation/confirmation/', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
+    Route::inertia('/reservation/status', 'Guest/CheckReservationStatus')->name('reservation.checkStatus');
 });
 
 //* Admin Reservation Management

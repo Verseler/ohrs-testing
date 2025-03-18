@@ -93,3 +93,29 @@ export function formatCurrency(amount: number): string {
       maximumFractionDigits: 2
     })
   }
+
+
+export function yesterdayDate() {
+    return new Date(Date.now() - 1000 * 60 * 60 * 24);
+}
+
+
+//remove element in an array using index
+export function removeItem<T>(arr: Array<T>, index: number): Array<T> {
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+    return arr;
+  }
+
+  export function isObjectEmpty<T>(obj: T): boolean {
+    if (typeof obj !== 'object' || obj === null) {
+        return false; // Not an object, or is null
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.length === 0; // Check for empty array
+    }
+
+    return Object.keys(obj).length === 0;
+}
