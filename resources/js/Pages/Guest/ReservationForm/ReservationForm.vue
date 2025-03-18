@@ -2,7 +2,7 @@
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import { Table, TableCell, TableRow } from "@/Components/ui/table";
-import TableSectionHeading from "@/Pages/Guest/Partials/TableSectionHeading.vue";
+import TableSectionHeading from "@/Pages/Guest/ReservationForm/Partials/TableSectionHeading.vue";
 import { Textarea } from "@/Components/ui/textarea";
 import { Input, InputError } from "@/Components/ui/input";
 import InputLabel from "@/Components/ui/input/InputLabel.vue";
@@ -19,7 +19,7 @@ import type { SharedData } from "@/types";
 import { computed, ref, watch } from "vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import { yesterdayDate } from "@/lib/utils";
-import GuestsDetailsInput from "@/Pages/Guest/Partials/GuestsDetailsInput.vue";
+import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
 
 type ReservationFormProps = {

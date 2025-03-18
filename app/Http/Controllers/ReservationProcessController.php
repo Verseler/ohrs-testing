@@ -21,7 +21,7 @@ class ReservationProcessController extends Controller
         $hostelOffice = Office::where('has_hostel', true)
             ->findOrFail($request->hostel_office_id);
 
-        return Inertia::render('Guest/ReservationForm', [
+        return Inertia::render('Guest/ReservationForm/ReservationForm', [
             'canLogin' => Route::has('login'),
             'regions' => $regions,
             'offices' => $offices,

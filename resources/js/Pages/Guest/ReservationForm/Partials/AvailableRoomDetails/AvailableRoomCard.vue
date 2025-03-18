@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { RoomWithBedCounts } from "@/Pages/RoomManagement/room.types";
+import { RoomWithBedCounts } from "@/Pages/Admin/Room/room.types";
 import { Badge } from "@/Components/ui/badge";
 import GenderBadge from "@/Components/GenderBadge.vue";
 
 type AvailableRoomCardProps = {
-    room: Omit<RoomWithBedCounts, 'beds'> & {
+    room: Omit<RoomWithBedCounts, "beds"> & {
         beds_count: number;
     };
-}
+};
 
 const { room } = defineProps<AvailableRoomCardProps>();
-
 </script>
 
 <template>
