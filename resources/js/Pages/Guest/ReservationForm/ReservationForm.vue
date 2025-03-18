@@ -40,52 +40,21 @@ const DEFAULT_FIRST_GUEST = {
     phone: null,
 };
 
-// const form = useForm({
-//     //reservation details
-//     check_in_date: undefined,
-//     check_out_date: undefined,
-//     hostel_office_id: hostelOffice.id,
-//     guests: [DEFAULT_FIRST_GUEST],
-
-//     //contact info
-//     first_name: "",
-//     middle_initial: undefined,
-//     last_name: "",
-//     email: "",
-//     phone: undefined,
-//     guest_office_id: undefined,
-//     employee_id: "",
-//     purpose_of_stay: "",
-// });
-
 const form = useForm({
     //reservation details
-    check_in_date: new Date("2025-03-18"),
-    check_out_date: new Date("2025-03-18"),
+    check_in_date: undefined,
+    check_out_date: undefined,
     hostel_office_id: hostelOffice.id,
-    guests: [
-        {
-            first_name: 'guest',
-            last_name: '1',
-            gender: 'male',
-            phone: null,
-        },
-        {
-            first_name: 'guest',
-            last_name: '2',
-            gender: 'female',
-            phone: null,
-        },
-    ],
+    guests: [DEFAULT_FIRST_GUEST],
 
     //contact info
-    first_name: "V",
+    first_name: "",
     middle_initial: undefined,
-    last_name: "H",
-    email: "vh@gmail.com",
-    phone: 9059609327,
+    last_name: "",
+    email: "",
+    phone: undefined,
     guest_office_id: undefined,
-    employee_id: "1",
+    employee_id: "",
     purpose_of_stay: "",
 });
 
