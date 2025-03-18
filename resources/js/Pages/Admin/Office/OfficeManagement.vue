@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import Badge from "@/Components/ui/badge/Badge.vue";
 import {
     Ellipsis,
     FilterX,
@@ -43,23 +42,32 @@ import {
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import type { LaravelPagination } from "@/types/index";
-import { Office, Filters, Region } from "@/Pages/OfficeManagement/office.types";
+import type {
+    Office,
+    OfficeFilters,
+    Region,
+} from "@/Pages/Admin/Office/office.types";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import { debounce } from "@/lib/utils";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
 
-const OFFICES_COLUMNS = [
-    'region',
-    "name",
-] as const;
+const OFFICES_COLUMNS = ["region", "name"] as const;
 
 type OfficeManagementProps = {
     offices: LaravelPagination<Office>;
-    filters: Filters;
+    filters: OfficeFilters;
     regions: Region[];
 };
 
@@ -67,14 +75,16 @@ const { offices, filters, regions } = defineProps<OfficeManagementProps>();
 
 const selectedOffice = ref<Office | null>(null);
 
-const form = useForm<Filters>({
+const form = useForm<Partial<OfficeFilters>>({
     region_id: filters.region_id,
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
-const formHasValue = computed(() => form.region_id || form.search || form.sort_by);
+const formHasValue = computed(
+    () => form.region_id || form.search || form.sort_by
+);
 
 //Room Filter
 function clearFilter() {
@@ -82,7 +92,7 @@ function clearFilter() {
     form.search = undefined;
     form.sort_by = undefined;
     form.sort_order = "asc";
-};
+}
 
 function applyFilter() {
     form.get(route("office.list"), {
@@ -113,13 +123,13 @@ function showDeleteConfirmation(office: Office) {
 function handleDeleteOffice() {
     if (!selectedOffice.value) return;
 
-    router.delete(route('office.delete', { id: selectedOffice.value.id }), {
+    router.delete(route("office.delete", { id: selectedOffice.value.id }), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
             deleteConfirmation.value = false;
             selectedOffice.value = null;
-        }
+        },
     });
 }
 </script>
@@ -154,7 +164,7 @@ function handleDeleteOffice() {
         </PageHeader>
 
         <!-- Search, Filter and Sort -->
-        <div class="flex gap-x-2 mb-2">
+        <div class="flex mb-2 gap-x-2">
             <Select v-model="form.region_id">
                 <SelectTrigger class="w-40">
                     <SelectValue placeholder="Select a region" />
@@ -163,9 +173,9 @@ function handleDeleteOffice() {
                     <SelectGroup>
                         <SelectLabel>Region</SelectLabel>
                         <SelectItem
-                        v-for="region in regions"
-                        :key="region.id"
-                        :value="region.id"
+                            v-for="region in regions"
+                            :key="region.id"
+                            :value="region.id"
                         >
                             {{ region.name }}
                         </SelectItem>
@@ -200,7 +210,7 @@ function handleDeleteOffice() {
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="rounded border">
+        <div class="border rounded">
             <Table>
                 <TableHeader>
                     <TableRow class="bg-primary-500 hover:bg-primary-600">
@@ -218,8 +228,8 @@ function handleDeleteOffice() {
                         >
                             <TableCell>
                                 {{ office.region.name }}
-                             </TableCell>
-                             <TableCell class="font-medium">
+                            </TableCell>
+                            <TableCell class="font-medium">
                                 {{ office.name }}
                             </TableCell>
                             <TableCell class="text-right">
@@ -245,7 +255,9 @@ function handleDeleteOffice() {
 
                                             <PopoverField
                                                 @click="
-                                                    showDeleteConfirmation(office)
+                                                    showDeleteConfirmation(
+                                                        office
+                                                    )
                                                 "
                                                 variant="danger"
                                             >

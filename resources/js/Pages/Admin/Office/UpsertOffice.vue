@@ -18,7 +18,7 @@ import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import {  Home, Hotel } from "lucide-vue-next";
 import { Button } from "@/Components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select";
-import type { Office, Region } from "@/Pages/OfficeManagement/office.types";
+import type { Office, Region } from "@/Pages/Admin/Office/office.types";
 
 type UpsertOfficeProps = {
     office: Office | null;
@@ -28,13 +28,13 @@ type UpsertOfficeProps = {
 const { office, regions } = defineProps<UpsertOfficeProps>();
 
 
-type UpsertOfficeForm = Pick<Office, "name" | "has_hostel">;
+type UpsertOfficeForm = Pick<Office, "name" | "has_hostel" | "region_id">;
 
-const form: InertiaForm<UpsertOfficeForm> = useForm({
-    id: office?.id ?? null,
-    name: office?.name ?? '',
-    region_id: office?.region_id ?? null,
-    has_hostel: office?.has_hostel ?? false
+const form: InertiaForm<Partial<UpsertOfficeForm>> = useForm({
+    id: office?.id ?? undefined,
+    name: office?.name ?? undefined,
+    region_id: office?.region_id ?? undefined,
+    has_hostel: office?.has_hostel ?? false,
 });
 
 function showSubmitConfirmation() {
@@ -77,7 +77,7 @@ function showSubmitConfirmation() {
 
         <form
             @submit.prevent="showSubmitConfirmation"
-            class="space-y-4 max-w-xl"
+            class="max-w-xl space-y-4"
         >
             <!-- Name Field -->
             <div class="flex flex-col gap-2">
@@ -93,7 +93,6 @@ function showSubmitConfirmation() {
                     {{ form.errors.name }}
                 </InputError>
             </div>
-
             <div class="flex flex-col gap-2">
                 <Label for="name">Region</Label>
                 <Select v-model="form.region_id" :invalid="!!form.errors.region_id">
@@ -125,7 +124,7 @@ function showSubmitConfirmation() {
                     :model-value="form.has_hostel ? 'yes' : 'no'"
                     v-on:update:model-value="(value) => form.has_hostel = value === 'yes'"
                 >
-                    <div class="flex gap-4 w-full">
+                    <div class="flex w-full gap-4">
                         <RadioButtonCard
                             id="yes"
                             value="yes"
@@ -151,7 +150,7 @@ function showSubmitConfirmation() {
                 <Button
                     type="submit"
                     size="lg"
-                    class="mt-4 w-full text-md"
+                    class="w-full mt-4 text-md"
                     :disabled="form.processing"
                 >
                     Save

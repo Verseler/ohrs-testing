@@ -25,7 +25,7 @@ class OfficeController extends Controller
 
         // Sorting
         if ($request->filled('sort_by')) {
-            $sortBy = in_array($request->sort_by, ['name']) ? $request->sort_by : 'name';
+            $sortBy = in_array($request->sort_by, ['name', 'region_id']) ? $request->sort_by : 'name';
             $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
             $query->orderBy($sortBy, $sortOrder);
         }
@@ -33,7 +33,7 @@ class OfficeController extends Controller
         $offices = $query->paginate(10)->withQueryString();
         $regions = Region::all();
 
-        return Inertia::render("OfficeManagement/OfficeManagement", [
+        return Inertia::render("Admin/Office/OfficeManagement", [
             'offices' => $offices,
             'regions'=> $regions,
             'filters'=> $request->only(['search', 'has_hostel', 'sort_by', 'sort_order', 'region_id'])
@@ -44,7 +44,7 @@ class OfficeController extends Controller
     {
         $office = Office::find($id);
         $regions = Region::all();
-        return Inertia::render("OfficeManagement/UpsertOffice", [
+        return Inertia::render("Admin/Office/UpsertOffice", [
             'office' => $office,
             'regions' => $regions
         ]);

@@ -29,18 +29,18 @@ const nav = ref<Array<NavItem>>([
     {
         heading: "MANAGEMENT",
         items: [
-            {
-                label: "Reservation",
-                route: "reservation.list",
-                path: "/reservations",
-                icon: CalendarCheck,
-            },
-            {
-                label: "Room",
-                route: "room.list",
-                path: "/rooms",
-                icon: Bed,
-            },
+            // {
+            //     label: "Reservation",
+            //     route: "reservation.list",
+            //     path: "/reservations",
+            //     icon: CalendarCheck,
+            // },
+            // {
+            //     label: "Room",
+            //     route: "room.list",
+            //     path: "/rooms",
+            //     icon: Bed,
+            // },
             {
                 label: "Office",
                 route: "office.list",
