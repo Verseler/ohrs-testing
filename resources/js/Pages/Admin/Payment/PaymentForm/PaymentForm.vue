@@ -2,10 +2,16 @@
 import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import { ref, watch } from "vue";
 import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
+import { Input, InputError } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Separator } from "@/Components/ui/separator";
-import { CheckCircleIcon, CircleIcon, CreditCard, Home } from "lucide-vue-next";
+import {
+    CheckCircleIcon,
+    CircleIcon,
+    CreditCard,
+    Home,
+    ReceiptText,
+} from "lucide-vue-next";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
@@ -30,7 +36,18 @@ import {
     BreadcrumbPage,
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
-import StatusBadge from "@/Components/StatusBadge.vue";
+import DatePicker from "@/Components/DatePicker.vue";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/Components/ui/select";
+import type {
+    Payment,
+    PaymentOption,
+} from "@/Pages/Admin/Payment/payment.types";
 
 type ReservationDetailsProps = {
     reservation: Reservation;
@@ -40,11 +57,13 @@ const { reservation } = defineProps<ReservationDetailsProps>();
 
 const page = usePage<SharedData>();
 
-type PaymentOption = "full" | "custom";
-
-const form = useForm({
+const form = useForm<Partial<Payment>>({
     amount: reservation.remaining_balance,
     reservation_id: reservation.id,
+    or_number: "",
+    or_date: undefined,
+    payment_method: "cash",
+    transaction_id: "",
 });
 
 // Payment form state
@@ -157,9 +176,11 @@ watch(
         <div class="max-w-2xl">
             <Card>
                 <CardHeader>
-                    <CardTitle class="text-xl font-bold"
-                        >Process Payment</CardTitle
+                    <CardTitle
+                        class="flex items-center justify-between text-xl font-bolds"
                     >
+                        Record Payment
+                    </CardTitle>
                     <CardDescription>
                         Reservation #{{ reservation.reservation_code }} for
                         {{ reservation.first_name }} {{ reservation.last_name }}
@@ -169,10 +190,7 @@ watch(
                 <CardContent class="space-y-6">
                     <!-- Reservation Summary -->
                     <div class="p-4 rounded-lg bg-muted">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-medium">Reservation Summary</h3>
-                            <StatusBadge :status="reservation.status" />
-                        </div>
+                        <h3 class="mb-4 font-medium">Reservation Summary</h3>
 
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
@@ -235,6 +253,80 @@ watch(
                                     }}
                                 </p>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="grid items-center grid-cols-2 gap-3">
+                        <div>
+                            <Label>OR Number</Label>
+                            <div class="relative">
+                                <Input
+                                    v-model="form.or_number"
+                                    :invalid="!!form.errors.or_number"
+                                    class="h-12 mt-1 text-base rounded ps-9 border-primary-700"
+                                />
+                                <ReceiptText
+                                    class="absolute text-lg size-4 top-4 left-2.5 text-primary-600"
+                                />
+                            </div>
+                            <InputError v-if="!!form.errors.or_number">
+                                {{ form.errors.or_number }}
+                            </InputError>
+                        </div>
+
+                        <div>
+                            <Label>OR Date</Label>
+                            <DatePicker
+                                v-model="form.or_date"
+                                :invalid="!!form.errors.or_date"
+                                class="mt-1"
+                            />
+                            <InputError v-if="!!form.errors.or_date">
+                                {{ form.errors.or_date }}
+                            </InputError>
+                        </div>
+
+                        <div>
+                            <Label>Transaction ID</Label>
+                            <div class="relative">
+                                <Input
+                                    v-model="form.transaction_id"
+                                    :invalid="!!form.errors.transaction_id"
+                                    class="h-12 mt-1 text-base rounded ps-9 border-primary-700"
+                                />
+                                <ReceiptText
+                                    class="absolute text-lg size-4 top-4 left-2.5 text-primary-600"
+                                />
+                            </div>
+                            <InputError v-if="!!form.errors.transaction_id">
+                                {{ form.errors.transaction_id }}
+                            </InputError>
+                        </div>
+
+                        <!-- Payment method -->
+                        <div class="space-y-2">
+                            <Label for="payment-method">Payment Method</Label>
+                            <Select v-model="form.payment_method" required>
+                                <SelectTrigger
+                                    id="payment-method"
+                                    class="h-12 rounded border-primary-700"
+                                    :invalid="!!form.errors.payment_method"
+                                >
+                                    <SelectValue
+                                        placeholder="Select payment method"
+                                    />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="cash">Cash</SelectItem>
+                                    <SelectItem value="online">
+                                        Online
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <InputError v-if="!!form.errors.payment_method">
+                                {{ form.errors.payment_method }}
+                            </InputError>
                         </div>
                     </div>
 
@@ -306,7 +398,7 @@ watch(
                                     v-model.number="form.amount"
                                     :max="reservation.remaining_balance"
                                     :invalid="!!form.errors.amount"
-                                    class="h-12 mt-1 text-lg ps-7 text-primary-900 border-primary-600"
+                                    class="h-12 mt-1 text-lg rounded ps-7 text-primary-900 border-primary-700"
                                 />
                                 <span
                                     class="absolute text-lg top-2.5 left-2.5 text-primary-600"
@@ -328,7 +420,7 @@ watch(
                 <CardFooter v-if="reservation.remaining_balance > 0">
                     <div class="flex justify-end w-full pt-3 border-t gap-x-2">
                         <Button
-                            v-if="reservation.payment_type === 'pay_later'"
+                            v-if="reservation.payment_type === 'full_payment'"
                             variant="outline"
                             @click="changePaymentTypeToPayLater"
                             type="button"

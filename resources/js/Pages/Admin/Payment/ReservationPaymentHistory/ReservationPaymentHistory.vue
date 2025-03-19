@@ -17,7 +17,7 @@ import {
     DialogTitle,
 } from "@/Components/ui/dialog";
 import { ReceiptIcon, History, Home, Maximize } from "lucide-vue-next";
-import { Head } from "@inertiajs/vue3";
+import { Head, usePage } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {
     Breadcrumb,
@@ -37,6 +37,9 @@ import {
     formatDateTimeString,
 } from "@/lib/utils";
 import AmountCard from "@/Pages/Admin/Payment/ReservationPaymentHistory/Partials/AmountCard.vue";
+import { watch } from "vue";
+import { SharedData } from "@/types";
+import { toast } from "vue-sonner";
 
 type ReservationPaymentHistoryProps = {
     reservationPaymentHistory: Reservation & {
@@ -46,6 +49,8 @@ type ReservationPaymentHistoryProps = {
 
 const { reservationPaymentHistory } =
     defineProps<ReservationPaymentHistoryProps>();
+
+const page = usePage<SharedData>();
 
 const totalBillings = computed(() =>
     formatCurrency(reservationPaymentHistory.total_billings)
@@ -80,6 +85,26 @@ const closeReceiptDialog = () => {
         selectedPayment.value = null;
     }, 100);
 };
+
+// Display flash success or error message as sonner or toast
+watch(
+    () => page.props.flash.success,
+    () => {
+        if (page.props.flash.success) {
+            toast.success(page.props.flash.success, {
+                style: {
+                    background: "#22c55e",
+                    color: "white",
+                },
+                position: "top-center",
+            });
+
+            setTimeout(() => {
+                page.props.flash.success = null;
+            }, 300);
+        }
+    }
+);
 </script>
 
 <template>
@@ -187,12 +212,10 @@ const closeReceiptDialog = () => {
                     >
                         <div class="flex items-start justify-between">
                             <div>
-                                <div class="font-medium">Payment</div>
+                                <div class="font-medium">Record Payment</div>
                                 <div class="text-xs text-muted-foreground">
                                     {{
-                                        formatDateTimeString(
-                                            payment.payment_date
-                                        )
+                                        formatDateTimeString(payment.created_at)
                                     }}
                                 </div>
                             </div>
@@ -241,7 +264,7 @@ const closeReceiptDialog = () => {
                     <DialogHeader>
                         <DialogTitle>Payment Receipt</DialogTitle>
                         <DialogDescription>
-                            OR #{{ selectedPayment?.or_number }}
+                           CODE: {{ reservationPaymentHistory.reservation_code }}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -249,36 +272,14 @@ const closeReceiptDialog = () => {
                         <div class="mb-2 text-center">
                             <h3 class="font-bold">Official Receipt</h3>
                             <p class="text-sm text-muted-foreground">
-                                {{
-                                    formatDateTimeString(
-                                        selectedPayment.payment_date
-                                    )
-                                }}
+                                {{ formatDateString(selectedPayment.or_date) }}
+                            </p>
+                            <p class="text-sm text-neutral-500">
+                                #{{ selectedPayment?.or_number }}
                             </p>
                         </div>
 
                         <div class="space-y-3">
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <p class="text-xs text-muted-foreground">
-                                        OR Number:
-                                    </p>
-                                    <p class="font-medium">
-                                        {{ selectedPayment.or_number }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-muted-foreground">
-                                        Reservation:
-                                    </p>
-                                    <p class="font-medium">
-                                        {{
-                                            reservationPaymentHistory.reservation_code
-                                        }}
-                                    </p>
-                                </div>
-                            </div>
-
                             <div>
                                 <p class="text-xs text-muted-foreground">
                                     Guest:
@@ -298,12 +299,12 @@ const closeReceiptDialog = () => {
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <p class="text-xs text-muted-foreground">
-                                        Payment Date:
+                                        Record Payment:
                                     </p>
                                     <p class="font-medium">
                                         {{
                                             formatDateString(
-                                                selectedPayment.payment_date
+                                                selectedPayment.created_at
                                             )
                                         }}
                                     </p>
