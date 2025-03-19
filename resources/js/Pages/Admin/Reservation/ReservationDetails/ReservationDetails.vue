@@ -10,8 +10,7 @@ import {
     Pencil,
 } from "lucide-vue-next";
 import PageHeader from "@/Components/PageHeader.vue";
-import { Button } from "@/Components/ui/button";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head, usePage } from "@inertiajs/vue3";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import {
     Breadcrumb,
@@ -28,12 +27,36 @@ import GuestInformation from "@/Pages/Admin/Reservation/ReservationDetails/Parti
 import ReservedBeds from "@/Pages/Admin/Reservation/ReservationDetails/Partials/ReservedBeds.vue";
 import LinkButton from "@/Components/LinkButton.vue";
 import ReservationCode from "./Partials/ReservationCode.vue";
+import { onMounted } from 'vue';
+import { SharedData } from '@/types';
+import { toast } from 'vue-sonner';
 
 type ReservationDetailsProps = {
     reservation: ReservationWithBeds;
 };
 
 const { reservation } = defineProps<ReservationDetailsProps>();
+
+const page = usePage<SharedData>();
+
+// Display flash success or error message as sonner or toast
+onMounted(
+    () => {
+        if (page.props.flash.success) {
+            toast.success(page.props.flash.success, {
+                style: {
+                    background: "#22c55e",
+                    color: "white",
+                },
+                position: "top-center",
+            });
+
+            setTimeout(() => {
+                page.props.flash.success = null;
+            }, 300);
+        }
+    }
+);
 </script>
 
 <template>

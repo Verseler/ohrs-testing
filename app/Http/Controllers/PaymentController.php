@@ -6,6 +6,7 @@ use App\Models\Office;
 use App\Models\Payment;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -83,5 +84,17 @@ class PaymentController extends Controller
         return Inertia::render('Admin/Payment/ReservationPaymentHistory/ReservationPaymentHistory', [
             'reservationPaymentHistory' => $reservationPaymentHistory
         ]);
+    }
+
+    public function payLater(Request $request)
+    {
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)->findOrFail($request->id);
+
+        DB::transaction(function () use ($reservation) {
+            $reservation->payment_type = 'pay_later';
+            $reservation->save();
+        });
+
+        return to_route('reservation.show', ['id' => $reservation->id])->with('success', 'Successfully change to pay later.');
     }
 }

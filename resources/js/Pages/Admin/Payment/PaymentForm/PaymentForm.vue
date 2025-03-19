@@ -12,7 +12,7 @@ import {
     Home,
     ReceiptText,
 } from "lucide-vue-next";
-import { Head, useForm, usePage } from "@inertiajs/vue3";
+import { Head, router, useForm, usePage } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import { formatCurrency, formatDateString } from "@/lib/utils";
@@ -90,11 +90,7 @@ watch(
     }
 );
 
-function changePaymentTypeToPayLater() {
-    console.log("change payment type to pay later");
-}
-
-//Delete Confirmation Dialog
+//Payment Confirmation Dialog
 const paymentConfirmation = ref(false);
 
 function showPaymentConfirmation() {
@@ -104,6 +100,18 @@ function showPaymentConfirmation() {
 function submitPayment() {
     form.post(route("reservation.payment"));
 }
+
+//Pay Later Confirmation
+const payLaterConfirmation = ref(false);
+
+function showPayLaterConfirmation() {
+    payLaterConfirmation.value = true;
+}
+
+function submitPayLater() {
+    router.post(route('reservation.payLater', { id: reservation.id }));
+}
+
 
 // Display flash success or error message as sonner or toast
 watch(
@@ -422,7 +430,7 @@ watch(
                         <Button
                             v-if="reservation.payment_type === 'full_payment'"
                             variant="outline"
-                            @click="changePaymentTypeToPayLater"
+                            @click="showPayLaterConfirmation"
                             type="button"
                         >
                             <CreditCard /> Pay Later
@@ -436,6 +444,13 @@ watch(
             </Card>
         </div>
 
+        <Alert
+            :open="payLaterConfirmation"
+            @update:open="payLaterConfirmation = $event"
+            :onConfirm="submitPayLater"
+            title="Confirm change to Pay Later"
+            confirm-label="Confirm"
+        />
         <Alert
             :open="paymentConfirmation"
             @update:open="paymentConfirmation = $event"
