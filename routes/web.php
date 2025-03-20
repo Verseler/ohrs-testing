@@ -1,10 +1,12 @@
 <?php
+
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuestController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationProcessController;
-use App\Http\Controllers\ReservationSubmissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -25,15 +27,16 @@ Route::middleware('guest')->group(function () {
 
 //* Admin Reservation Management
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
-    Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
-    Route::get('/reservations/payment/receipt', [PaymentController::class, 'paymentReceipt'])->name('reservation.paymentReceipt');
-    Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
-    Route::get('/reservations/payment/history/{id}', [PaymentController::class, 'paymentHistory'])->name('reservation.paymentHistory');
-    Route::post('/reservations/payment', [PaymentController::class, 'payment'])->name('reservation.payment');
-    Route::get('/reservations/extend/{id}', [ReservationController::class, 'extendForm'])->name('reservation.extendForm');
-    Route::get('reservations/edit-status/{id}', [ReservationController::class, 'editStatusForm'])->name('reservation.editStatusForm');
-    Route::get('reservations/edit-bed-assignment/{id}', [ReservationController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');
+Route::get('/waiting-list', [ReservationController::class, 'waitingList'])->name('reservation.waitingList');
+Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
+Route::post('/reservations/payment', [PaymentController::class, 'payment'])->name('reservation.payment');
+Route::post('/reservations/pay-later', [PaymentController::class, 'payLater'])->name('reservation.payLater');
+Route::get('/reservations/extend/{id}', [ReservationController::class, 'extendForm'])->name('reservation.extendForm');
+Route::get('/reservations/edit-status/{id}', [ReservationController::class, 'editStatusForm'])->name('reservation.editStatusForm');
+Route::get('/reservations/edit-bed-assignment/{id}', [ReservationController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');
+Route::get('/reservations/payment/history/{id}', [PaymentController::class, 'paymentHistory'])->name('reservation.paymentHistory');
+Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
+Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
 });
 
 //* Admin Room Management
@@ -55,10 +58,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/offices/{id}', [OfficeController::class, 'delete'])->name('office.delete');
 });
 
-
-//* Other Admin pages
+//* Admin Guest Management
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('/dashboard', 'Admin/Dashboard/Dashboard')->name('dashboard');
+    Route::get('/guests', [GuestController::class, 'list'])->name('guest.list');
+});
+
+//* Dashboard
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__ . '/auth.php';

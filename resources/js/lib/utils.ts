@@ -73,6 +73,21 @@ export function formatDateTimeString(date: string | Date): string {
 }
 
 
+export function formatYear(date: Date | string | undefined): string | null {
+    if (!date) return null;
+
+    const jsDate = new Date(date);
+
+    if (isNaN(jsDate.getTime())) {
+        console.error("Invalid date input");
+        return null;
+    }
+
+    const year = jsDate.getFullYear();
+    return `${year}`;
+}
+
+
 export function getDaysDifference(startDate: string | Date, endDate: string | Date): number {
     const start = new Date(startDate);
     const end = new Date(endDate);

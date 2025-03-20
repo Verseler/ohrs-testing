@@ -7,7 +7,7 @@ import { Toaster } from "@/Components/ui/sonner";
     <div class="flex min-h-screen bg-white">
         <Sidebar />
 
-        <main class="flex-1 p-4 ms-72 md:px-6 md:pb-10">
+        <main class="flex-1 p-4 overflow-y-auto ms-72 md:px-6 md:pb-10">
             <slot />
         </main>
 

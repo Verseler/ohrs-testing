@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Office;
-use App\Models\ORNumber;
 use App\Models\Payment;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class PaymentController extends Controller
@@ -28,6 +29,10 @@ class PaymentController extends Controller
 
         $validated = $request->validate([
             'reservation_id' => ['required', 'numeric'],
+            'or_number' => ['required', 'string', 'unique:payments,or_number'],
+            'or_date' => ['required', 'date'],
+            'payment_method' => ['required', Rule::in(['cash', 'online'])],
+            'transaction_id' => ['required', 'string', 'unique:payments,transaction_id'],
             'amount' => [
                 'required',
                 'numeric',
@@ -39,33 +44,23 @@ class PaymentController extends Controller
                 }
             ],
         ], [
+            'or_number.unique' => 'OR number already existed.',
+            'transaction_id.unique' => 'Transaction ID already existed.',
             'amount.min' => 'The payment amount must not be zero or less.',
         ]);
 
         try {
             DB::transaction(function () use (&$validated, $reservation) {
                 $payment = Payment::create([
-                    'reservation_id' => $validated['reservation_id'],
                     'amount' => $validated['amount'],
                     'or_number' => $validated['or_number'],
-                    'payment_date' => now(),
+                    'or_date' => $validated['or_date'],
+                    'transaction_id' => $validated['transaction_id'],
+                    'payment_method' => $validated['payment_method'],
+                    'reservation_id' => $validated['reservation_id'],
                 ]);
 
                 $latestBalance = $reservation->remaining_balance - $payment->amount;
-
-                //Populate needed data for payment receipt
-                $hostOffice = Office::findOrFail($reservation->host_office_id);
-                $bookBy = "$reservation->first_name $reservation->last_name";
-                $validated['host_office_name'] = $hostOffice->name;
-                $validated['payment_receipt'] = $payment->or_number;
-                $validated['date_issued'] = now()->format('Y-m-d');
-                $validated['book_by'] = $bookBy;
-                $validated['contact'] = $reservation->phone;
-                $validated['reservation_code'] = $reservation->reservation_code;
-                $validated['total_amount_paid'] = $payment->amount;
-                $validated['total_billing'] = $reservation->total_billing;
-                $validated['previous_balance'] = $reservation->remaining_balance;
-                $validated['latest_balance'] = $latestBalance;
 
                 //Update reservation remaining balance
                 $reservation->update(['remaining_balance' => $latestBalance]);
@@ -74,36 +69,8 @@ class PaymentController extends Controller
             return redirect()->back()->with(['error' => 'Payment processing failed. Please try again.']);
         }
 
-        return to_route('reservation.paymentReceipt', [
-            'hostel' => $validated['host_office_name'],
-            'payment_receipt' => $validated['payment_receipt'],
-            'date_issued' => $validated['date_issued'],
-            'book_by' => $validated['book_by'],
-            'contact' => $validated['contact'],
-            'reservation_code' => $validated['reservation_code'],
-            'total_amount_paid' => $validated['total_amount_paid'],
-            'total_billing' => $validated['total_billing'],
-            'previous_balance' => $validated['previous_balance'],
-            'latest_balance' => $validated['latest_balance']
-        ]);
+        return to_route('reservation.paymentHistory', ['id' => $validated['reservation_id']])->with('success', 'Successfully record a payment.');
     }
-
-    public function paymentReceipt(Request $request)
-    {
-        return Inertia::render('Admin/Payment/PaymentReceipt', [
-            'hostel' => $request->hostel,
-            'paymentReceipt' => $request->payment_receipt,
-            'dateIssued' => $request->date_issued,
-            'bookBy' => $request->book_by,
-            'contact' => $request->contact,
-            'reservationCode' => $request->reservation_code,
-            'totalAmountPaid' => $request->total_amount_paid,
-            'totalBilling' => $request->total_billing,
-            'previousBalance' => $request->previous_balance,
-            'latestBalance' => $request->latest_balance
-        ]);
-    }
-
     public function paymentHistory(int $id)
     {
         $reservationPaymentHistory = Reservation::where('id', $id)
@@ -117,5 +84,17 @@ class PaymentController extends Controller
         return Inertia::render('Admin/Payment/ReservationPaymentHistory/ReservationPaymentHistory', [
             'reservationPaymentHistory' => $reservationPaymentHistory
         ]);
+    }
+
+    public function payLater(Request $request)
+    {
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)->findOrFail($request->id);
+
+        DB::transaction(function () use ($reservation) {
+            $reservation->payment_type = 'pay_later';
+            $reservation->save();
+        });
+
+        return to_route('reservation.show', ['id' => $reservation->id])->with('success', 'Successfully change to pay later.');
     }
 }
