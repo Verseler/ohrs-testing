@@ -70,7 +70,7 @@ class ReservationProcessController extends Controller
             DB::transaction(function () use ($guestOffice, $hostelOffice, $validated) {
                 //create an initial reservation
                 $reservation = Reservation::create([
-                    'reservation_code' => $this->generateReservationCode(),
+                    'reservation_code' => $this->generateReservationCode($guestOffice->id, $hostelOffice->id),
                     'check_in_date' => $validated['check_in_date'],
                     'check_out_date' => $validated['check_out_date'],
                     'total_billings' => 0,
@@ -87,7 +87,7 @@ class ReservationProcessController extends Controller
                     'employee_id' => $validated['employee_id'],
                     'purpose_of_stay' => $validated['purpose_of_stay'] ?? null,
                 ]);
-
+                dd($reservation->reservation_code);
                 //create guests
                 foreach ($validated['guests'] as $guest) {
                     $guest = Guest::create([
@@ -115,7 +115,7 @@ class ReservationProcessController extends Controller
         return redirect()->route('reservation.confirmation');
     }
 
-    private function generateReservationCode(): string
+    private function generateReservationCode(int $guestOfficeId, int $hostelOfficeId): string
     {
         $date = now()->format('Ymd');
         $maxAttempts = 100;
@@ -123,7 +123,7 @@ class ReservationProcessController extends Controller
 
         while ($attempt < $maxAttempts) {
             $randomNumber = random_int(1000, 9999);
-            $code = "RES-{$date}-{$randomNumber}";
+            $code = "RES-{$date}-{$guestOfficeId}{$hostelOfficeId}{$randomNumber}";
 
             // Check if code already exists
             if (!Reservation::where('reservation_code', $code)->exists()) {
@@ -139,7 +139,7 @@ class ReservationProcessController extends Controller
             ->first();
 
         $sequence = $latestReservation ? (int) explode('-', $latestReservation->reservation_code)[2] + 1 : 1;
-        return "RES-{$date}-" . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        return "RES-{$date}{$guestOfficeId}{$hostelOfficeId}-" . str_pad($sequence, 6, '0', STR_PAD_LEFT);
     }
 
     public function confirmation()
