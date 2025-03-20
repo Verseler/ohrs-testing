@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
 
@@ -102,5 +103,26 @@ class ReservationController extends Controller
     public function editBedAssignmentForm(int $id)
     {
         return Inertia::render('Admin/Reservation/EditBedAssignment');
+    }
+
+    public function checkStatusForm()
+    {
+        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus', [
+            'canLogin' => Route::has('login'),
+        ]);
+    }
+
+    public function checkStatus(string $code)
+    {
+        $reservation = Reservation::where('reservation_code', $code)->first();
+
+        if (!$reservation) {
+            return redirect()->back()->with('error','Reservation doesn\'t exist.');
+        }
+
+        return Inertia::render('Guest/CheckReservationStatus/ReservationStatusResult', [
+            'reservation' => $reservation,
+            'canLogin' => Route::has('login'),
+        ]);
     }
 }

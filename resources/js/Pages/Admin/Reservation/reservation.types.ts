@@ -2,7 +2,7 @@ import type { Guest } from '@/Pages/Guest/guest.types';
 import type { Bed, Room } from '@/Pages/Admin/Room/room.types';
 import type { Office } from '@/Pages/Admin/Office/office.types';
 
-export type ReservationStatus = 'pending' | 'canceled' | 'checked_in' | 'checked_out';
+export type ReservationStatus = 'pending' | 'confirmed' | 'canceled' | 'checked_in' | 'checked_out';
 
 export type PaymentType = 'full_payment' | 'pay_later'
 

@@ -4,7 +4,7 @@ import { Button } from "@/Components/ui/button";
 import { Link } from "@inertiajs/vue3";
 import { User } from "@/types";
 import Inplace from "./Inplace.vue";
-import { AlignJustify, X } from "lucide-vue-next";
+import { AlignJustify, X, ScanSearch } from "lucide-vue-next";
 
 type HeaderProps = {
     canLogin: boolean;
@@ -16,10 +16,10 @@ const { canLogin, user } = defineProps<HeaderProps>();
 
 <template>
     <header
-        class="container flex items-center justify-between w-full p-2 mx-auto bg-white md:px-4"
+        class="container flex justify-between items-center p-2 mx-auto w-full bg-white md:px-4"
     >
         <Link href="/">
-            <div class="flex items-center gap-x-2">
+            <div class="flex gap-x-2 items-center">
                 <ApplicationLogo />
                 <p class="text-xl font-bold text-primary-500">
                     <span class="text-yellow-300">H</span>ostel
@@ -29,10 +29,10 @@ const { canLogin, user } = defineProps<HeaderProps>();
             </div>
         </Link>
 
-        <div class="inline-flex items-center gap-2">
-            <nav class="flex items-center gap-x-2">
-                <Link :href="route('reservation.checkStatus')">
-                    <Button class="px-6">Check Reservation Status</Button>
+        <div class="inline-flex gap-2 items-center">
+            <nav class="flex gap-x-2 items-center">
+                <Link :href="route('reservation.checkStatusForm')">
+                    <Button class="px-3"><ScanSearch /> Reservation Status</Button>
                 </Link>
 
                 <template v-if="canLogin">

@@ -67,8 +67,8 @@ onMounted(() => {
     <div class="w-full min-h-screen">
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
-        <div class="container max-w-xl px-4 py-8 mx-auto">
-            <div class="flex items-center justify-center mb-8">
+        <div class="container px-4 py-8 mx-auto max-w-xl">
+            <div class="flex justify-center items-center mb-8">
                 <div class="p-3 bg-green-600 rounded-full">
                     <Check class="w-8 h-8 text-white" />
                 </div>
@@ -82,7 +82,7 @@ onMounted(() => {
                 for the admin confirmation and you can check your reservation
                 status in
                 <Link
-                    :href="route('reservation.checkStatus')"
+                    :href="route('reservation.checkStatusForm')"
                     class="text-blue-500 underline"
                 >
                     here
@@ -106,9 +106,9 @@ onMounted(() => {
 
                 <CardContent class="space-y-6">
                     <div class="p-4 rounded-lg bg-muted">
-                        <div class="flex items-center justify-between">
+                        <div class="flex justify-between items-center">
                             <div class="font-medium">Status</div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex gap-2 items-center">
                                 <span
                                     class="bg-yellow-500 rounded-full size-2"
                                 ></span>
@@ -124,8 +124,8 @@ onMounted(() => {
                     <Separator />
 
                     <div class="space-y-4">
-                        <div class="flex items-start gap-4">
-                            <Calendar class="h-5 w-5 text-neutral-500 mt-0.5" />
+                        <div class="flex gap-4 items-start">
+                            <Calendar class="mt-0.5 w-5 h-5 text-neutral-500" />
                             <div>
                                 <div class="font-medium">Check In</div>
                                 <div class="text-neutral-500">
@@ -134,8 +134,8 @@ onMounted(() => {
                             </div>
                         </div>
 
-                        <div class="flex items-start gap-4">
-                            <Calendar class="h-5 w-5 text-neutral-500 mt-0.5" />
+                        <div class="flex gap-4 items-start">
+                            <Calendar class="mt-0.5 w-5 h-5 text-neutral-500" />
                             <div>
                                 <div class="font-medium">Check Out</div>
                                 <div class="text-neutral-500">
@@ -144,8 +144,8 @@ onMounted(() => {
                             </div>
                         </div>
 
-                        <div class="flex items-start gap-4">
-                            <Users class="h-5 w-5 text-neutral-500 mt-0.5" />
+                        <div class="flex gap-4 items-start">
+                            <Users class="mt-0.5 w-5 h-5 text-neutral-500" />
                             <div>
                                 <div class="font-medium">Total Guests</div>
                                 <div class="text-neutral-500">
@@ -159,8 +159,8 @@ onMounted(() => {
                             </div>
                         </div>
 
-                        <div class="flex items-start gap-4">
-                            <Hotel class="h-5 w-5 text-neutral-500 mt-0.5" />
+                        <div class="flex gap-4 items-start">
+                            <Hotel class="mt-0.5 w-5 h-5 text-neutral-500" />
                             <div>
                                 <div class="font-medium">Hostel Office</div>
                                 <div class="text-neutral-500">
@@ -172,7 +172,7 @@ onMounted(() => {
                 </CardContent>
             </Card>
 
-            <div class="flex items-center mt-3 gap-x-2">
+            <div class="flex gap-x-2 items-center mt-3">
                 <Link href="/">
                     <Button
                         variant="outline"
