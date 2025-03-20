@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuestController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
@@ -56,6 +57,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/offices/{id}', [OfficeController::class, 'delete'])->name('office.delete');
 });
 
+//* Admin Guest Management
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/guests', [GuestController::class, 'list'])->name('guest.list');
+});
 
 //* Dashboard
 Route::middleware(['auth', 'verified'])->group(function () {

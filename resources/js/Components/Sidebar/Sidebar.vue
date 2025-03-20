@@ -6,7 +6,14 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import SidebarHeading from "@/Components/Sidebar/SidebarHeading.vue";
 import SidebarNavLink from "@/Components/Sidebar/SidebarNavLink.vue";
 import Button from "@/Components/ui/button/Button.vue";
-import { Bed, ChartColumnIncreasing, Hotel, LogOut, CalendarCheck } from "lucide-vue-next";
+import {
+    Bed,
+    ChartColumnIncreasing,
+    Hotel,
+    LogOut,
+    CalendarCheck,
+    Users,
+} from "lucide-vue-next";
 import { capitalized } from "@/lib/utils";
 import type { NavItem } from "./sidebar.type";
 import { SharedData } from "@/types";
@@ -42,17 +49,17 @@ const nav = ref<Array<NavItem>>([
                 icon: Bed,
             },
             {
+                label: "Guest",
+                route: "guest.list",
+                path: "/guests",
+                icon: Users,
+            },
+            {
                 label: "Office",
                 route: "office.list",
                 path: "/offices",
                 icon: Hotel,
             },
-            //     {
-            //         label: "Guest",
-            //         route: "guest.list",
-            //         path: "/guests",
-            //         icon: "pi pi-users",
-            //     },
         ],
     },
 ]);
