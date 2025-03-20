@@ -4,18 +4,12 @@ import { Button } from "@/Components/ui/button";
 import { XIcon } from "lucide-vue-next";
 
 interface Props {
-    triggerText?: string;
-    triggerClass?: string;
-    contentClass?: string;
     disabled?: boolean;
     showClose?: boolean;
     closeOnClickOutside?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    triggerText: "Click to show",
-    triggerClass: "inline-block",
-    contentClass: "",
     disabled: false,
     showClose: true,
     closeOnClickOutside: true,
@@ -71,7 +65,6 @@ onBeforeUnmount(() => {
             @click="open"
             :class="[
                 'cursor-pointer transition-colors',
-                triggerClass,
                 disabled
                     ? 'cursor-not-allowed opacity-50'
                     : 'hover:bg-muted/50',
@@ -79,24 +72,21 @@ onBeforeUnmount(() => {
         >
             <slot name="trigger">
                 <Button variant="ghost" size="sm" :disabled="disabled">
-                    {{ triggerText }}
+                    Show
                 </Button>
             </slot>
         </div>
 
         <!-- Content -->
-        <div
-            v-show="isOpen"
-            class="flex items-center animate-in gap-x-2 fade-in-0 zoom-in-95"
-        >
-            <div :class="contentClass">
+        <div v-show="isOpen" class="flex items-center gap-x-2">
+            <div class="animate-in fade-in-0 zoom-in-75">
                 <slot name="content" />
             </div>
 
             <!-- Close Button -->
             <div v-if="showClose" @click="close">
                 <slot name="close-trigger">
-                    <Button variant="ghost" size="icon" class="w-6 h-6">
+                    <Button variant="ghost" size="icon">
                         <XIcon class="w-4 h-4" />
                     </Button>
                 </slot>
