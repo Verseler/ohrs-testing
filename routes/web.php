@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
@@ -11,9 +10,10 @@ use Inertia\Inertia;
 
 //* All
 Route::get('/', function () {
-    return Inertia::render('LandingPage');
+    return Inertia::render('LandingPage', [
+        'canLogin' => Route::has('login'),
+    ]);
 });
-
 
 //* Guest Reservation
 Route::middleware('guest')->group(function () {
