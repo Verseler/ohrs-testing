@@ -12,7 +12,7 @@ import {
 } from "@/Components/ui/select";
 import { isObjectEmpty, removeItem } from "@/lib/utils";
 import { TableCell, TableRow } from "@/Components/ui/table";
-import { Alert, AlertDescription, AlertTitle } from '@/Components/ui/alert';
+import { Alert, AlertDescription } from '@/Components/ui/alert';
 
 const { form } = defineProps({
     form: {
@@ -36,7 +36,7 @@ function addGuest() {
         first_name: undefined,
         last_name: undefined,
         gender: undefined,
-        phone: undefined,
+        phone: null
     });
 }
 </script>
