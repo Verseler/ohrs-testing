@@ -15,7 +15,6 @@ import {
     CalendarClock,
     Users,
 } from "lucide-vue-next";
-import { capitalized } from "@/lib/utils";
 import type { NavItem } from "./sidebar.type";
 import { SharedData } from "@/types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
@@ -132,9 +131,9 @@ function handleLogout() {
                     </span>
                     <span
                         aria-label="user-role"
-                        class="text-[0.65rem] text-neutral-200"
+                        class="text-[0.65rem] text-neutral-200 capitalize"
                     >
-                        {{ capitalized(page.props.auth.user.role ?? "Admin") }}
+                        {{ page.props.auth.user.role ?? "Admin" }}
                     </span>
                 </div>
             </div>

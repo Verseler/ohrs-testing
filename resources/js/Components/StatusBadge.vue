@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Badge from '@/Components/ui/badge/Badge.vue';
-import { capitalized } from '@/lib/utils';
-import { ReservationStatus } from '@/Pages/ReservationManagement/reservations.types';
+import Badge from "@/Components/ui/badge/Badge.vue";
+import type { ReservationStatus } from "@/Pages/Admin/Reservation/reservation.types";
 
 const { status } = defineProps<{ status: ReservationStatus }>();
 </script>
@@ -10,14 +9,17 @@ const { status } = defineProps<{ status: ReservationStatus }>();
     <Badge
         :severity="
             status === 'checked_in'
-                ? 'success'
+                ? 'info'
                 : status === 'checked_out'
                 ? 'secondary'
                 : status === 'canceled'
                 ? 'danger'
+                : status === 'confirmed'
+                ? 'success'
                 : 'warning' //status: pending
         "
+        class='capitalize'
     >
-    {{ capitalized(status) }}
+        {{ status }}
     </Badge>
 </template>
