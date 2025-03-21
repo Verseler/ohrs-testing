@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Label } from "@/Components/ui/label";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
+import { IdCard } from 'lucide-vue-next';
 
 const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 </script>
