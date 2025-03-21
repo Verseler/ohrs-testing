@@ -260,7 +260,10 @@ watch(
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.first_name }}
-                                {{ reservation.middle_initial + "." }}
+                                {{
+                                    reservation?.middle_initial &&
+                                    reservation.middle_initial + "."
+                                }}
                                 {{ reservation.last_name }}
                             </TableCell>
                             <TableCell class="font-medium">
