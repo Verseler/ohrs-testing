@@ -18,7 +18,7 @@ class ReservationProcessController extends Controller
     {
         $regions = Region::all();
         $offices = Office::all();
-        $hostelOffice = Office::where('has_hostel', true)
+        $hostelOffice = Office::with('region')->where('has_hostel', true)
             ->findOrFail($request->hostel_office_id);
 
         return Inertia::render('Guest/ReservationForm/ReservationForm', [
@@ -87,7 +87,7 @@ class ReservationProcessController extends Controller
                     'employee_id' => $validated['employee_id'],
                     'purpose_of_stay' => $validated['purpose_of_stay'] ?? null,
                 ]);
-                dd($reservation->reservation_code);
+
                 //create guests
                 foreach ($validated['guests'] as $guest) {
                     $guest = Guest::create([
@@ -107,7 +107,6 @@ class ReservationProcessController extends Controller
                 ]);
             });
         } catch (\Exception $e) {
-            dd($e->getMessage());
             return redirect()->back()->with("error", $e->getMessage());
         }
 
