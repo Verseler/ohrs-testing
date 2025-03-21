@@ -85,7 +85,7 @@ function submit() {
                 <Table class="max-w-3xl">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
-                            {{ hostelOffice.name }} Reservation
+                           Region {{ hostelOffice.region.name }} - {{ hostelOffice.name }} Reservation
                         </TableCell>
                     </TableRow>
 
@@ -95,8 +95,9 @@ function submit() {
                             <DatePicker
                                 v-model="form.check_in_date"
                                 :invalid="!!form.errors.check_in_date"
-                                :min-value="yesterdayDate"
+                                :min-value="yesterdayDate()"
                                 :max-value="form.check_out_date"
+                                calendar-class='left-14'
                             />
                             <InputError v-if="form.errors.check_in_date">
                                 {{ form.errors.check_in_date }}
@@ -108,6 +109,7 @@ function submit() {
                                 v-model="form.check_out_date"
                                 :invalid="!!form.errors.check_out_date"
                                 :min-value="form.check_in_date"
+                                calendar-class='left-14'
                             />
                             <InputError v-if="form.errors.check_out_date">
                                 {{ form.errors.check_out_date }}

@@ -14,11 +14,15 @@ type DatePickerFieldProps = {
     minValue?: DateValue;
     disabled?: boolean;
     invalid?: boolean;
+    class?: string;
+    calendarClass?: string;
 };
 
 const {
     maxValue,
     minValue,
+    class: triggerClass,
+    calendarClass,
     disabled = false,
     invalid = false,
 } = defineProps<DatePickerFieldProps>();
@@ -213,9 +217,13 @@ onUnmounted(() => {
     <div class="relative" ref="pickerRef">
         <!-- Date input trigger -->
         <div
+            role="button"
             @click="toggleCalendar"
             class="relative flex items-center justify-between h-12 pr-2 border rounded cursor-pointer pl-3.5"
-            :class="{ 'border-red-500': invalid, 'border-green-700': !invalid }"
+            :class="[
+                invalid ? 'border-red-500' : 'border-green-700',
+                triggerClass,
+            ]"
         >
             <p
                 class="text-sm leading-none"
@@ -224,7 +232,7 @@ onUnmounted(() => {
                 {{ formattedDate ? formattedDate : "Pick a date" }}
             </p>
             <CalendarIcon
-                class='font-normal size-4'
+                class="font-normal size-4"
                 :class="{
                     'text-red-500': invalid,
                     'text-primary-700': !invalid,
@@ -235,7 +243,8 @@ onUnmounted(() => {
         <!-- Calendar popup -->
         <div
             v-if="isOpen"
-            class="absolute z-10 w-64 mt-1 bg-white border border-gray-200 rounded-md shadow-lg left-14"
+            class="absolute z-10 w-64 mt-1 bg-white border border-gray-200 rounded-md shadow-lg"
+            :class='calendarClass'
         >
             <!-- Calendar header -->
             <div class="flex items-center justify-between p-2 border-b">

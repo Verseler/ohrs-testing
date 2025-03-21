@@ -25,7 +25,9 @@ export type Reservation = {
     guests: Guest[];
     guest_office_id: number;
     hostel_office_id: number;
-    reserved_beds: Bed[]
+    reserved_beds: Bed[];
+    created_at: string;
+    updated_at: string;
 }
 
 export type ReservationFilters = {
@@ -35,6 +37,8 @@ export type ReservationFilters = {
     sort_by: string | null;
     sort_order: 'asc' | 'desc' | null;
 }
+
+export type WaitingListFilers = Omit<ReservationFilters, 'status' | 'balance'>;
 
 export type ReservationWithBeds = Omit<
     Reservation,

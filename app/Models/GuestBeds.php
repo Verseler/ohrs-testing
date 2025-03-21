@@ -17,4 +17,15 @@ class GuestBeds extends Model
     {
         return $this->belongsTo(Bed::class);
     }
+
+    public function reservedBeds($checkInDate, $checkOutDate)
+    {
+        return $this->whereHas('guest', function ($query) use ($checkInDate, $checkOutDate) {
+            $query->whereHas('reservation', function ($query) use ($checkInDate, $checkOutDate) {
+                $query->where('check_in_date', '<=', $checkInDate)
+                    ->where('check_out_date', '>=', $checkOutDate)
+                    ->whereNotIn('status', ['canceled', 'checked_out']);
+            });
+        });
+    }
 }

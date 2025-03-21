@@ -33,11 +33,11 @@ const forwardedProps = useForwardProps(delegatedProps)
   >
     <span class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectItemIndicator>
-        <Check class="h-4 w-4" />
+        <Check class="w-4 h-4" />
       </SelectItemIndicator>
     </span>
 
-    <SelectItemText>
+    <SelectItemText class='w-full'>
       <slot />
     </SelectItemText>
   </SelectItem>

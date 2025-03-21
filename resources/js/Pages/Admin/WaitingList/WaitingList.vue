@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, useForm, usePage } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import PageHeader from "@/Components/PageHeader.vue";
+import { Head, useForm } from "@inertiajs/vue3";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -9,13 +10,12 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
-import PageHeader from "@/Components/PageHeader.vue";
 import {
     Home,
-    CalendarCheck,
     Ellipsis,
-    FilterX,
     Maximize,
+    CalendarClock,
+    FilterX,
 } from "lucide-vue-next";
 import {
     Table,
@@ -32,19 +32,11 @@ import {
     PaginatorButton,
     PaginatorInfo,
 } from "@/Components/ui/paginator";
-import type {
-    ReservationFilters,
-    Reservation as ReservationWithBeds,
-} from "@/Pages/Admin/Reservation/reservation.types";
-import type { LaravelPagination, SharedData } from "@/types/index";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
-import { Button } from "@/Components/ui/button";
-import { computed, watch } from "vue";
-import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import {
     Select,
     SelectContent,
@@ -54,22 +46,29 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
-import Searchbox from "@/Components/Searchbox.vue";
-import { debounce } from "@/lib/utils";
+import { Button } from "@/Components/ui/button";
+import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
+import type {
+    ReservationFilters,
+    ReservationWithBeds,
+    WaitingListFilers,
+} from "@/Pages/Admin/Reservation/reservation.types";
+import type { LaravelPagination } from "@/types";
 import type { Office } from "@/Pages/Admin/Office/office.types";
-import StatusBadge from "@/Components/StatusBadge.vue";
+import Searchbox from "@/Components/Searchbox.vue";
+import { computed, watch } from "vue";
+import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
+import { debounce, formatDateString, formatDateTimeString } from "@/lib/utils";
+import { Bed } from '@/Pages/Admin/Room/room.types';
 
 const RESERVATIONS_COLUMNS = [
     "reservation_code",
+    "requested_date",
     "book_by",
     "check_in_date",
     "check_out_date",
-    "total_billing",
-    "remaining_balance",
     "total_guests",
     "guest_office",
-    "status",
 ] as const;
 
 type Reservation = Omit<
@@ -87,29 +86,23 @@ type ReservationManagementProps = {
 
 const { reservations, filters } = defineProps<ReservationManagementProps>();
 
-const form = useForm<ReservationFilters>({
-    status: filters.status,
-    balance: filters.balance,
+const form = useForm<WaitingListFilers>({
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
-const formHasValue = computed(
-    () => form.search || form.balance || form.status || form.sort_by
-);
+const formHasValue = computed(() => form.search || form.sort_by);
 
 //Room Filter
 const clearFilter = () => {
-    form.status = null;
-    form.balance = null;
     form.search = undefined;
     form.sort_by = null;
     form.sort_order = "asc";
 };
 
 function applyFilter() {
-    form.get(route("reservation.list"), {
+    form.get(route("reservation.waitingList"), {
         preserveScroll: true,
         preserveState: true,
         replace: true,
@@ -117,19 +110,13 @@ function applyFilter() {
 }
 
 watch(
-    [
-        () => form.status,
-        () => form.balance,
-        () => form.search,
-        () => form.sort_by,
-        () => form.sort_order,
-    ],
+    [() => form.search, () => form.sort_by, () => form.sort_order],
     debounce(applyFilter, 300)
 );
 </script>
 
 <template>
-    <Head title="Reservation Management" />
+    <Head title="Waiting List" />
 
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
@@ -142,51 +129,19 @@ watch(
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Reservation Management</BreadcrumbPage>
+                        <BreadcrumbPage>Waiting List</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
         </div>
 
         <PageHeader>
-            <template #icon><CalendarCheck /></template>
-            <template #title>Reservation Management</template>
+            <template #icon><CalendarClock /></template>
+            <template #title>Waiting List</template>
         </PageHeader>
 
         <!-- Search, Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
-            <Select v-model="form.status">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Reservation Status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Status</SelectLabel>
-                        <SelectItem value="confirmed"> Confirmed </SelectItem>
-                        <SelectItem value="checked_in"> Checked In </SelectItem>
-                        <SelectItem value="checked_out">
-                            Checked Out
-                        </SelectItem>
-                        <SelectItem value="canceled"> Canceled </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
-            <Select v-model="form.balance">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Balance Status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Balance</SelectLabel>
-                        <SelectItem value="paid"> Paid </SelectItem>
-                        <SelectItem value="has_balance">
-                            Has Balance
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
             <Select v-model="form.sort_by">
                 <SelectTrigger class="w-40">
                     <SelectValue placeholder="Sort by" />
@@ -197,6 +152,9 @@ watch(
                         <SelectItem value="reservation_code">
                             Reservation code
                         </SelectItem>
+                        <SelectItem value="created_at">
+                            Requested date
+                        </SelectItem>
                         <SelectItem value="first_name"> Book by </SelectItem>
                         <SelectItem value="check_in_date">
                             Checked in
@@ -204,10 +162,9 @@ watch(
                         <SelectItem value="check_out_date">
                             Checked out
                         </SelectItem>
-                        <SelectItem value="total_billing">
-                            Total billing
+                        <SelectItem value="guest_office_id">
+                            Guest Office
                         </SelectItem>
-                        <SelectItem value="status"> Status </SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>
@@ -233,18 +190,14 @@ watch(
                         <TableHead class="text-white">
                             Reservation Code
                         </TableHead>
+                        <TableHead class="text-white">
+                            Requested Date
+                        </TableHead>
                         <TableHead class="text-white"> Book by </TableHead>
                         <TableHead class="text-white"> Check in </TableHead>
                         <TableHead class="text-white"> Check out </TableHead>
-                        <TableHead class="text-white">
-                            Total Billing
-                        </TableHead>
-                        <TableHead class="text-white">
-                            Remaining Balance
-                        </TableHead>
                         <TableHead class="text-white"> Total Guests </TableHead>
                         <TableHead class="text-white"> Guest Office </TableHead>
-                        <TableHead class="text-white"> Status </TableHead>
                         <TableHead class="text-right"></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -259,30 +212,33 @@ watch(
                                 {{ reservation.reservation_code }}
                             </TableCell>
                             <TableCell class="font-medium">
+                                {{
+                                    formatDateTimeString(reservation.created_at)
+                                }}
+                            </TableCell>
+                            <TableCell class="font-medium">
                                 {{ reservation.first_name }}
-                                {{ reservation.middle_initial + "." }}
+                                {{
+                                    reservation.middle_initial &&
+                                    reservation.middle_initial + "."
+                                }}
                                 {{ reservation.last_name }}
                             </TableCell>
                             <TableCell class="font-medium">
-                                {{ reservation.check_in_date }}
+                                {{
+                                    formatDateString(reservation.check_in_date)
+                                }}
                             </TableCell>
                             <TableCell class="font-medium">
-                                {{ reservation.check_out_date }}
-                            </TableCell>
-                            <TableCell class="font-medium">
-                                {{ reservation.total_billings }}
-                            </TableCell>
-                            <TableCell class="font-medium">
-                                {{ reservation.remaining_balance }}
+                                {{
+                                    formatDateString(reservation.check_out_date)
+                                }}
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.guests.length }}
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.guest_office.name }}
-                            </TableCell>
-                            <TableCell>
-                                <StatusBadge :status="reservation.status" />
                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>
@@ -297,12 +253,15 @@ watch(
                                         <div class="flex flex-col">
                                             <PopoverLinkField
                                                 :href="
-                                                    route('reservation.show', {
-                                                        id: reservation.id,
-                                                    })
+                                                    route(
+                                                        'reservation.assignBeds',
+                                                        {
+                                                            id: reservation.id,
+                                                        }
+                                                    )
                                                 "
                                             >
-                                                <Maximize />Show
+                                                Assign Beds
                                             </PopoverLinkField>
                                         </div>
                                     </PopoverContent>

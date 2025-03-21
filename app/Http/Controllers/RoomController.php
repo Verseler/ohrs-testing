@@ -17,40 +17,35 @@ class RoomController extends Controller
     public function list(Request $request)
     {
         $request->validate([
-            'selected_date'=> ['nullable', 'date'],
+            'check_in_date' => ['nullable', 'date'],
+            'check_out_date' => ['nullable', 'date'],
             'eligible_gender' => ['nullable', Rule::in(['any', 'male', 'female'])],
             'status' => ['nullable', Rule::in(['available', 'fully_occupied'])],
             'sort_by' => ['nullable', Rule::in(['name', 'status', 'eligible_gender', 'beds_count', 'available_beds', 'bed_price'])],
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
-        $date = $request->selected_date ? Carbon::parse($request->selected_date) : Carbon::today();
+        $checkInDate = $request->check_in_date ? Carbon::parse($request->check_in_date) : Carbon::today();
+        $checkOutDate = $request->check_out_date ? Carbon::parse($request->check_out_date) : Carbon::now()->addDays(1);
 
         // Get all beds reserved for the selected date
-        $reservedBedIds = GuestBeds::whereHas('guest', function ($query) use ($date) {
-            $query->whereHas('reservation', function ($query) use ($date) {
-            $query->where('check_in_date', '<=', $date)
-                ->where('check_out_date', '>=', $date)
-                ->whereNotIn('status', ['canceled', 'checked_out']);
-            });
-        })->pluck('bed_id');
-
+        $guestBeds = new GuestBeds();
+        $reservedBedIds = $guestBeds->reservedBeds($checkInDate, $checkOutDate)
+            ->pluck('bed_id')->toArray();
+       
         $query = Room::withCount([
             'beds',
             'beds as available_beds' => function ($query) use ($reservedBedIds) {
                 $query->whereNotIn('id', $reservedBedIds);
             }
         ])
-        //Bed prices
-        ->with(['beds' => function($query) {
-            $query->select('id', 'room_id', 'price');
-        }])
-        ->where('office_id', Auth::user()->office_id);
-
-        // Search Filter
-        if ($request->filled('search')) {
-            $query->where('name', 'ILIKE', "%{$request->search}%");
-        }
+            //Bed prices
+            ->with([
+                'beds' => function ($query) {
+                    $query->select('id', 'room_id', 'price');
+                }
+            ])
+            ->where('office_id', Auth::user()->office_id);
 
         // Gender Filter
         if ($request->filled('eligible_gender') && in_array($request->eligible_gender, ['any', 'male', 'female'])) {
@@ -60,8 +55,11 @@ class RoomController extends Controller
         // Sorting updates
         if ($request->filled('sort_by')) {
             $sortBy = in_array($request->sort_by, [
-                'name', 'eligible_gender', 'beds_count',
-                'available_beds', 'bed_price'
+                'name',
+                'eligible_gender',
+                'beds_count',
+                'available_beds',
+                'bed_price'
             ]) ? $request->sort_by : 'name';
 
             $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
@@ -104,7 +102,7 @@ class RoomController extends Controller
             'office_id' => Auth::user()->office_id,
         ]);
 
-        for($i = 1; $i <= $validated['number_of_beds']; $i++) {
+        for ($i = 1; $i <= $validated['number_of_beds']; $i++) {
             $room->beds()->create(['name' => "Bed #$i", 'price' => $validated['bed_price_rate']]);
         }
 
@@ -117,7 +115,7 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
 
         // Check if any beds in this room have future reservations
-        $hasFutureReservations = $room->beds()->whereHas('guestBeds.guest.reservation', function($query) {
+        $hasFutureReservations = $room->beds()->whereHas('guestBeds.guest.reservation', function ($query) {
             $query->where('check_out_date', '>=', Carbon::today());
         })->exists();
 
@@ -206,34 +204,34 @@ class RoomController extends Controller
 
     public function getAvailableRooms(Request $request)
     {
-    $validated = $request->validate([
-        'selected_date' => ['required','date'],
-    ]);
+        $validated = $request->validate([
+            'selected_date' => ['required', 'date'],
+        ]);
 
-    $date = Carbon::parse($validated['selected_date']);
+        $date = Carbon::parse($validated['selected_date']);
 
-    // Get all beds with active reservations for the target date
-    $reservedBedIds = GuestBeds::reservedOnDate($date)->pluck('bed_id');
+        // Get all beds with active reservations for the target date
+        $reservedBedIds = GuestBeds::reservedOnDate($date)->pluck('bed_id');
 
-    // Get all rooms with their beds
-    $rooms = Room::with('beds', 'eligibleGenderSchedules')->get()->map(function (Room $room) use ($reservedBedIds, $date) {
-        $eligibleGenderSchedule = EligibleGenderSchedule::where('room_id', $room->id)->where('start_date', '<=', $date)->where('end_date', '>=', $date)->first();
-        $roomEligibleGender = $eligibleGenderSchedule->eligible_gender ?? $room->eligible_gender;
+        // Get all rooms with their beds
+        $rooms = Room::with('beds', 'eligibleGenderSchedules')->get()->map(function (Room $room) use ($reservedBedIds, $date) {
+            $eligibleGenderSchedule = EligibleGenderSchedule::where('room_id', $room->id)->where('start_date', '<=', $date)->where('end_date', '>=', $date)->first();
+            $roomEligibleGender = $eligibleGenderSchedule->eligible_gender ?? $room->eligible_gender;
 
-        //get all available beds of the current room
-        $bedCount = $room->beds
-            ->whereNotIn('id', $reservedBedIds)
-            ->count();
+            //get all available beds of the current room
+            $bedCount = $room->beds
+                ->whereNotIn('id', $reservedBedIds)
+                ->count();
 
-        //structure the data so that we get the room with its available beds
-        return [
-            'id' => $room->id,
-            'name' => $room->name,
-            'eligible_gender' => $roomEligibleGender,
-            'beds_count' => $bedCount
-        ];
-    });
+            //structure the data so that we get the room with its available beds
+            return [
+                'id' => $room->id,
+                'name' => $room->name,
+                'eligible_gender' => $roomEligibleGender,
+                'beds_count' => $bedCount
+            ];
+        });
 
-    return response()->json($rooms);
+        return response()->json($rooms);
     }
 }

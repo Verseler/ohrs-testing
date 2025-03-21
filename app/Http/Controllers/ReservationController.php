@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bed;
+use App\Models\GuestBeds;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +26,7 @@ class ReservationController extends Controller
         $query = Reservation::with(relations: ['guests', 'guestOffice', 'hostelOffice'])
             //Make sure that the reservations is ony accessible by authorized admin
             ->where('hostel_office_id', Auth::user()->office_id)
-            //Make sure to not include the pending reservations because it has dedicated page for that (Waiting List Pages)
+            //Make sure to not include the pending reservations because it has a dedicated page for that. (Waiting List Page)
             ->whereNotIn('status', ['pending']);
 
 
@@ -103,6 +105,89 @@ class ReservationController extends Controller
     public function editBedAssignmentForm(int $id)
     {
         return Inertia::render('Admin/Reservation/EditBedAssignment');
+    }
+
+    public function waitingList(Request $request)
+    {
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'sort_by' => ['nullable', Rule::in(['reservation_code', 'created_at', 'first_name', 'check_in_date', 'check_out_date', 'guest_office_id'])],
+            'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
+        ]);
+
+        $query = Reservation::with(relations: ['guests', 'guestOffice', 'hostelOffice'])
+            //Make sure that the reservations is only accessible by authorized admin
+            ->where('hostel_office_id', Auth::user()->office_id)
+            //Make sure the reservation status is pending
+            ->whereIn('status', ['pending']);
+
+
+        // Search Filter
+        if ($request->filled('search')) {
+            $query->where(function ($query) use ($request) {
+                $query->where('first_name', 'ILIKE', "%{$request->search}%")
+                    ->orWhere('last_name', 'ILIKE', "%{$request->search}%")
+                    ->orWhere('reservation_code', 'ILIKE', "%{$request->search}%");
+            });
+        }
+
+        // Sorting updates
+        if ($request->filled('sort_by')) {
+            $sortBy = in_array($request->sort_by, [
+                'reservation_code',
+                'created_at',
+                'first_name',
+                'check_in_date',
+                'check_out_date',
+                'guest_office_id'
+            ]) ? $request->sort_by : 'reservation_code';
+
+            $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
+            $query->orderBy($sortBy, $sortOrder);
+        }
+
+        $reservations = $query->paginate(10);
+
+        return Inertia::render('Admin/WaitingList/WaitingList', [
+            'reservations' => $reservations,
+            'filters' => $request->only(['search', 'sort_by', 'sort_order'])
+        ]);
+    }
+
+    public function assignBeds(int $id)
+    {
+
+        $reservation = Reservation::with([
+            'guests' => function($query) {
+                $query->orderBy('gender');
+            },
+            'guestOffice.region',
+            'hostelOffice.region',
+            'reservedBeds'
+        ])->where([
+                    ['hostel_office_id', Auth::user()->office_id],
+                    ['status', 'pending']
+                ])->findOrFail($id);
+
+
+        //Available Beds
+        $checkInDate = $reservation->check_in_date;
+        $checkOutDate = $reservation->check_out_date;
+
+        $guestBeds = new GuestBeds();
+        $reservedBedIds = $guestBeds->reservedBeds($checkInDate, $checkOutDate)
+            ->pluck('bed_id')->toArray();
+
+        $availableBeds = Bed::whereNotIn('id', $reservedBedIds)
+            ->with(['room' => function($query) use($reservation) {
+                $query->where('office_id', $reservation->hostel_office_id);
+            }])
+            ->orderBy('room_id', 'asc')->get();
+
+        return Inertia::render('Admin/WaitingList/GuestBedAssignment', [
+            'reservation' => $reservation,
+            'availableBeds' => $availableBeds
+        ]);
     }
 
     public function checkStatusForm()

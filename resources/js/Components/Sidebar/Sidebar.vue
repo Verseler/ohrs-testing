@@ -12,6 +12,7 @@ import {
     Hotel,
     LogOut,
     CalendarCheck,
+    CalendarClock,
     Users,
 } from "lucide-vue-next";
 import { capitalized } from "@/lib/utils";
@@ -36,6 +37,12 @@ const nav = ref<Array<NavItem>>([
     {
         heading: "MANAGEMENT",
         items: [
+            {
+                label: "Waiting List",
+                route: "reservation.waitingList",
+                path: "/waiting-list",
+                icon: CalendarClock,
+            },
             {
                 label: "Reservation",
                 route: "reservation.list",

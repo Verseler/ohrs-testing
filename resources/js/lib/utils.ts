@@ -114,6 +114,10 @@ export function yesterdayDate() {
     return new Date(Date.now() - 1000 * 60 * 60 * 24);
 }
 
+export function tomorrowDate() {
+   return new Date(+new Date() + 86400000);
+}
+
 
 //remove element in an array using index
 export function removeItem<T>(arr: Array<T>, index: number): Array<T> {

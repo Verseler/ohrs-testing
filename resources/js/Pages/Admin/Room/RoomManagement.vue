@@ -50,7 +50,6 @@ import {
     PopoverTrigger,
 } from "@/Components/ui/popover";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
-import Searchbox from "@/Components/Searchbox.vue";
 import type { LaravelPagination, SharedData } from "@/types/index";
 import type {
     Bed,
@@ -64,9 +63,14 @@ import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
-import { debounce, formatDate } from "@/lib/utils";
+import {
+    debounce,
+    tomorrowDate,
+    yesterdayDate,
+} from "@/lib/utils";
 import { toast } from "vue-sonner";
-import DatePicker from '@/Components/DatePicker.vue';
+import { Label } from "@/Components/ui/label";
+import DatePicker from "@/Components/DatePicker.vue";
 
 const ROOMS_COLUMNS = [
     "name",
@@ -100,23 +104,20 @@ const page = usePage<SharedData>();
 
 const selectedRoom = ref<Room | null>(null);
 
-const form = useForm<RoomFilters>({
-    selected_date: filters.selected_date ?? formatDate(new Date()),
-    search: filters.search,
+const form = useForm({
+    check_in_date: filters.check_in_date ?? new Date(),
+    check_out_date: filters.check_in_date ?? tomorrowDate(),
     eligible_gender: filters.eligible_gender,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
-const formHasValue = computed(
-    () => form.search || form.eligible_gender || form.sort_by
-);
+const formHasValue = computed(() => form.eligible_gender || form.sort_by);
 
 //Room Filter
 const clearFilter = () => {
-    form.search = undefined;
-    form.eligible_gender = null;
-    form.sort_by = null;
+    form.eligible_gender = undefined;
+    form.sort_by = undefined;
     form.sort_order = "asc";
 };
 
@@ -130,8 +131,8 @@ function applyFilter() {
 
 watch(
     [
-        () => form.selected_date,
-        () => form.search,
+        () => form.check_out_date,
+        () => form.check_in_date,
         () => form.eligible_gender,
         () => form.sort_by,
         () => form.sort_order,
@@ -212,13 +213,8 @@ function handleDeleteRoom() {
             <template #title>Room Management</template>
         </PageHeader>
 
-        <!-- Search, Filter and Sort -->
+        <!-- Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
-            <input
-                class="py-0 text-sm rounded shadow-sm border-neutral-200"
-                type="date"
-                v-model="form.selected_date"
-            />
             <Select v-model="form.eligible_gender as Gender">
                 <SelectTrigger class="w-40">
                     <SelectValue placeholder="Select a gender" />
@@ -244,7 +240,7 @@ function handleDeleteRoom() {
                         <SelectItem value="eligible_gender">
                             Eligible Gender
                         </SelectItem>
-                        <SelectItem value="beds_count"> Beds Count </SelectItem>
+                        <SelectItem value="beds_count"> Total Beds </SelectItem>
                         <SelectItem value="available_beds">
                             Available Beds
                         </SelectItem>
@@ -264,7 +260,39 @@ function handleDeleteRoom() {
                 <FilterX />
             </Button>
 
-            <Searchbox class="ml-auto" v-model="form.search" />
+            <div class="flex items-center ml-auto gap-x-2 h-9">
+                <div class="relative">
+                    <Label
+                        for="check_in"
+                        class="absolute text-[0.65rem] text-neutral-500 z-10 -top-2 left-1.5 bg-white"
+                    >
+                        Check In
+                    </Label>
+                    <DatePicker
+                        id="check_in"
+                        class="text-sm rounded shadow-sm max-h-10 min-w-40 border-neutral-200"
+                        calendar-class='-right-10'
+                        v-model="form.check_in_date"
+                        :min-value="yesterdayDate()"
+                        :max-value="form.check_out_date"
+                    />
+                </div>
+                <div class="relative">
+                    <Label
+                        for="check_out"
+                        class="absolute text-[0.65rem] text-neutral-500 z-10 -top-2 left-1.5 bg-white"
+                    >
+                        Check Out
+                    </Label>
+                    <DatePicker
+                        id="check_out"
+                        class="text-sm rounded shadow-sm max-h-10 min-w-40 border-neutral-200"
+                        calendar-class='right-0'
+                        v-model="form.check_out_date"
+                        :min-value="form.check_in_date"
+                    />
+                </div>
+            </div>
         </div>
 
         <div class="border rounded">
@@ -272,7 +300,7 @@ function handleDeleteRoom() {
                 <TableHeader>
                     <TableRow class="bg-primary-500 hover:bg-primary-600">
                         <TableHead class="text-white"> Room Name </TableHead>
-                        <TableHead class="text-white">Beds Count</TableHead>
+                        <TableHead class="text-white"> Total Beds </TableHead>
                         <TableHead class="text-white">
                             Available Beds
                         </TableHead>
