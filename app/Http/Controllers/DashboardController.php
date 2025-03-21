@@ -28,7 +28,7 @@ class DashboardController extends Controller
 
         //For the selected month and year (selectedDate)
         $pendingReservationsCount = Reservation::where([
-            ['hostel_office_id', '=', Auth::user()->id],
+            ['hostel_office_id', '=', Auth::user()->office_id],
             ['status', '=', 'pending']
         ])
             ->whereYear('check_in_date', $selectedDate->year)
@@ -37,16 +37,18 @@ class DashboardController extends Controller
 
         //total reservation
         $totalReservationsCount = Reservation::where([
-            ['hostel_office_id', '=', Auth::user()->id]
+            ['hostel_office_id', '=', Auth::user()->office_id]
         ])
+            ->whereNotIn('status', ['pending', 'canceled'])
             ->whereYear('check_in_date', $selectedDate->year)
             ->whereMonth('check_in_date', $selectedDate->month)
             ->count();
 
         //total guests
         $totalGuestsCount = Reservation::where([
-            ['hostel_office_id', '=', Auth::user()->id]
+            ['hostel_office_id', '=', Auth::user()->office_id]
         ])
+            ->whereNotIn('status', ['pending', 'canceled'])
             ->whereYear('check_in_date', $selectedDate->year)
             ->whereMonth('check_in_date', $selectedDate->month)
             ->withCount('guests')
@@ -56,12 +58,12 @@ class DashboardController extends Controller
         //total revenue (Already paid)
         $totalRevenue = Payment::whereHas('reservation', function ($query) use ($selectedDate) {
             $query->where([
-                ['hostel_office_id', '=', Auth::user()->id]
+                ['hostel_office_id', '=', Auth::user()->office_id]
             ])
-            ->whereYear('check_in_date', $selectedDate->year)
-            ->whereMonth('check_in_date', $selectedDate->month);
+                ->whereYear('check_in_date', $selectedDate->year)
+                ->whereMonth('check_in_date', $selectedDate->month);
         })
-        ->sum('amount');
+            ->sum('amount');
 
         //For monthly revenue of selected year ($monthlyRevenueYear)
         $monthlyRevenue = [
@@ -83,12 +85,12 @@ class DashboardController extends Controller
             $monthNumber = array_search($monthData['name'], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']) + 1;
             $monthData['revenue'] = Payment::whereHas('reservation', function ($query) use ($monthlyRevenueYear, $monthNumber) {
                 $query->where([
-                    ['hostel_office_id', '=', Auth::user()->id]
+                    ['hostel_office_id', '=', Auth::user()->office_id]
                 ])
-                ->whereYear('check_in_date', $monthlyRevenueYear->year)
-                ->whereMonth('check_in_date', $monthNumber);
+                    ->whereYear('check_in_date', $monthlyRevenueYear->year)
+                    ->whereMonth('check_in_date', $monthNumber);
             })
-            ->sum('amount');
+                ->sum('amount');
         }
 
         return Inertia::render('Admin/Dashboard/Dashboard', [
