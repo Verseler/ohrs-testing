@@ -4,32 +4,17 @@ import { usePage } from "@inertiajs/vue3";
 import type { SharedData } from "@/types";
 import Header from "@/Components/Header.vue";
 import LinkButton from "@/Components/LinkButton.vue";
-import { TreePalmIcon, HotelIcon, Building2Icon } from "lucide-vue-next";
+import { HotelIcon } from "lucide-vue-next";
+import type { Office } from "@/Pages/Admin/Office/office.types";
 
-const { canLogin } = defineProps<{ canLogin: boolean }>();
+type LandingPageProps = {
+    canLogin: boolean;
+    hostels: Office[];
+};
+
+const { canLogin, hostels } = defineProps<LandingPageProps>();
 
 const page = usePage<SharedData>();
-
-const offices = [
-    {
-        id: 1,
-        name: "Regional Executive Office",
-        icon: HotelIcon,
-        available: true,
-    },
-    {
-        id: 2,
-        name: "Camiguin",
-        icon: TreePalmIcon,
-        available: false,
-    },
-    {
-        id: 3,
-        name: "Other Office",
-        icon: Building2Icon,
-        available: false,
-    },
-];
 </script>
 
 <template>
@@ -49,40 +34,38 @@ const offices = [
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="container flex flex-wrap items-center justify-center gap-6 ">
                 <div
-                    v-for="office in offices"
-                    :key="office.id"
-                    class="overflow-hidden transition-all duration-200 bg-white border border-gray-200 rounded-lg shadow-sm"
+                    v-for="hostel in hostels"
+                    :key="hostel.id"
+                    class="overflow-hidden transition-all duration-200 bg-white border border-gray-200 rounded-lg shadow-sm min-w-64"
                     :class="
-                        office.available
+                        hostel.has_hostel
                             ? 'hover:shadow-md hover:border-primary/50'
                             : 'opacity-75'
                     "
                 >
                     <div class="p-6">
-                        <div class="flex justify-center mb-4">
+                        <div class="flex justify-center mb-3">
                             <div
                                 class="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10"
                             >
-                                <component
-                                    :is="office.icon"
-                                    class="w-8 h-8 text-primary"
-                                />
+                                <HotelIcon class="size-8 text-primary-500" />
                             </div>
                         </div>
 
-                        <h2 class="mb-2 text-lg font-semibold text-center">
-                            {{ office.name }}
+                        <h2 class="text-lg font-semibold text-center">
+                            {{ hostel.name }}
                         </h2>
+                        <p class='mb-3 text-sm font-medium text-center text-neutral-500'>Region {{ hostel.region.name }}</p>
 
                         <div class="flex justify-center">
                             <LinkButton
-                                v-if="office.available"
+                                v-if="hostel.has_hostel"
                                 class="w-full"
                                 :href="
                                     route('reservation.form', {
-                                        hostel_office_id: office.id,
+                                        hostel_office_id: hostel.id,
                                     })
                                 "
                             >

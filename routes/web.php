@@ -7,12 +7,17 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationProcessController;
+use App\Models\Office;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 //* All
 Route::get('/', function () {
+    $hostels = Office::with('region')->where('has_hostel', true)->get();
+
     return Inertia::render('LandingPage', [
         'canLogin' => Route::has('login'),
+        'hostels' => $hostels
     ]);
 });
 
