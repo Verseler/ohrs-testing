@@ -84,7 +84,7 @@ class ReservationController extends Controller
         $reservation = Reservation::with([
             'guestOffice.region',
             'hostelOffice.region',
-            'reservedBeds'
+            'reservedBeds.room'
         ])->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
 
         return Inertia::render("Admin/Reservation/ReservationDetails/ReservationDetails", [

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GenderBadge from '@/Components/GenderBadge.vue';
+import GenderBadge from "@/Components/GenderBadge.vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 
@@ -15,11 +15,11 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
             <div class="space-y-2">
                 <template v-if="reservation.reserved_beds.length > 0">
                     <div
-                        v-for="bed in reservation.beds"
-                        class="inline-flex text-sm gap-x-2"
+                        v-for="bed in reservation.reserved_beds"
+                        class="flex text-sm gap-x-2"
                     >
                         <p>{{ bed.room.name }}</p>
-                        <p>{{ bed.name }}</p>
+                        <p>- {{ bed.name }}</p>
                         <GenderBadge
                             class="ml-auto"
                             :gender="bed.room.eligible_gender"
