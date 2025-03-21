@@ -199,7 +199,7 @@ class ReservationController extends Controller
 
     public function checkStatus(string $code)
     {
-        $reservation = Reservation::where('reservation_code', $code)->first();
+        $reservation = Reservation::with('guests')->where('reservation_code', $code)->first();
 
         if (!$reservation) {
             return redirect()->back()->with('error','Reservation doesn\'t exist.');
