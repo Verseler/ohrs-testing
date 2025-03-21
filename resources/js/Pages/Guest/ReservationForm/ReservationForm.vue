@@ -21,6 +21,7 @@ import DatePicker from "@/Components/DatePicker.vue";
 import { yesterdayDate } from "@/lib/utils";
 import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
+import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 
 type ReservationFormProps = {
     canLogin: boolean;
@@ -69,6 +70,13 @@ watch(selectedRegionId, () => {
     form.guest_office_id = undefined;
 });
 
+//confirmation dialog
+const confirmation = ref(false);
+
+function showConfirmation() {
+    confirmation.value = true;
+}
+
 function submit() {
     form.post(route("reservation.create"));
 }
@@ -80,12 +88,14 @@ function submit() {
     <div class="w-full min-h-screen">
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
+        {{ page.props.flash.error }}
         <div class="px-2 py-4 md:p-8">
-            <form @submit.prevent="submit">
+            <form @submit.prevent="showConfirmation">
                 <Table class="max-w-3xl">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
-                           Region {{ hostelOffice.region.name }} - {{ hostelOffice.name }} Reservation
+                            Region {{ hostelOffice.region.name }} -
+                            {{ hostelOffice.name }} Reservation
                         </TableCell>
                     </TableRow>
 
@@ -97,7 +107,7 @@ function submit() {
                                 :invalid="!!form.errors.check_in_date"
                                 :min-value="yesterdayDate()"
                                 :max-value="form.check_out_date"
-                                calendar-class='left-14'
+                                calendar-class="left-14"
                             />
                             <InputError v-if="form.errors.check_in_date">
                                 {{ form.errors.check_in_date }}
@@ -109,7 +119,7 @@ function submit() {
                                 v-model="form.check_out_date"
                                 :invalid="!!form.errors.check_out_date"
                                 :min-value="form.check_in_date"
-                                calendar-class='left-14'
+                                calendar-class="left-14"
                             />
                             <InputError v-if="form.errors.check_out_date">
                                 {{ form.errors.check_out_date }}
@@ -291,12 +301,22 @@ function submit() {
                             <Button
                                 type="submit"
                                 class="w-full h-12 mt-4 text-base"
-                                >Submit</Button
                             >
+                                Submit
+                            </Button>
                         </TableCell>
                     </TableRow>
                 </Table>
             </form>
         </div>
     </div>
+
+    <Alert
+        :open="confirmation"
+        @update:open="confirmation = $event"
+        :onConfirm="submit"
+        title="Are you sure you want to submit this reservation?"
+        description="Please confirm that all the details are correct before proceeding."
+        confirm-label="Confirm"
+    />
 </template>
