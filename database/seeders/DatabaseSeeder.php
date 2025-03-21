@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@gmail.com',
             'role' => 'admin',
-            'office_id' => 1,
+            'office_id' => 175,
             'password' => bcrypt('1010101010'),
         ]);
     }

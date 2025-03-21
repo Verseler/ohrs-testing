@@ -17,10 +17,12 @@ class RoomFactory extends Factory
      */
     public function definition(): array
     {
+        static $order = 1;
+
         return [
-            'name' => $this->faker->name,
+            'name' => 'Room ' . $order++,
             'eligible_gender' => 'any',//$this->faker->randomElement(['any', 'male', 'female']),
-            'office_id' => 1, //!temporary
+            'office_id' => 175, //! region 10 - REO
         ];
     }
 }
