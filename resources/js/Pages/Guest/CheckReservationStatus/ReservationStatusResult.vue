@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Header from "@/Components/Header.vue";
-import { formatDateString } from "@/lib/utils";
+import { formatDateString, obscureName } from "@/lib/utils";
 import type {
     Reservation,
     ReservationStatus,
@@ -106,6 +106,29 @@ const statusConfig = computed(() => {
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <h3 class="text-sm font-medium text-gray-500">
+                            Book By
+                        </h3>
+                        <p class="mt-1">
+                            {{
+                                obscureName(
+                                    reservation.first_name,
+                                    reservation.last_name
+                                )
+                            }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Number of Guests
+                        </h3>
+                        <p class="mt-1">
+                            {{ reservation?.guests?.length }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">
                             Check-in Date
                         </h3>
                         <p class="mt-1">
@@ -130,12 +153,33 @@ const statusConfig = computed(() => {
                         </p>
                     </div>
 
-                    <div>
+                    <div
+                        v-if="
+                            reservation.status !== 'pending' &&
+                            reservation.status !== 'canceled' &&
+                            reservation.total_billings
+                        "
+                    >
                         <h3 class="text-sm font-medium text-gray-500">
-                            Number of Guests
+                            Total Billings
                         </h3>
                         <p class="mt-1">
-                            {{ reservation?.guests?.length }}
+                            {{ reservation.total_billings }}
+                        </p>
+                    </div>
+
+                    <div
+                        v-if="
+                            reservation.status !== 'pending' &&
+                            reservation.status !== 'canceled' &&
+                            reservation.remaining_balance
+                        "
+                    >
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Remaining Balance
+                        </h3>
+                        <p class="mt-1">
+                            {{ reservation.remaining_balance }}
                         </p>
                     </div>
                 </div>

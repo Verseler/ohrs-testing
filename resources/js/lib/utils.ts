@@ -138,3 +138,23 @@ export function removeItem<T>(arr: Array<T>, index: number): Array<T> {
 
     return Object.keys(obj).length === 0;
 }
+
+
+
+//hide some letters in the name. It partially obscure a name
+export function obscureName(first_name: string, last_name: string): string {
+    const obscureName = (name: string, visibleChars: number = 3): string => {
+        if (name.length <= visibleChars) {
+            return name;
+        }
+        // Reveal the first `visibleChars` characters and replace the rest with *
+        return name.slice(0, visibleChars) + '*'.repeat(name.length - visibleChars);
+    };
+
+    // Obscure first and last names
+    const secureFirstName = obscureName(first_name);
+    const secureLastName = obscureName(last_name);
+
+    // Return the combined secure name
+    return `${secureFirstName} ${secureLastName}`;
+}
