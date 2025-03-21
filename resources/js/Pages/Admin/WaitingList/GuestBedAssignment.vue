@@ -13,7 +13,7 @@ import {
     BreadcrumbPage,
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 import { SharedData } from "@/types";
 import { toast } from "vue-sonner";
 import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
@@ -45,6 +45,25 @@ onMounted(() => {
         }, 300);
     }
 });
+
+watch(
+    () => page.props.flash.error,
+    () => {
+        if (page.props.flash.error) {
+            toast.error(page.props.flash.error, {
+                style: {
+                    background: "#ef4444",
+                    color: "white",
+                },
+                position: "top-center",
+            });
+
+            setTimeout(() => {
+                page.props.flash.error = null;
+            }, 300);
+        }
+    }
+);
 </script>
 
 <template>
@@ -84,7 +103,11 @@ onMounted(() => {
 
         <!-- Main content -->
         <div class="flex max-w-6xl gap-6">
-            <AssignGuestList :reservation="reservation" :availableBeds='availableBeds' class="flex-1" />
+            <AssignGuestList
+                :reservation="reservation"
+                :availableBeds="availableBeds"
+                class="flex-1"
+            />
             <ReservationOverview :reservation="reservation" />
         </div>
     </AuthenticatedLayout>

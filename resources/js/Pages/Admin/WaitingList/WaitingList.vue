@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, usePage } from "@inertiajs/vue3";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -53,13 +53,13 @@ import type {
     ReservationWithBeds,
     WaitingListFilers,
 } from "@/Pages/Admin/Reservation/reservation.types";
-import type { LaravelPagination } from "@/types";
+import type { LaravelPagination, SharedData } from "@/types";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import Searchbox from "@/Components/Searchbox.vue";
-import { computed, watch } from "vue";
+import { computed, onMounted, watch } from "vue";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import { debounce, formatDateString, formatDateTimeString } from "@/lib/utils";
-import { Bed } from '@/Pages/Admin/Room/room.types';
+import { toast } from 'vue-sonner';
 
 const RESERVATIONS_COLUMNS = [
     "reservation_code",
@@ -85,6 +85,8 @@ type ReservationManagementProps = {
 };
 
 const { reservations, filters } = defineProps<ReservationManagementProps>();
+
+const page = usePage<SharedData>();
 
 const form = useForm<WaitingListFilers>({
     search: filters.search,
@@ -113,6 +115,23 @@ watch(
     [() => form.search, () => form.sort_by, () => form.sort_order],
     debounce(applyFilter, 300)
 );
+
+// Display flash success or error message as sonner or toast
+onMounted(() => {
+    if (page.props.flash.success) {
+        toast.success(page.props.flash.success, {
+            style: {
+                background: "#22c55e",
+                color: "white",
+            },
+            position: "top-center",
+        });
+
+        setTimeout(() => {
+            page.props.flash.success = null;
+        }, 300);
+    }
+});
 </script>
 
 <template>
@@ -254,7 +273,7 @@ watch(
                                             <PopoverLinkField
                                                 :href="
                                                     route(
-                                                        'reservation.assignBeds',
+                                                        'reservation.assignBedsForm',
                                                         {
                                                             id: reservation.id,
                                                         }

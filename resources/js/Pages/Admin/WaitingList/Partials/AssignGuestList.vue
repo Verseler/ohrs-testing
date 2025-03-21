@@ -11,12 +11,14 @@ import {
 import { Button } from "@/Components/ui/button";
 import { Bed } from "@/Pages/Admin/Room/room.types";
 import { useForm } from "@inertiajs/vue3";
-import { watch, ref } from "vue";
+import { watch, ref, computed } from "vue";
 import { Gender } from "@/Pages/Guest/guest.types";
 import GenderBadge from "@/Components/GenderBadge.vue";
 import LinkButton from "@/Components/LinkButton.vue";
 import { RefreshCw } from "lucide-vue-next";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
+import { InputError } from "@/Components/ui/input";
+import { getDaysDifference } from "@/lib/utils";
 
 type AssignGuestListProps = {
     reservation: ReservationWithBeds;
@@ -38,8 +40,37 @@ const prepareGuests = () => {
 
 // Initialize form with prepared guests
 const form = useForm({
+    reservation_id: reservation.id,
     guests: prepareGuests(),
 });
+
+const lengthOfStay = computed(() => {
+    const difference = getDaysDifference(
+        reservation.check_in_date,
+        reservation.check_out_date
+    );
+
+    if (difference === 0) return 1;
+
+    return difference;
+});
+
+const totalPrice = computed(() =>
+    form.guests.reduce((price, currentGuest) => {
+        return (
+            price + (currentGuest.bed_id ? getBedPrice(currentGuest.bed_id) : 0)
+        );
+    }, 0)
+);
+
+
+function getBedPrice(id: number): number {
+    const bed = availableBeds.find((bed) => bed.id === id);
+
+    if (!bed) return 0;
+
+    return bed.price * lengthOfStay.value;
+}
 
 // Track assigned bed IDs
 const assignedBedIds = ref<number[]>([]);
@@ -103,7 +134,7 @@ function showSubmitConfirmation() {
 }
 
 function submit() {
-    console.log("handle submit");
+    form.post(route("reservation.assignBeds"));
 }
 </script>
 
@@ -113,7 +144,9 @@ function submit() {
             <p class="text-2xl font-bold text-primary-600">Guests</p>
             <LinkButton
                 variant="outline"
-                :href="route('reservation.assignBeds', { id: reservation.id })"
+                :href="
+                    route('reservation.assignBedsForm', { id: reservation.id })
+                "
                 class="text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600"
             >
                 <RefreshCw />Reset
@@ -126,9 +159,9 @@ function submit() {
             class="grid items-center grid-cols-10 gap-x-2"
         >
             <p class="col-span-3 capitalize">
-                <span class="text-lg font-bold text-primary-600"
-                    >{{ index + 1 }}.</span
-                >
+                <span class="text-lg font-bold text-primary-600">
+                    {{ index + 1 }}.
+                </span>
                 {{ guest.name }}
             </p>
             <div
@@ -136,7 +169,7 @@ function submit() {
                 :class="{
                     'bg-blue-50 text-blue-500 border-blue-500':
                         guest.gender === 'male',
-                    'bg-red-50 text-red-500 border-red-500':
+                    'bg-red-50 text-red-500 border-red-400':
                         guest.gender === 'female',
                 }"
             >
@@ -151,6 +184,7 @@ function submit() {
             >
                 <SelectTrigger
                     class="h-12 col-span-5 rounded-sm shadow-none border-primary-700"
+                    :invalid="(form.errors as any)[`guests.${index}.bed_id`]"
                 >
                     <SelectValue placeholder="Select bed">{{
                         guest.bed_id ? getBedName(guest.bed_id) : "Select bed"
@@ -179,7 +213,18 @@ function submit() {
                     </SelectGroup>
                 </SelectContent>
             </Select>
+
+            <InputError
+                class="col-start-6 col-end-10 mt-1"
+                v-if="(form.errors as any)[`guests.${index}.bed_id`]"
+            >
+                {{ (form.errors as any)[`guests.${index}.bed_id`] }}
+            </InputError>
         </div>
+
+        <p class="mt-2 text-sm text-end text-neutral-600">
+            Total Price: {{ totalPrice }}
+        </p>
 
         <Button
             @click="showSubmitConfirmation"

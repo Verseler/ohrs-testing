@@ -41,7 +41,8 @@ Route::get('/reservations/edit-status/{id}', [ReservationController::class, 'edi
 Route::get('/reservations/edit-bed-assignment/{id}', [ReservationController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');
 Route::get('/reservations/payment/history/{id}', [PaymentController::class, 'paymentHistory'])->name('reservation.paymentHistory');
 Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
-Route::get('/waiting-list/assign-bed/{id}', [ReservationController::class, 'assignBeds'])->name('reservation.assignBeds');
+Route::post('/waiting-list/assign-bed', [ReservationController::class, 'assignBeds'])->name('reservation.assignBeds');
+Route::get('/waiting-list/assign-bed/{id}', [ReservationController::class, 'assignBedsForm'])->name('reservation.assignBedsForm');
 Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
 });
 
