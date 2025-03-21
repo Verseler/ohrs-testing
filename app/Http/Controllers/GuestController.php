@@ -20,7 +20,9 @@ class GuestController extends Controller
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
-        $query = Guest::with(['office.region', 'reservation']);
+        $query = Guest::whereHas('reservation', function ($query) {
+            $query->whereNotIn('status', ['pending', 'canceled']);
+        })->with(['office.region', 'reservation']);
 
         // Search Filter
         if ($request->filled('search')) {
@@ -48,22 +50,22 @@ class GuestController extends Controller
             switch ($request->sort_by) {
                 case 'office_id':
                     $query->join('offices', 'guests.office_id', '=', 'offices.id')
-                          ->orderBy('offices.name', $sortOrder)
-                          ->select('guests.*');
+                        ->orderBy('offices.name', $sortOrder)
+                        ->select('guests.*');
                     break;
 
                 case 'region_id':
                     $query->join('offices', 'guests.office_id', '=', 'offices.id')
-                          ->join('regions', 'offices.region_id', '=', 'regions.id')
-                          ->orderBy('regions.name', $sortOrder)
-                          ->select('guests.*');
+                        ->join('regions', 'offices.region_id', '=', 'regions.id')
+                        ->orderBy('regions.name', $sortOrder)
+                        ->select('guests.*');
                     break;
 
                 case 'check_in_date':
                 case 'check_out_date':
                     $query->join('reservations', 'guests.reservation_id', '=', 'reservations.id')
-                          ->orderBy("reservations.{$request->sort_by}", $sortOrder)
-                          ->select('guests.*');
+                        ->orderBy("reservations.{$request->sort_by}", $sortOrder)
+                        ->select('guests.*');
                     break;
 
                 default:
