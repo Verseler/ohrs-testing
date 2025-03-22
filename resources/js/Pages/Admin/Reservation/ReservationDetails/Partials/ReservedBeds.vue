@@ -13,7 +13,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
         </CardHeader>
         <CardContent>
             <div class="space-y-2">
-                <template v-if="reservation.reserved_beds.length > 0">
+                <template v-if="reservation?.reserved_beds?.length > 0">
                     <div
                         v-for="bed in reservation.reserved_beds"
                         class="flex text-sm gap-x-2"

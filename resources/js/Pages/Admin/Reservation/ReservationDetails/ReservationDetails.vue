@@ -27,9 +27,9 @@ import GuestInformation from "@/Pages/Admin/Reservation/ReservationDetails/Parti
 import ReservedBeds from "@/Pages/Admin/Reservation/ReservationDetails/Partials/ReservedBeds.vue";
 import LinkButton from "@/Components/LinkButton.vue";
 import ReservationCode from "./Partials/ReservationCode.vue";
-import { onMounted } from 'vue';
-import { SharedData } from '@/types';
-import { toast } from 'vue-sonner';
+import { onMounted } from "vue";
+import { SharedData } from "@/types";
+import { toast } from "vue-sonner";
 
 type ReservationDetailsProps = {
     reservation: ReservationWithBeds;
@@ -40,30 +40,28 @@ const { reservation } = defineProps<ReservationDetailsProps>();
 const page = usePage<SharedData>();
 
 // Display flash success or error message as sonner or toast
-onMounted(
-    () => {
-        if (page.props.flash.success) {
-            toast.success(page.props.flash.success, {
-                style: {
-                    background: "#22c55e",
-                    color: "white",
-                },
-                position: "top-center",
-            });
+onMounted(() => {
+    if (page.props.flash.success) {
+        toast.success(page.props.flash.success, {
+            style: {
+                background: "#22c55e",
+                color: "white",
+            },
+            position: "top-center",
+        });
 
-            setTimeout(() => {
-                page.props.flash.success = null;
-            }, 300);
-        }
+        setTimeout(() => {
+            page.props.flash.success = null;
+        }, 300);
     }
-);
+});
 </script>
 
 <template>
     <Head title="Reservation Details" />
 
     <AuthenticatedLayout>
-        <div class="flex justify-between min-h-12">
+        <div class="flex justify-between">
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -107,8 +105,8 @@ onMounted(
                     <div class="flex mt-4 gap-x-2">
                         <!-- Input or record a payment -->
                         <LinkButton
-                            class="flex-1"
                             v-if="reservation.remaining_balance > 0"
+                            class="flex-1"
                             :href="
                                 route('reservation.paymentForm', reservation.id)
                             "
@@ -167,7 +165,7 @@ onMounted(
                             "
                         >
                             <Pencil class="mr-1" />
-                            Status
+                            Change Status
                         </LinkButton>
                     </div>
                 </div>
