@@ -147,9 +147,6 @@ class ReservationProcessController extends Controller
         $reservationId = session('reservation_id');
         $totalGuests = session('total_guests');
 
-        // Clear the session data after retrieval
-        session()->forget(['reservation_id', 'total_guests']);
-
         $reservation = Reservation::findOrFail($reservationId);
         $hostelOffice = Office::with('region')->findOrFail($reservation->hostel_office_id);
         $regionName = $hostelOffice->region->name;
