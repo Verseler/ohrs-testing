@@ -6,7 +6,6 @@ import {
     CalendarIcon,
     ChartColumnIncreasing,
     CreditCardIcon,
-    Download,
     Home,
     UsersIcon,
 } from "lucide-vue-next";
@@ -19,14 +18,12 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
-import { Button } from "@/Components/ui/button";
-import MonthPicker from "@/Components/MonthPicker.vue";
 import StatsCard from "@/Components/Analytics/StatsCard.vue";
 import { BarChart } from "@/Components/ui/chart-bar";
 import YearPicker from "@/Components/YearPicker.vue";
-import { formatYear } from "@/lib/utils";
-import { onMounted, watch } from 'vue';
-import type { MonthlyRevenue } from '@/Pages/Admin/Dashboard/dashboard.types';
+import { formatYear, getMonthYear } from "@/lib/utils";
+import { onMounted, watch } from "vue";
+import type { MonthlyRevenue } from "@/Pages/Admin/Dashboard/dashboard.types";
 
 type DashboardProps = {
     pendingReservationsCount: number;
@@ -49,10 +46,10 @@ const form = useForm({
     monthly_revenue_year: new Date(),
 });
 
-watch([
-() => form.selected_date,
-() => form.monthly_revenue_year
-], updateDashboardData);
+watch(
+    [() => form.selected_date, () => form.monthly_revenue_year],
+    updateDashboardData
+);
 
 onMounted(() => updateDashboardData());
 
@@ -85,22 +82,18 @@ function updateDashboardData() {
             </Breadcrumb>
         </div>
 
-        <div class="flex items-center justify-between">
-            <PageHeader>
-                <template #icon><ChartColumnIncreasing /></template>
-                <template #title>Dashboard</template>
-            </PageHeader>
-
-            <div class="flex items-center gap-x-2">
-                <MonthPicker v-model="form.selected_date" />
-                <Button>
-                    <Download class="mr-1 size-4" />
-                    Generate Report
-                </Button>
-            </div>
-        </div>
+        <PageHeader>
+            <template #icon><ChartColumnIncreasing /></template>
+            <template #title>Dashboard</template>
+        </PageHeader>
 
         <!-- Main Content -->
+        <p
+            class="px-4 py-1.5 mb-2 mr-2 text-xl font-bold border rounded-lg text-primary-700 border-primary-500 max-w-max"
+        >
+            {{ getMonthYear(new Date()) }}
+        </p>
+
         <section id="stats" class="grid grid-cols-4 gap-3">
             <StatsCard>
                 <template #title>Pending Reservations</template>

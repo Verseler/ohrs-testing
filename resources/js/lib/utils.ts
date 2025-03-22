@@ -35,6 +35,15 @@ export function formatDate(date: Date | string | undefined) {
     return `${year}-${month}-${day}`;
 }
 
+export function getMonthYear(date: Date | string) {
+    const d = typeof date === 'string' ? new Date(date) : date;
+
+    const year = d.getFullYear();
+    const month = d.toLocaleString('default', { month: 'long' });
+
+    return `${month} ${year}`;
+}
+
 export function formatDateString(date: string | Date): string {
     const d = typeof date === 'string' ? new Date(date) : date;
 
