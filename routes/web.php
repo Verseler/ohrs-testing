@@ -36,6 +36,7 @@ Route::get('/waiting-list', [ReservationController::class, 'waitingList'])->name
 Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
 Route::post('/reservations/payment', [PaymentController::class, 'payment'])->name('reservation.payment');
 Route::post('/reservations/pay-later', [PaymentController::class, 'payLater'])->name('reservation.payLater');
+Route::put('/reservations/edit-status', [ReservationController::class, 'editStatus'])->name('reservation.editStatus');
 Route::get('/reservations/extend/{id}', [ReservationController::class, 'extendForm'])->name('reservation.extendForm');
 Route::get('/reservations/edit-status/{id}', [ReservationController::class, 'editStatusForm'])->name('reservation.editStatusForm');
 Route::get('/reservations/edit-bed-assignment/{id}', [ReservationController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');

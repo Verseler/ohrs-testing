@@ -1,3 +1,5 @@
+import type { UserIcon } from 'lucide-vue-next';
+
 export interface User {
     id: number;
     name: string;
@@ -49,3 +51,5 @@ export type LaravelPagination<T> = {
 
 
   export type Severity = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'secondary'
+
+  export type LucideIcon = typeof UserIcon;

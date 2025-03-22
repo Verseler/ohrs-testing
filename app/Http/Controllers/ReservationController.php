@@ -85,7 +85,7 @@ class ReservationController extends Controller
             'guestOffice.region',
             'hostelOffice.region',
             'reservedBeds.room'
-        ])->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id)->first();
+        ])->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
 
         return Inertia::render("Admin/Reservation/ReservationDetails/ReservationDetails", [
             'reservation' => $reservation,
@@ -102,7 +102,29 @@ class ReservationController extends Controller
 
     public function editStatusForm(int $id)
     {
-        return Inertia::render('Admin/Reservation/EditReservationStatus');
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+            ->findOrFail($id);
+
+        return Inertia::render('Admin/Reservation/EditReservationStatus', [
+            'reservation' => $reservation,
+        ]);
+    }
+
+    public function editStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'reservation_id' => ['required', 'exists:reservations,id'],
+            'status' => ['required', Rule::in(['confirmed', 'checked_in', 'checked_out', 'canceled'])]
+        ]);
+
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+            ->findOrFail($validated['reservation_id']);
+
+        $reservation->status = $validated['status'];
+        $reservation->save();
+
+        return to_route('reservation.show', ['id' => $reservation->id])
+            ->with('success', 'Reservation status updated successfully.');
     }
 
     public function editBedAssignmentForm(int $id)
