@@ -73,6 +73,7 @@ class ReservationProcessController extends Controller
                     'reservation_code' => $this->generateReservationCode($guestOffice->id, $hostelOffice->id),
                     'check_in_date' => $validated['check_in_date'],
                     'check_out_date' => $validated['check_out_date'],
+                    'daily_rate' => 0,
                     'total_billings' => 0,
                     'remaining_balance' => 0,
                     'status' => 'pending',

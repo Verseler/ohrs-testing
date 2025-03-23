@@ -11,8 +11,9 @@ export type Reservation = {
     reservation_code: string;
     check_in_date: string;
     check_out_date: string;
-    remaining_balance: number;
+    daily_rate: number;
     total_billings: number;
+    remaining_balance: number;
     status: ReservationStatus;
     payment_type: PaymentType;
     first_name: string;

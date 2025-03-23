@@ -14,6 +14,7 @@ class Reservation extends Model
         'reservation_code',
         'check_in_date',
         'check_out_date',
+        'daily_rate',
         'total_billings',
         'remaining_balance',
         'status',

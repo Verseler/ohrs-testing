@@ -15,8 +15,9 @@ return new class extends Migration {
             $table->string('reservation_code')->unique()->after('id');
             $table->date('check_in_date');
             $table->date('check_out_date');
-            $table->double('remaining_balance');
+            $table->double('daily_rate');
             $table->double('total_billings');
+            $table->double('remaining_balance');
             $table->enum('status', allowed: ['pending', 'confirmed', 'canceled', 'checked_in', 'checked_out'])->default('pending');
             $table->enum('payment_type', ['full_payment', 'pay_later']);
             $table->string('first_name');
