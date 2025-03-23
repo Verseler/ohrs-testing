@@ -15,7 +15,7 @@ import { watch, ref, computed } from "vue";
 import { Gender } from "@/Pages/Guest/guest.types";
 import GenderBadge from "@/Components/GenderBadge.vue";
 import LinkButton from "@/Components/LinkButton.vue";
-import { RefreshCw } from "lucide-vue-next";
+import { Check, RefreshCw } from "lucide-vue-next";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { InputError } from "@/Components/ui/input";
 import { getDaysDifference } from "@/lib/utils";
@@ -62,7 +62,6 @@ const totalPrice = computed(() =>
         );
     }, 0)
 );
-
 
 function getBedPrice(id: number): number {
     const bed = availableBeds.find((bed) => bed.id === id);
@@ -223,7 +222,7 @@ function submit() {
         </div>
 
         <p class="mt-2 text-sm text-end text-neutral-600">
-            Total Price: {{ totalPrice }}
+            Total Price: ₱{{ totalPrice }}
         </p>
 
         <Button
@@ -231,6 +230,7 @@ function submit() {
             type="button"
             class="w-full h-12 text-base border border-primary-600"
         >
+        <Check class='mr-1' />
             Confirm Reservation
         </Button>
 

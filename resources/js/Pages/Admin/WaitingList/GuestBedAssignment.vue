@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { CalendarCheck, Home } from "lucide-vue-next";
+import { CalendarCheck, Home, Info, XCircle } from "lucide-vue-next";
 import PageHeader from "@/Components/PageHeader.vue";
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head, router, usePage } from "@inertiajs/vue3";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -13,12 +13,15 @@ import {
     BreadcrumbPage,
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
-import { onMounted, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { SharedData } from "@/types";
 import { toast } from "vue-sonner";
 import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
 import AssignGuestList from "@/Pages/Admin/WaitingList/Partials/AssignGuestList.vue";
 import { Bed } from "@/Pages/Admin/Room/room.types";
+import { Message } from "@/Components/ui/message";
+import { Button } from "@/Components/ui/button";
+import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 
 type GuestBedAssignmentProps = {
     reservation: ReservationWithBeds;
@@ -28,6 +31,21 @@ type GuestBedAssignmentProps = {
 const { reservation, availableBeds } = defineProps<GuestBedAssignmentProps>();
 
 const page = usePage<SharedData>();
+
+const cancelConfirmation = ref(false);
+
+function showCancelConfirmation() {
+    cancelConfirmation.value = true;
+}
+
+function cancelReservation() {
+    router.put(
+        route("reservation.editStatus", {
+            reservation_id: reservation.id,
+            status: "canceled",
+        })
+    );
+}
 
 // Display flash success or error message as sonner or toast
 onMounted(() => {
@@ -108,7 +126,38 @@ watch(
                 :availableBeds="availableBeds"
                 class="flex-1"
             />
-            <ReservationOverview :reservation="reservation" />
+            <div>
+                <ReservationOverview :reservation="reservation" />
+
+                <Message
+                    severity="info"
+                    class="flex items-center max-w-lg mt-6 mb-2 text-sm gap-x-2"
+                >
+                    <Info class="size-6" />
+                    If ever there is no available beds or beds are not enough
+                    for all guests, you can cancel the reservation if needed.
+                </Message>
+
+                <Button
+                    @click="showCancelConfirmation"
+                    type="button"
+                    variant="outline"
+                    class="w-full text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
+                >
+                    <XCircle />
+                    Cancel Reservation
+                </Button>
+            </div>
+
+            <Alert
+                :open="cancelConfirmation"
+                @update:open="cancelConfirmation = $event"
+                :onConfirm="cancelReservation"
+                title="Are you sure you want to cancel reservation?"
+                description="This action is unchangeable and will cancel the reservation."
+                severity="danger"
+                confirm-label="Confirm"
+            />
         </div>
     </AuthenticatedLayout>
 </template>
