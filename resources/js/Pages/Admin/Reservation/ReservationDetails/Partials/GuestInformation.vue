@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EmployeeID from "@/Components/EmployeeID.vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Label } from "@/Components/ui/label";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
@@ -60,15 +61,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                 </p>
             </div>
 
-            <div class="space-y-1">
-                <Label class="text-neutral-700"> Employee ID </Label>
-                <p
-                    class="flex items-center px-2 py-2 rounded gap-x-2 bg-neutral-100"
-                >
-                    <IdCard class="size-5 text-neutral-500" />
-                    {{ reservation.employee_id || "-" }}
-                </p>
-            </div>
+            <EmployeeID :value="reservation.employee_id" />
         </CardContent>
     </Card>
 </template>
