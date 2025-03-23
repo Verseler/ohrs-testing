@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExtendReservationController;
+use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PaymentController;
@@ -23,15 +24,13 @@ Route::get('/', function () {
         'hostels' => $hostels
     ]);
 });
+//* Guest Reservation Process
+Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
+Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
+Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
+Route::get('/reservation/status', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
+Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
 
-//* Guest Reservation
-Route::middleware('guest')->group(function () {
-    Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
-    Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
-    Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
-    Route::get('/reservation/status', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
-    Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
-});
 
 //* Admin Reservation Management
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -74,9 +73,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/guests', [GuestController::class, 'list'])->name('guest.list');
 });
 
-//* Dashboard
+//* Admin analytics and reports
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/reports', [GenerateReportController::class, 'list'])->name('reports');
 });
 
 require __DIR__ . '/auth.php';

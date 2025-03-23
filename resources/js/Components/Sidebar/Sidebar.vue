@@ -14,6 +14,7 @@ import {
     CalendarCheck,
     CalendarClock,
     Users,
+    FileDown,
 } from "lucide-vue-next";
 import type { NavItem } from "./sidebar.type";
 import { SharedData } from "@/types";
@@ -30,6 +31,12 @@ const nav = ref<Array<NavItem>>([
                 route: "dashboard",
                 path: "/dashboard",
                 icon: ChartColumnIncreasing,
+            },
+            {
+                label: "Generate Report",
+                route: "reports",
+                path: "/reports",
+                icon: FileDown,
             },
         ],
     },
