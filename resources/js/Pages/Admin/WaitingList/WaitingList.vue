@@ -16,6 +16,7 @@ import {
     Maximize,
     CalendarClock,
     FilterX,
+    Check,
 } from "lucide-vue-next";
 import {
     Table,
@@ -59,7 +60,7 @@ import Searchbox from "@/Components/Searchbox.vue";
 import { computed, onMounted, watch } from "vue";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import { debounce, formatDateString, formatDateTimeString } from "@/lib/utils";
-import { toast } from 'vue-sonner';
+import { toast } from "vue-sonner";
 
 const RESERVATIONS_COLUMNS = [
     "reservation_code",
@@ -280,7 +281,17 @@ onMounted(() => {
                                                     )
                                                 "
                                             >
-                                                Assign Beds
+                                                <Check /> Confirm
+                                            </PopoverLinkField>
+
+                                            <PopoverLinkField
+                                                :href="
+                                                    route('reservation.show', {
+                                                        id: reservation.id,
+                                                    })
+                                                "
+                                            >
+                                                <Maximize />Show
                                             </PopoverLinkField>
                                         </div>
                                     </PopoverContent>

@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
+import type {
+    ReservationStatus,
+    ReservationWithBeds,
+} from "@/Pages/Admin/Reservation/reservation.types";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {
     CalendarCheck,
     CalendarPlus,
+    Check,
     CreditCard,
     History,
     Home,
@@ -102,7 +106,14 @@ onMounted(() => {
                         <StatusBadge :status="reservation.status" />
                     </div>
 
-                    <div class="flex mt-4 gap-x-2">
+                    <div
+                        class="flex mt-4 gap-x-2"
+                        v-if="
+                            reservation.status !== 'canceled' &&
+                            reservation.status !== 'pending' &&
+                            reservation.status !== 'checked_out'
+                        "
+                    >
                         <!-- Input or record a payment -->
                         <LinkButton
                             v-if="reservation.remaining_balance > 0"
@@ -154,7 +165,7 @@ onMounted(() => {
                             Bed Assignment
                         </LinkButton>
 
-                        <!-- Edit a bed assignment -->
+                        <!-- Change reservation status -->
                         <LinkButton
                             class="flex-1 bg-pink-500 hover:bg-pink-600"
                             :href="
@@ -168,6 +179,24 @@ onMounted(() => {
                             Change Status
                         </LinkButton>
                     </div>
+
+                    <!-- Change reservation status -->
+                    <div
+                        v-if="reservation.status === 'pending'"
+                        class="flex justify-end"
+                    >
+                        <LinkButton
+                            class="bg-primary-500 hover:bg-primary-600"
+                            :href="
+                                route(
+                                    'reservation.assignBedsForm',
+                                    reservation.id
+                                )
+                            "
+                        >
+                            <Check class="mr-1" /> Confirm Reservation
+                        </LinkButton>
+                    </div>
                 </div>
 
                 <!-- Main content -->
@@ -176,7 +205,11 @@ onMounted(() => {
 
                     <GuestInformation :reservation="reservation" />
 
-                    <ReservedBeds :reservation="reservation" />
+                    <!-- Don't show reserved beds if reservation is pending, cancelled or checked_out -->
+                    <ReservedBeds
+                        v-if="(['confirmed', 'checked_in'] as ReservationStatus[]).includes(reservation.status)"
+                        :reservation="reservation"
+                    />
 
                     <Card>
                         <CardHeader>

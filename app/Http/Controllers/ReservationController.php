@@ -82,6 +82,7 @@ class ReservationController extends Controller
     public function show(int $id)
     {
         $reservation = Reservation::with([
+            'guests',
             'guestOffice.region',
             'hostelOffice.region',
             'reservedBeds.room'

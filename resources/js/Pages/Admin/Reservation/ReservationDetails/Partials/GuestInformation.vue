@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Label } from "@/Components/ui/label";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
-import { IdCard } from 'lucide-vue-next';
+import { IdCard } from "lucide-vue-next";
 
 const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 </script>
@@ -13,17 +13,25 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
             <CardTitle>Guest Information</CardTitle>
         </CardHeader>
         <CardContent class="grid gap-4">
-            <div>
-                <Label class="text-neutral-700">Full Name</Label>
-                <p class="font-medium">
-                    {{ reservation.first_name }}
-                    {{
-                        reservation.middle_initial
-                            ? reservation.middle_initial + "."
-                            : ""
-                    }}
-                    {{ reservation.last_name }}
-                </p>
+            <div class="grid grid-cols-2">
+                <div>
+                    <Label class="text-neutral-700">Book By</Label>
+                    <p class="font-medium">
+                        {{ reservation.first_name }}
+                        {{
+                            reservation.middle_initial
+                                ? reservation.middle_initial + "."
+                                : ""
+                        }}
+                        {{ reservation.last_name }}
+                    </p>
+                </div>
+                <div>
+                    <Label class="text-neutral-700">Total Guests</Label>
+                    <p class="font-medium">
+                        {{ reservation?.guests?.length }}
+                    </p>
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">

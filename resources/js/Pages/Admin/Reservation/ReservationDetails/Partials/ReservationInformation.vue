@@ -4,8 +4,13 @@ import { Label } from "@/Components/ui/label";
 import { Separator } from "@/Components/ui/separator";
 import { formatCurrency, formatDateString } from "@/lib/utils";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
+import { computed } from "vue";
 
 const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
+
+const notPendingOrCanceled = computed(
+    () => reservation.status !== "pending" && reservation.status !== "canceled"
+);
 </script>
 
 <template>
@@ -29,9 +34,9 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                 </div>
             </div>
 
-            <Separator />
+            <Separator v-if="notPendingOrCanceled" />
 
-            <div class="grid gap-2">
+            <div class="grid gap-2" v-if="notPendingOrCanceled">
                 <Label class="text-neutral-700">Payment Details</Label>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
