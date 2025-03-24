@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bed;
+use App\Models\EligibleGenderSchedule;
+use App\Models\Guest;
 use App\Models\GuestBeds;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
@@ -17,36 +19,26 @@ class ReservationAssignBedsController extends Controller
     //For assigning beds on each guests
     public function assignBedsForm(int $id)
     {
-
         $reservation = Reservation::with([
             'guests' => function ($query) {
                 $query->orderBy('gender');
             },
             'guestOffice.region',
             'hostelOffice.region',
-            'reservedBeds'
         ])->where([
                     ['hostel_office_id', Auth::user()->office_id],
                     ['status', 'pending']
                 ])->findOrFail($id);
 
-
-        //Available Beds
         $checkInDate = $reservation->check_in_date;
         $checkOutDate = $reservation->check_out_date;
 
-        $guestBeds = new GuestBeds();
-        $reservedBedIds = $guestBeds->reservedBeds($checkInDate, $checkOutDate)
-            ->pluck('bed_id')->toArray();
-
-
-        $availableBeds = Bed::whereNotIn('id', $reservedBedIds)
-            ->with([
-                'room' => function ($query) use ($reservation) {
-                    $query->where('office_id', $reservation->hostel_office_id);
-                }
-            ])
-            ->orderBy('room_id', 'asc')->get();
+        $bed = new Bed();
+        $availableBeds = $bed->availableBeds(
+            $checkInDate,
+            $checkOutDate,
+            $reservation->hostel_office_id
+        );
 
         return Inertia::render('Admin/WaitingList/GuestBedAssignment', [
             'reservation' => $reservation,
@@ -70,31 +62,22 @@ class ReservationAssignBedsController extends Controller
             DB::transaction(function () use ($validated) {
                 $reservation = Reservation::findOrFail($validated['reservation_id']);
 
-                //TODO: improve this later. don't get the reservedBedsIds, go directly get the availableBeds
-                // Get all reserved beds during the reservation period
-                $guestBed = new GuestBeds();
-                $reservedBedIds = $guestBed->reservedBeds(
+                // Get all available beds
+                $bed = new Bed();
+                $availableBedIds = $bed->availableBeds(
                     $reservation->check_in_date,
-                    $reservation->check_out_date
-                )->pluck('bed_id')->toArray();
+                    $reservation->check_in_date,
+                    $reservation->hostel_office_id
+                )->pluck('id')->toArray();
 
-                // Get available beds
-                $availableBeds = Bed::whereNotIn('id', $reservedBedIds)
-                    ->whereHas('room', function ($query) use ($reservation) {
-                        $query->where('office_id', $reservation->hostel_office_id);
-                    })
-                    ->get();
-
-
-                $availableBedIds = $availableBeds->pluck('id')->toArray();
+                $totalBedPrice = 0;
                 $usedBedIds = [];
-                $totalBedPrice = 0; //$totalBedPrice is the sum of all bed prices assigned to guests
 
+                //For each guest assign the selected bed
+                foreach ($validated['guests'] as $assignGuest) {
+                    $bedId = $assignGuest['bed_id'];
 
-                foreach ($validated['guests'] as $guest) {
-                    $bedId = $guest['bed_id'];
-
-                    // Check for duplicate assignments in current request
+                    // Check for duplicate assignments in current request. to ensures that only one guest is reserved to a bed.
                     if (in_array($bedId, $usedBedIds)) {
                         throw ValidationException::withMessages([
                             'guests.*.bed_id' => "Bed {$bedId} is assigned to multiple guests. Please click reset."
@@ -110,23 +93,38 @@ class ReservationAssignBedsController extends Controller
 
                     $usedBedIds[] = $bedId;
 
-                    // Get the bed price
-                    $bed = Bed::findOrFail($bedId);
+                    // Re compute the total bed price
+                    $bed = Bed::with('room')->findOrFail($bedId);
                     $totalBedPrice += $bed->price;
 
-                    // Create GuestBeds record with dates
+                    // Assign each guest to its selected bed
                     GuestBeds::create([
-                        'guest_id' => $guest['id'],
-                        'bed_id' => $bedId
+                        'reservation_id' => $reservation->id,
+                        'guest_id' => $assignGuest['id'],
+                        'bed_id' => $bedId,
                     ]);
+
+                    $currentGuest = Guest::findOrFail($assignGuest['id']);
+
+                    // if the room status is "any" then set eligible gender schedule on that room
+                    // with the gender of the first guest who occupied that room
+                    // for the given period of time (check in and out)
+                    if($bed->room->eligible_gender == 'any') {
+                        EligibleGenderSchedule::create([
+                            "start_date" => $reservation->check_in_date,
+                            "end_date" => $reservation->check_in_date,
+                            "eligible_gender" =>  $currentGuest->gender,
+                            "room_id" => $bed->room->id
+                        ]);
+                    }
                 }
 
-                // Update reservation daily_rate, total_billings,remaining_balance and status
+                //* Update reservation billings
                 $checkInDate = Carbon::parse($reservation->check_in_date);
                 $checkOutDate = Carbon::parse($reservation->check_out_date);
                 $lengthOfStay = $checkInDate->diffInDays($checkOutDate, false);
 
-                //if guest set check in and out date on the same day, length of stay is 1
+                //if reservation check in and out date is on the same day then the length of stay is counted as 1 day
                 if ($lengthOfStay == 0) {
                     $lengthOfStay = 1;
                 }
@@ -139,8 +137,6 @@ class ReservationAssignBedsController extends Controller
                 $reservation->remaining_balance = $totalBillings;
                 $reservation->status = 'confirmed';
                 $reservation->save();
-
-                //TODO: take into consideration the eligible gender schedule
             });
         } catch (\Exception $e) {
             return redirect()->back()->with(['error' => $e->getMessage()]);

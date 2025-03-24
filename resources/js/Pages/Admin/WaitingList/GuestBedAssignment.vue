@@ -85,7 +85,7 @@ watch(
 </script>
 
 <template>
-    <Head title="BedAssignment" />
+    <Head title="Bed Assignment" />
 
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
@@ -113,7 +113,7 @@ watch(
 
             <BackLink :href="route('reservation.waitingList')" />
         </div>
-
+      
         <PageHeader>
             <template #icon><CalendarCheck /></template>
             <template #title>Bed Assignment</template>

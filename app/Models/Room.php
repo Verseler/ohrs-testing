@@ -26,7 +26,7 @@ class Room extends Model
         return $this->belongsTo(Office::class);
     }
 
-    public function EligibleGenderSchedules()
+    public function eligibleGenderSchedules()
     {
         return $this->hasMany(EligibleGenderSchedule::class);
     }

@@ -2,6 +2,7 @@
 import GenderBadge from "@/Components/GenderBadge.vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
+import { roomScheduledEligibleGender } from "@/Pages/Admin/WaitingList/helpers";
 
 const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 </script>
@@ -20,7 +21,14 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                     >
                         <p>{{ bed.room.name }}</p>
                         <p>- {{ bed.name }}</p>
+
                         <GenderBadge
+                            class="ml-auto"
+                            v-if="roomScheduledEligibleGender(bed)"
+                            :gender="roomScheduledEligibleGender(bed)"
+                        />
+                        <GenderBadge
+                            v-else
                             class="ml-auto"
                             :gender="bed.room.eligible_gender"
                         />

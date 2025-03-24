@@ -48,4 +48,5 @@ export type ReservationWithBeds = Omit<
     guest_office: Office;
     hostel_office: Office;
     beds: (Bed & { room: Room })[];
+    reservedBeds: Bed[];
 };

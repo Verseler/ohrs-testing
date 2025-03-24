@@ -45,9 +45,9 @@ class Reservation extends Model
         return $this->belongsTo(Office::class, 'hostel_office_id');
     }
 
-    public function beds()
+    public function guestBeds()
     {
-        return $this->belongsToMany(Bed::class, 'reservation_assignments');
+        return $this->hasMany(GuestBeds::class);
     }
 
     public function payments()
@@ -57,6 +57,6 @@ class Reservation extends Model
 
     public function reservedBeds()
     {
-        return $this->hasManyThrough(Bed::class, GuestBeds::class, 'guest_id', 'id', 'id', 'bed_id');
+        return $this->hasManyThrough(Bed::class, GuestBeds::class, 'reservation_id', 'id', 'id', 'bed_id');
     }
 }

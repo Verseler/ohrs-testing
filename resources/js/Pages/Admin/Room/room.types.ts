@@ -12,16 +12,24 @@ export type RoomFilters = {
     sort_order?: 'asc' | 'desc';
 }
 
+export type EligibleGenderSchedule = {
+    start_date: Date;
+    end_date: Date;
+    eligible_gender: Gender;
+    room_id: number;
+}
+
 export type Room = {
     id: number;
     name: string;
     eligible_gender: Gender;
+    eligible_gender_schedules: EligibleGenderSchedule[];
 }
 
 export type BedStatus = 'available' | 'reserved' | 'occupied' | 'maintenance';
 
 export type Bed = {
-    id: number | string;
+    id: number;
     name: string;
     price: number;
     room_id: number;

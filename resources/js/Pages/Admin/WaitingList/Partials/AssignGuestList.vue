@@ -19,14 +19,16 @@ import { Check, RefreshCw } from "lucide-vue-next";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { InputError } from "@/Components/ui/input";
 import { getDaysDifference } from "@/lib/utils";
+import { roomScheduledEligibleGender } from "@/Pages/Admin/WaitingList/helpers";
 
 type AssignGuestListProps = {
     reservation: ReservationWithBeds;
-    availableBeds: Bed[];
+    availableBeds: Bed[]; //beds that are available within check in and out reservation
 };
 
 // Initialize component data
-const { reservation, availableBeds } = defineProps<AssignGuestListProps>();
+const { reservation, availableBeds: beds } =
+    defineProps<AssignGuestListProps>();
 
 // Prepare guest data for the form
 const prepareGuests = () => {
@@ -38,10 +40,26 @@ const prepareGuests = () => {
     }));
 };
 
-// Initialize form with prepared guests
 const form = useForm({
     reservation_id: reservation.id,
     guests: prepareGuests(),
+});
+
+const availableBeds = computed(() => {
+    //if bed room has scheduled eligible gender, use it or else use the default
+    const updatedGenderAvailableBeds = beds.map((bed) => {
+        const scheduledEligibleGender =
+            bed.room?.eligible_gender_schedules?.[0]?.eligible_gender;
+
+        if (scheduledEligibleGender) {
+            bed.room.eligible_gender = scheduledEligibleGender;
+            return bed;
+        }
+
+        return bed;
+    });
+
+    return updatedGenderAvailableBeds;
 });
 
 const lengthOfStay = computed(() => {
@@ -50,6 +68,7 @@ const lengthOfStay = computed(() => {
         reservation.check_out_date
     );
 
+    //If the check in and out is on the same day then the length of stay is counted as one
     if (difference === 0) return 1;
 
     return difference;
@@ -64,14 +83,13 @@ const totalPrice = computed(() =>
 );
 
 function getBedPrice(id: number): number {
-    const bed = availableBeds.find((bed) => bed.id === id);
+    const bed = availableBeds.value.find((bed) => bed.id === id);
 
     if (!bed) return 0;
 
     return bed.price * lengthOfStay.value;
 }
 
-// Track assigned bed IDs
 const assignedBedIds = ref<number[]>([]);
 
 // Update assigned beds when form changes
@@ -84,27 +102,31 @@ const updateAssignedBeds = () => {
 // Watch for changes in guest bed assignments
 watch(form.guests, updateAssignedBeds, { deep: true });
 
-// Get available beds excluding assigned ones
 const getAvailableBeds = () => {
-    return availableBeds.filter(
+    // Get available beds excluding newly assigned ones
+    const unassignedAvailableBeds = availableBeds.value.filter(
         (bed) => !assignedBedIds.value.includes(Number(bed.id))
     );
+
+    return unassignedAvailableBeds;
 };
 
 // Filter beds by gender compatibility
 const filterBedsByGender = (beds: Bed[], gender: Gender) => {
-    return beds.filter(
-        (bed) =>
-            bed.room.eligible_gender === "any" ||
-            bed.room.eligible_gender === gender
-    );
+    return beds
+        .filter((bed) => {
+            const eligibleGender = bed.room.eligible_gender;
+            return eligibleGender === "any" || eligibleGender === gender;
+        })
+        .sort((a, b) => a.id - b.id); //desc order
 };
 
 // Update room gender when first bed is assigned
 const updateRoomGender = (bedId: number, gender: Gender) => {
-    const bed = availableBeds.find((b) => b.id === bedId);
+    const bed = availableBeds.value.find((b) => b.id === bedId);
+
     if (bed?.room.eligible_gender === "any") {
-        availableBeds
+        availableBeds.value
             .filter((b) => b.room.id === bed.room.id)
             .forEach((b) => (b.room.eligible_gender = gender));
     }
@@ -112,7 +134,7 @@ const updateRoomGender = (bedId: number, gender: Gender) => {
 
 // Get formatted bed name for display
 const getBedName = (bedId: number) => {
-    const bed = availableBeds.find((b) => b.id === bedId);
+    const bed = availableBeds.value.find((b) => b.id === bedId);
     return bed ? `${bed.room.name} - ${bed.name}` : "";
 };
 
@@ -151,7 +173,6 @@ function submit() {
                 <RefreshCw />Reset
             </LinkButton>
         </div>
-
         <div
             v-for="(guest, index) in form.guests"
             :key="guest.id"
@@ -205,6 +226,11 @@ function submit() {
                                 </span>
 
                                 <GenderBadge
+                                    v-if="roomScheduledEligibleGender(bed)"
+                                    :gender="roomScheduledEligibleGender(bed)"
+                                />
+                                <GenderBadge
+                                    v-else
                                     :gender="bed.room.eligible_gender"
                                 />
                             </div>
@@ -230,7 +256,7 @@ function submit() {
             type="button"
             class="w-full h-12 text-base border border-primary-600"
         >
-        <Check class='mr-1' />
+            <Check class="mr-1" />
             Confirm Reservation
         </Button>
 
