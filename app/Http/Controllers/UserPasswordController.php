@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -10,8 +11,12 @@ use Inertia\Inertia;
 
 class UserPasswordController extends Controller
 {
+    use AuthorizesRequests;
+
     public function changePassForm(int $id)
     {
+        $this->authorize('changePassword', User::class);
+
         $user = User::findOrFail($id);
 
         return Inertia::render('Admin/User/ChangePasswordUser', [
@@ -21,6 +26,8 @@ class UserPasswordController extends Controller
 
     public function changePass(Request $request)
     {
+        $this->authorize('changePassword', User::class);
+        
         $user = User::findOrFail($request->id);
 
         $validated = $request->validate([

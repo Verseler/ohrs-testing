@@ -6,6 +6,7 @@ use App\Models\Office;
 use App\Models\Region;
 use App\Models\User;
 use Exception;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -16,8 +17,12 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    use AuthorizesRequests;
+
     public function list(Request $request)
     {
+        $this->authorize('view', User::class);
+
         $query = User::query()->with('office.region');
 
         // Search Filter
@@ -33,7 +38,7 @@ class UserController extends Controller
         // Region Filter
         if ($request->filled('region_id')) {
             $query->whereHas('office', function ($q) use ($request) {
-            $q->where('region_id', $request->region_id);
+                $q->where('region_id', $request->region_id);
             });
         }
 
@@ -56,6 +61,8 @@ class UserController extends Controller
 
     public function createForm()
     {
+        $this->authorize('create', User::class);
+
         $regions = Region::all();
         $offices = Office::all();
 
@@ -67,6 +74,8 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
+        $this->authorize('create', User::class);
+
         $validated = $request->validate(
             [
                 'name' => ['required', 'string', 'max:20'],
@@ -97,6 +106,8 @@ class UserController extends Controller
 
     public function editForm(int $id)
     {
+        $this->authorize('update', User::class);
+
         $user = User::with('office')->findOrFail($id);
         $regions = Region::all();
         $offices = Office::all();
@@ -110,6 +121,8 @@ class UserController extends Controller
 
     public function edit(Request $request)
     {
+        $this->authorize('update', User::class);
+
         $validated = $request->validate(
             [
                 'id' => ['required', 'exists:users,id'],
@@ -136,6 +149,8 @@ class UserController extends Controller
 
     public function delete(int $id)
     {
+        $this->authorize('delete', User::class);
+
         $user = User::findOrFail($id);
 
         $user->delete();
