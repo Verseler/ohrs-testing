@@ -52,4 +52,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Office::class);
     }
+
+    public function isSuperAdmin()
+    {
+        if ($this->role === 'super_admin') {
+            return true;
+        }
+
+        return false;
+    }
 }

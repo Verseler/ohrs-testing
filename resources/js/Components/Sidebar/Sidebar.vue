@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { Avatar, AvatarFallback } from "@/Components/ui/avatar";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
@@ -15,12 +15,17 @@ import {
     CalendarClock,
     Users,
     FileDown,
+    ShieldUser,
 } from "lucide-vue-next";
 import type { NavItem } from "./sidebar.type";
 import { SharedData } from "@/types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 
 const page = usePage<SharedData>();
+
+const isSuperAdmin = computed(
+    () => page.props.auth.user.role === "super_admin"
+);
 
 const nav = ref<Array<NavItem>>([
     {
@@ -31,12 +36,14 @@ const nav = ref<Array<NavItem>>([
                 route: "dashboard",
                 path: "/dashboard",
                 icon: ChartColumnIncreasing,
+                accessible: true,
             },
             {
                 label: "Generate Report",
                 route: "reports",
                 path: "/reports",
                 icon: FileDown,
+                accessible: true,
             },
         ],
     },
@@ -48,30 +55,42 @@ const nav = ref<Array<NavItem>>([
                 route: "reservation.waitingList",
                 path: "/waiting-list",
                 icon: CalendarClock,
+                accessible: true,
             },
             {
                 label: "Reservation",
                 route: "reservation.list",
                 path: "/reservations",
                 icon: CalendarCheck,
+                accessible: true,
             },
             {
                 label: "Room",
                 route: "room.list",
                 path: "/rooms",
                 icon: Bed,
+                accessible: true,
             },
             {
                 label: "Guest",
                 route: "guest.list",
                 path: "/guests",
                 icon: Users,
+                accessible: true,
             },
             {
                 label: "Office",
                 route: "office.list",
                 path: "/offices",
                 icon: Hotel,
+                accessible: isSuperAdmin.value,
+            },
+            {
+                label: "Users",
+                route: "user.list",
+                path: "/users",
+                icon: ShieldUser,
+                accessible: isSuperAdmin.value,
             },
         ],
     },
@@ -113,6 +132,7 @@ function handleLogout() {
                             :key="navItem.path"
                         >
                             <SidebarNavLink
+                                v-if="navItem.accessible"
                                 :href="route(navItem.route)"
                                 :icon="navItem.icon"
                                 :active="$page.url.includes(navItem.path)"
@@ -140,7 +160,7 @@ function handleLogout() {
                         aria-label="user-role"
                         class="text-[0.65rem] text-neutral-200 capitalize"
                     >
-                        {{ page.props.auth.user.role ?? "Admin" }}
+                        {{ page.props?.auth?.user?.role === 'super_admin' ? "Super Admin" : "Admin" }}
                     </span>
                 </div>
             </div>

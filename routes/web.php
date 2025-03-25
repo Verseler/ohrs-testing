@@ -11,6 +11,8 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationProcessController;
 use App\Http\Controllers\ReservationStatusController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPasswordController;
 use App\Models\Office;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -60,14 +62,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/rooms/{id}', [RoomController::class, 'delete'])->name('room.delete');
 });
 
-//* Admin Office Management
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/offices', [OfficeController::class, 'list'])->name('office.list');
-    Route::get('/offices/form/{id?}', [OfficeController::class, 'upsertForm'])->name('office.upsertForm');
-    Route::post('/offices/upsert/{id?}', [OfficeController::class, 'upsert'])->name('office.upsert');
-    Route::delete('/offices/{id}', [OfficeController::class, 'delete'])->name('office.delete');
-});
-
 //* Admin Guest Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/guests', [GuestController::class, 'list'])->name('guest.list');
@@ -77,6 +71,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/reports', [GenerateReportController::class, 'list'])->name('reports');
+});
+
+
+//* Super Admin Office Management
+Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
+    Route::get('/offices', [OfficeController::class, 'list'])->name('office.list');
+    Route::get('/offices/form/{id?}', [OfficeController::class, 'upsertForm'])->name('office.upsertForm');
+    Route::post('/offices/upsert/{id?}', [OfficeController::class, 'upsert'])->name('office.upsert');
+    Route::delete('/offices/{id}', [OfficeController::class, 'delete'])->name('office.delete');
+});
+
+
+//* Super Admin User Management
+Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
+    Route::get('/users', [UserController::class, 'list'])->name('user.list');
+    Route::get('/users/create', [UserController::class, 'createForm'])->name('user.createForm');
+    Route::post('/users/create', [UserController::class, 'create'])->name('user.create');
+    Route::put('/users/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::get('/users/edit/{id}', [UserController::class, 'editForm'])->name('user.editForm');
+    Route::put('/users/change-password', [UserPasswordController::class, 'changePass'])->name('user.changePass');
+    Route::get('/users/change-password/{id}', [UserPasswordController::class, 'changePassForm'])->name('user.changePassForm');
+    Route::delete('/users/delete/{id}', [UserController::class, 'delete'])->name('user.delete');
 });
 
 require __DIR__ . '/auth.php';

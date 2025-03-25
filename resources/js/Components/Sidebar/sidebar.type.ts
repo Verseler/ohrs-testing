@@ -12,4 +12,5 @@ type  Item = {
     route: string,
     path: string,
     icon: LucidIconType,
+    accessible: boolean
 };
