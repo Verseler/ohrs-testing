@@ -18,7 +18,7 @@ const model = defineModel<string>();
 <template>
     <form
         @submit.prevent="submit"
-        class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-sm"
+        class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-sm"
     >
         <div class="flex flex-col gap-3 pb-2 sm:flex-row">
             <div class="flex-1">
@@ -36,6 +36,7 @@ const model = defineModel<string>();
                     class="h-12 shadow-none border-neutral-400"
                     :invalid="!!error"
                     @keyup.enter="submit"
+                    autocomplete="off"
                 />
 
             </div>
@@ -48,7 +49,7 @@ const model = defineModel<string>();
                     <SearchIcon v-if="!loading" class="mr-2 font-bold size-4" />
                     <span
                         v-if="loading"
-                        class="inline-block mr-2 w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent"
+                        class="inline-block w-4 h-4 mr-2 border-2 border-white rounded-full animate-spin border-t-transparent"
                     ></span>
                     {{ loading ? "Checking..." : "Check Status" }}
                 </Button>

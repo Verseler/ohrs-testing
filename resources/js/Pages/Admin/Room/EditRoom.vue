@@ -53,7 +53,7 @@ const bedsLength = computed(() => {
     return form.beds.length;
 });
 
-function addMoreBed() {
+function increaseBed() {
     if (!form.beds || !room) return;
 
     counter.value++;
@@ -65,7 +65,7 @@ function addMoreBed() {
     });
 }
 
-function removeBed(id: number | string) {
+function decreaseBed(id: number | string) {
     if (!form.beds) return;
 
     form.beds = form.beds.filter((bed) => bed.id !== id);
@@ -199,7 +199,7 @@ function showSubmitConfirmation() {
                     <ValueAdjuster
                         :value="bedsLength"
                         :on-decrease="removeLastBed"
-                        :on-increase="addMoreBed"
+                        :on-increase="increaseBed"
                     />
                 </div>
 
@@ -241,7 +241,7 @@ function showSubmitConfirmation() {
 
                     <Button
                         v-if="bedsLength > 1"
-                        @click="removeBed(bed.id)"
+                        @click="decreaseBed(bed.id)"
                         size="icon"
                         variant="ghost"
                         type="button"
