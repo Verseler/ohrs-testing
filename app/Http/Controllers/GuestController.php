@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Guest;
 use App\Models\Region;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -21,7 +22,8 @@ class GuestController extends Controller
         ]);
 
         $query = Guest::whereHas('reservation', function ($query) {
-            $query->whereNotIn('status', ['pending', 'canceled']);
+            $query->whereNotIn('status', ['pending', 'canceled'])
+            ->where('hostel_office_id', Auth::user()->office_id);
         })->with(['office.region', 'reservation']);
 
         // Search Filter

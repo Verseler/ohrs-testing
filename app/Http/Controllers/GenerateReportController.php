@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GenerateReportController extends Controller
 {
@@ -29,6 +30,9 @@ class GenerateReportController extends Controller
         }
 
         $payments = Payment::with('reservation.guests')
+            ->whereHas('reservation', function ($query)  {
+                $query->where('hostel_office_id', Auth::user()->office_id);
+            })
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'asc')
             ->get();

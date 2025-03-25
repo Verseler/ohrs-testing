@@ -15,7 +15,7 @@ class PaymentController extends Controller
 {
     public function paymentForm($id)
     {
-        $reservation = Reservation::findOrFail($id);
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
         return Inertia::render('Admin/Payment/PaymentForm/PaymentForm', [
             'reservation' => $reservation
         ]);
@@ -74,6 +74,7 @@ class PaymentController extends Controller
     public function paymentHistory(int $id)
     {
         $reservationPaymentHistory = Reservation::where('id', $id)
+            ->where('hostel_office_id', Auth::user()->office_id)
             ->with([
                 'payments' => function ($query) {
                     $query->orderBy('created_at', 'desc');
