@@ -61,6 +61,9 @@ import { computed, onMounted, watch } from "vue";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import { debounce, formatDateString, formatDateTimeString } from "@/lib/utils";
 import { toast } from "vue-sonner";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 const RESERVATIONS_COLUMNS = [
     "reservation_code",

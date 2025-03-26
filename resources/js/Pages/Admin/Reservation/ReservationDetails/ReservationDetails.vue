@@ -34,6 +34,9 @@ import ReservationCode from "./Partials/ReservationCode.vue";
 import { onMounted } from "vue";
 import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 type ReservationDetailsProps = {
     reservation: ReservationWithBeds;

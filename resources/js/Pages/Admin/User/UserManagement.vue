@@ -63,6 +63,9 @@ import {
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import RoleBadge from "@/Pages/Admin/User/Partials/RoleBadge.vue";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 const USER_COLUMNS = ["Name", "Email", "Hostel Office", "Role", ""];
 

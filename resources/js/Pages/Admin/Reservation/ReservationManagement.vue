@@ -59,6 +59,9 @@ import Searchbox from "@/Components/Searchbox.vue";
 import { debounce } from "@/lib/utils";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import StatusBadge from "@/Components/StatusBadge.vue";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 const RESERVATIONS_COLUMNS = [
     "reservation_code",

@@ -23,6 +23,9 @@ import { Card, CardContent, CardTitle } from "@/Components/ui/card";
 import ReservationStatusBadge from "@/Components/ReservationStatusBadge.vue";
 import StatusButton from "@/Pages/Admin/Reservation/ReservationDetails/Partials/StatusButton.vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(10000);
 
 type EditReservationStatusProps = {
     reservation: Reservation;

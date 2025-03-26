@@ -40,6 +40,9 @@ import AmountCard from "@/Pages/Admin/Payment/ReservationPaymentHistory/Partials
 import { watch } from "vue";
 import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(15000);
 
 type ReservationPaymentHistoryProps = {
     reservationPaymentHistory: Reservation & {

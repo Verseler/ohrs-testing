@@ -62,6 +62,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 const OFFICES_COLUMNS = ["region", "name"] as const;
 

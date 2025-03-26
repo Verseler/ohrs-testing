@@ -24,6 +24,10 @@ import YearPicker from "@/Components/YearPicker.vue";
 import { formatYear, getMonthYear } from "@/lib/utils";
 import { onMounted, watch } from "vue";
 import type { MonthlyRevenue } from "@/Pages/Admin/Dashboard/dashboard.types";
+import NotificationLinkButton from "@/Components/NotificationLinkButton.vue";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 type DashboardProps = {
     pendingReservationsCount: number;
@@ -66,20 +70,23 @@ function updateDashboardData() {
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
-        <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbLink :href="route('dashboard')">
-                        <Home class="size-4" />
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
+        <div class="flex items-center justify-between">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink :href="route('dashboard')">
+                            <Home class="size-4" />
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Dashboard</BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
 
+            <NotificationLinkButton />
+        </div>
         <PageHeader>
             <template #icon><ChartColumnIncreasing /></template>
             <template #title>Dashboard</template>

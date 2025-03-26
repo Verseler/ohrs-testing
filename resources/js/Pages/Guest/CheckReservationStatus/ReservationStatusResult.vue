@@ -6,6 +6,7 @@ import type {
     ReservationStatus,
 } from "@/Pages/Admin/Reservation/reservation.types";
 import type { PageProps } from "@/types";
+import { usePoll } from "@inertiajs/vue3";
 import { Head, usePage } from "@inertiajs/vue3";
 import { CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
 import { computed } from "vue";
@@ -16,6 +17,8 @@ type ReservationStatusResult = {
 };
 
 const { reservation, canLogin } = defineProps<ReservationStatusResult>();
+
+usePoll(15000);
 
 const page = usePage<PageProps>();
 

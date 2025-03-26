@@ -5,10 +5,13 @@ import Button from "@/Components/ui/button/Button.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import type { Notification } from "@/Pages/Admin/Notification/notification.types";
 import { LaravelPagination } from "@/types";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, usePoll } from "@inertiajs/vue3";
 import { Bell, CheckIcon, RefreshCwIcon } from "lucide-vue-next";
 import NotificationListItem from "@/Pages/Admin/Notification/Partials/NotificationListItem.vue";
 import LinkButton from "@/Components/LinkButton.vue";
+import { watch } from "vue";
+
+usePoll(5000);
 
 type NotificationListProps = {
     notifications: LaravelPagination<Notification>;

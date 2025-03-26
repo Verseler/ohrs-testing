@@ -44,6 +44,9 @@ import type { LaravelPagination } from "@/types";
 import { Head, useForm } from "@inertiajs/vue3";
 import { FilterX, Home, Users } from "lucide-vue-next";
 import { computed, watch } from "vue";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 const GUESTS_COLUMNS = [
     "name",
