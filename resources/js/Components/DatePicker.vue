@@ -217,9 +217,10 @@ onUnmounted(() => {
     <div class="relative" ref="pickerRef">
         <!-- Date input trigger -->
         <div
+            tabindex="0"
             role="button"
             @click="toggleCalendar"
-            class="relative flex items-center justify-between h-12 pr-2 border rounded cursor-pointer pl-3.5"
+            class="relative flex items-center focus:outline-primary-500 justify-between h-12 pr-2 border rounded cursor-pointer pl-3.5"
             :class="[
                 invalid ? 'border-red-500' : 'border-green-700',
                 triggerClass,
@@ -244,7 +245,7 @@ onUnmounted(() => {
         <div
             v-if="isOpen"
             class="absolute z-10 w-64 mt-1 bg-white border border-gray-200 rounded-md shadow-lg"
-            :class='calendarClass'
+            :class="calendarClass"
         >
             <!-- Calendar header -->
             <div class="flex items-center justify-between p-2 border-b">
