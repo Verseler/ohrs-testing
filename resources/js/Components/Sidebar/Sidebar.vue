@@ -20,6 +20,7 @@ import {
 import type { NavItem } from "./sidebar.type";
 import { SharedData } from "@/types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
+import NotificationLinkButton from "../NotificationLinkButton.vue";
 
 const page = usePage<SharedData>();
 
@@ -160,18 +161,27 @@ function handleLogout() {
                         aria-label="user-role"
                         class="text-[0.65rem] text-neutral-200 capitalize"
                     >
-                        {{ page.props?.auth?.user?.role === 'super_admin' ? "Super Admin" : "Admin" }}
+                        {{
+                            page.props?.auth?.user?.role === "super_admin"
+                                ? "Super Admin"
+                                : "Admin"
+                        }}
                     </span>
                 </div>
             </div>
 
-            <Button
-                @click="showLogoutConfirmation"
-                size="icon"
-                class="shadow-none hover:bg-primary-700 hover:text-neutral-100"
-            >
-                <LogOut />
-            </Button>
+            <div class="space-x-1">
+                <NotificationLinkButton
+                    class="text-white bg-transparent hover:text-neutral-300"
+                />
+                <Button
+                    @click="showLogoutConfirmation"
+                    size="icon"
+                    class="shadow-none hover:bg-primary-700 hover:text-neutral-100"
+                >
+                    <LogOut />
+                </Button>
+            </div>
         </div>
 
         <Alert

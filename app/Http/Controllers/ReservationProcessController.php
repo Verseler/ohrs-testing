@@ -6,8 +6,11 @@ use App\Models\Guest;
 use App\Models\Office;
 use App\Models\Region;
 use App\Models\Reservation;
+use App\Models\User;
+use App\Notifications\NewReservationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -106,6 +109,13 @@ class ReservationProcessController extends Controller
                     'reservation_id' => $reservation->id,
                     'total_guests' => count($validated['guests'])
                 ]);
+
+                //send notification to admin
+                $admins = User::where('office_id', $hostelOffice->id)->get();
+                Notification::send(
+                    $admins,
+                    new NewReservationNotification($reservation)
+                );
             });
         } catch (\Exception $e) {
             return redirect()->back()->with("error", $e->getMessage());

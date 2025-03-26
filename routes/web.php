@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExtendReservationController;
 use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReservationAssignBedsController;
@@ -14,6 +15,8 @@ use App\Http\Controllers\ReservationStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
 use App\Models\Office;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,13 +29,13 @@ Route::get('/', function () {
         'hostels' => $hostels
     ]);
 });
+
 //* Guest Reservation Process
 Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
 Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
 Route::get('/reservation/status', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
-
 
 //* Admin Reservation Management
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -73,6 +76,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reports', [GenerateReportController::class, 'list'])->name('reports');
 });
 
+//* Admin Notifications
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'list'])->name('notification.list');
+    Route::put('/notifications/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('notification.markAsRead');
+    Route::put('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notification.markAllAsRead');
+    Inertia::share('unreadNotificationCount', function () {
+        return Auth::user()?->unreadNotifications()?->count();
+    });
+});
 
 //* Super Admin Office Management
 Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {

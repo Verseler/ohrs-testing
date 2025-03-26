@@ -24,7 +24,8 @@ export type PageProps<
     auth: {
         user: User;
     };
-    flash: Flash
+    flash: Flash,
+    unreadNotificationCount: number
 };
 
 
