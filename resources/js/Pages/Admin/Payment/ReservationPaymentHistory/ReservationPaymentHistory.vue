@@ -38,7 +38,7 @@ import {
 } from "@/lib/utils";
 import AmountCard from "@/Pages/Admin/Payment/ReservationPaymentHistory/Partials/AmountCard.vue";
 import { watch } from "vue";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
 
 type ReservationPaymentHistoryProps = {
@@ -50,7 +50,7 @@ type ReservationPaymentHistoryProps = {
 const { reservationPaymentHistory } =
     defineProps<ReservationPaymentHistoryProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const totalBillings = computed(() =>
     formatCurrency(reservationPaymentHistory.total_billings)

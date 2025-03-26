@@ -18,11 +18,11 @@ import {
     ShieldUser,
 } from "lucide-vue-next";
 import type { NavItem } from "./sidebar.type";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import NotificationLinkButton from "../NotificationLinkButton.vue";
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const isSuperAdmin = computed(
     () => page.props.auth.user.role === "super_admin"

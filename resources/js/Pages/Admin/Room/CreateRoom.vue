@@ -20,13 +20,16 @@ import { Bed as BedIcon, Home } from "lucide-vue-next";
 import { Room } from "@/Pages/Admin/Room/room.types";
 import { Button } from "@/Components/ui/button";
 import { usePage } from "@inertiajs/vue3";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
 import { watch } from "vue";
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
-type CreateRoomForm = Omit<Room, "id" | "bed_prices"> & {
+type CreateRoomForm = Omit<
+    Room,
+    "id" | "bed_prices" | "eligible_gender_schedules"
+> & {
     number_of_beds: number;
     bed_price_rate: number;
 };
@@ -99,7 +102,7 @@ function showSubmitConfirmation() {
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <BackLink />
+            <BackLink :href="route('room.list')" />
         </div>
 
         <PageHeader>

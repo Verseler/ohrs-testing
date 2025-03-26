@@ -54,7 +54,7 @@ import type {
     ReservationWithBeds,
     WaitingListFilers,
 } from "@/Pages/Admin/Reservation/reservation.types";
-import type { LaravelPagination, SharedData } from "@/types";
+import type { LaravelPagination, PageProps } from "@/types";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import Searchbox from "@/Components/Searchbox.vue";
 import { computed, onMounted, watch } from "vue";
@@ -87,7 +87,7 @@ type ReservationManagementProps = {
 
 const { reservations, filters } = defineProps<ReservationManagementProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const form = useForm<WaitingListFilers>({
     search: filters.search,

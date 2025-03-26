@@ -25,7 +25,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
 import {
     Breadcrumb,
@@ -55,7 +55,7 @@ type ReservationDetailsProps = {
 
 const { reservation } = defineProps<ReservationDetailsProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const form = useForm<Partial<Payment>>({
     amount: reservation.remaining_balance,

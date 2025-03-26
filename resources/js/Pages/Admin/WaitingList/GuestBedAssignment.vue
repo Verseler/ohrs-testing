@@ -14,7 +14,7 @@ import {
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
 import { onMounted, ref, watch } from "vue";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
 import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
 import AssignGuestList from "@/Pages/Admin/WaitingList/Partials/AssignGuestList.vue";
@@ -30,7 +30,7 @@ type GuestBedAssignmentProps = {
 
 const { reservation, availableBeds } = defineProps<GuestBedAssignmentProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const cancelConfirmation = ref(false);
 
@@ -113,7 +113,7 @@ watch(
 
             <BackLink :href="route('reservation.waitingList')" />
         </div>
-      
+
         <PageHeader>
             <template #icon><CalendarCheck /></template>
             <template #title>Bed Assignment</template>

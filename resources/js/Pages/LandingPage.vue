@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@/Components/ui/button";
 import { usePage } from "@inertiajs/vue3";
-import type { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import Header from "@/Components/Header.vue";
 import LinkButton from "@/Components/LinkButton.vue";
 import { HotelIcon } from "lucide-vue-next";
@@ -14,7 +14,7 @@ type LandingPageProps = {
 
 const { canLogin, hostels } = defineProps<LandingPageProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 </script>
 
 <template>

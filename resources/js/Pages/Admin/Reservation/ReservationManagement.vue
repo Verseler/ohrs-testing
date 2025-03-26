@@ -36,7 +36,7 @@ import type {
     ReservationFilters,
     Reservation as ReservationWithBeds,
 } from "@/Pages/Admin/Reservation/reservation.types";
-import type { LaravelPagination, SharedData } from "@/types/index";
+import type { LaravelPagination } from "@/types/index";
 import {
     Popover,
     PopoverContent,

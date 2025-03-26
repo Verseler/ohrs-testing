@@ -34,7 +34,7 @@ import {
     TableRow,
 } from "@/Components/ui/table";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import type { LaravelPagination, SharedData, User } from "@/types";
+import type { LaravelPagination, PageProps, User } from "@/types";
 import { Head, router, useForm, usePage } from "@inertiajs/vue3";
 import {
     Ellipsis,
@@ -74,7 +74,7 @@ type UserManagementProps = {
 
 const { users, filters } = defineProps<UserManagementProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const form = useForm<Partial<UserFilters>>({
     region_id: filters?.region_id,

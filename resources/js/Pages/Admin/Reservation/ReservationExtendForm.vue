@@ -34,7 +34,7 @@ import DatePicker from "@/Components/DatePicker.vue";
 import { InputError } from "@/Components/ui/input";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Badge } from "@/Components/ui/badge";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
 
 type ReservationExtendFormProps = {
@@ -43,7 +43,7 @@ type ReservationExtendFormProps = {
 
 const { reservation } = defineProps<ReservationExtendFormProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const form = useForm({
     reservation_id: reservation.id,

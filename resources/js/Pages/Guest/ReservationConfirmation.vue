@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { Separator } from "@/Components/ui/separator";
 import { Head, Link, usePage } from "@inertiajs/vue3";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import Header from "@/Components/Header.vue";
 import { Button } from "@/Components/ui/button";
 import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
@@ -31,7 +31,7 @@ type ReservationConfirmationProps = {
 
 const { canLogin, reservation } = defineProps<ReservationConfirmationProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 function downloadConfirmation() {
     htmlToImage

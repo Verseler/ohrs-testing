@@ -32,7 +32,7 @@ import ReservedBeds from "@/Pages/Admin/Reservation/ReservationDetails/Partials/
 import LinkButton from "@/Components/LinkButton.vue";
 import ReservationCode from "./Partials/ReservationCode.vue";
 import { onMounted } from "vue";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
 
 type ReservationDetailsProps = {
@@ -41,7 +41,7 @@ type ReservationDetailsProps = {
 
 const { reservation } = defineProps<ReservationDetailsProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 // Display flash success or error message as sonner or toast
 onMounted(() => {

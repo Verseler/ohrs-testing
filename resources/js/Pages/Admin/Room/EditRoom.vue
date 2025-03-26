@@ -22,7 +22,7 @@ import { Bed, Room, RoomWithBed } from "@/Pages/Admin/Room/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
 import { Button } from "@/Components/ui/button";
 import { usePage } from "@inertiajs/vue3";
-import { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { toast } from "vue-sonner";
 
 type InsertRoomProps = {
@@ -31,7 +31,7 @@ type InsertRoomProps = {
 
 const { room } = defineProps<InsertRoomProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 const counter = ref(room?.beds.length ?? 1);
 
 type UpsertRoomForm = Partial<

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Header from "@/Components/Header.vue";
-import { formatDateString, obscureName } from "@/lib/utils";
+import { formatCurrency, formatDateString, obscureName } from "@/lib/utils";
 import type {
     Reservation,
     ReservationStatus,
 } from "@/Pages/Admin/Reservation/reservation.types";
-import type { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { Head, usePage } from "@inertiajs/vue3";
 import { CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
 import { computed } from "vue";
@@ -17,7 +17,7 @@ type ReservationStatusResult = {
 
 const { reservation, canLogin } = defineProps<ReservationStatusResult>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const statusConfig = computed(() => {
     if (!reservation) return null;
@@ -164,7 +164,7 @@ const statusConfig = computed(() => {
                             Total Billings
                         </h3>
                         <p class="mt-1">
-                            {{ reservation.total_billings }}
+                            ₱{{ formatCurrency(reservation.total_billings) }}
                         </p>
                     </div>
 
@@ -179,7 +179,7 @@ const statusConfig = computed(() => {
                             Remaining Balance
                         </h3>
                         <p class="mt-1">
-                            {{ reservation.remaining_balance }}
+                            ₱{{ formatCurrency(reservation.remaining_balance) }}
                         </p>
                     </div>
                 </div>

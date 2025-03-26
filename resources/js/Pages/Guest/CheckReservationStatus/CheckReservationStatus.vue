@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from "@/Components/Header.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
-import type { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { Info } from "lucide-vue-next";
 import { Message } from "@/Components/ui/message";
 import SearchCodeForm from "@/Pages/Guest/CheckReservationStatus/Partials/SearchCodeForm.vue";
@@ -12,7 +12,7 @@ type CheckReservationStatusProps = {
 
 const { canLogin } = defineProps<CheckReservationStatusProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const form = useForm({
     code: '',
@@ -29,7 +29,7 @@ function checkReservation() {
     <div class="w-full min-h-screen">
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
-        <div class="px-4 py-12 mx-auto max-w-2xl">
+        <div class="max-w-2xl px-4 py-12 mx-auto">
             <div class="mb-8 text-center">
                 <h1 class="mb-2 text-2xl font-bold text-gray-900">
                     Check Your Reservation Status
@@ -50,7 +50,7 @@ function checkReservation() {
             <!-- Help Information -->
             <Message
                 severity="info"
-                class="flex gap-x-2 items-center p-4 mb-6 text-sm"
+                class="flex items-center p-4 mb-6 text-sm gap-x-2"
             >
                 <Info class="size-4" />
                 Your reservation code was automatically downloaded after your

@@ -28,14 +28,6 @@ export type PageProps<
     unreadNotificationCount: number
 };
 
-
-export interface SharedData extends PageProps {
-    name: string;
-    quote: { message: string; author: string };
-    auth: Auth;
-    flash: Flash
-}
-
 export type LaravelPagination<T> = {
     current_page: number;
     data: T[];
