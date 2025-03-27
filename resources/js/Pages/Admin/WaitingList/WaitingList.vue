@@ -16,7 +16,6 @@ import {
     Maximize,
     CalendarClock,
     FilterX,
-    Check,
 } from "lucide-vue-next";
 import {
     Table,
@@ -279,16 +278,6 @@ onMounted(() => {
                                                             id: reservation.id,
                                                         }
                                                     )
-                                                "
-                                            >
-                                                <Check /> Confirm
-                                            </PopoverLinkField>
-
-                                            <PopoverLinkField
-                                                :href="
-                                                    route('reservation.show', {
-                                                        id: reservation.id,
-                                                    })
                                                 "
                                             >
                                                 <Maximize />Show
