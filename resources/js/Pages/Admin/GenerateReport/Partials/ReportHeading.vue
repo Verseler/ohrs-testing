@@ -4,12 +4,10 @@ import { formatDateTimeString, getMonthYear } from "@/lib/utils";
 
 <template>
     <header
-        id="reportHeading"
         :style="{
-            position: 'relative',
             textAlign: 'center',
             lineHeight: '1',
-            display: 'none',
+            display: 'flex',
             flexDirection: 'column',
             gap: '5px',
             marginBottom: '12px',
@@ -24,11 +22,11 @@ import { formatDateTimeString, getMonthYear } from "@/lib/utils";
             }"
         >
             <!-- Image Left Side -->
+            <!-- src="https://denr10.com.ph/resources/assets/images/denr10.png" -->
+
             <img
-                src="https://denr10.com.ph/resources/assets/images/denr10.png"
+                src="/images/denr10Logo.png"
                 :style="{
-                    // position: 'absolute',
-                    // top: '-16px',
                     objectFit: 'contain',
                     width: '100px',
                     height: '100px',
@@ -59,7 +57,13 @@ import { formatDateTimeString, getMonthYear } from "@/lib/utils";
             />
         </div>
 
-        <hr :style="{ width: '100%', marginTop: '10px', marginBottom: 0 }" />
+        <hr
+            :style="{
+                width: '100%',
+                marginTop: '10px',
+                marginBottom: 0,
+            }"
+        />
 
         <!-- LowerSide side -->
         <div :style="{ display: 'flex', flexDirection: 'column', gap: '5px' }">
@@ -71,3 +75,17 @@ import { formatDateTimeString, getMonthYear } from "@/lib/utils";
         </div>
     </header>
 </template>
+
+<style scoped>
+header {
+    text-align: center;
+    padding-bottom: 5px;
+}
+h1 {
+    font-size: 1.5rem !important;
+    font-weight: bolder;
+}
+h3 {
+    font-weight: bold;
+}
+</style>
