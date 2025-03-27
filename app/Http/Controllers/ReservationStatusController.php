@@ -60,6 +60,9 @@ class ReservationStatusController extends Controller
 
                 // Update reservation status
                 $reservation->status = 'canceled';
+                $reservation->daily_rate = 0;
+                $reservation->total_billings = 0;
+                $reservation->remaining_balance = 0;
                 $reservation->save();
             });
         } catch (\Exception $e) {
