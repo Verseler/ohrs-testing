@@ -62,6 +62,6 @@ class Reservation extends Model
 
     public function reservedBedsWithGuests()
     {
-        return $this->guestBeds()->with(['bed.room', 'guest']);
+        return $this->guestBeds()->with(['bed.room.eligibleGenderSchedules', 'guest']);
     }
 }
