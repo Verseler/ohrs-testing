@@ -25,7 +25,7 @@ class GuestBeds extends Model
 
     public function bedsWithBalance()
     {
-        return  $this->whereHas('reservation', function ($query) {
+        return $this->whereHas('reservation', function ($query) {
             $query->where('payment_type', 'full_payment')
                 ->where('remaining_balance', '>', 0);
         });
@@ -35,8 +35,8 @@ class GuestBeds extends Model
     {
         return $this->whereHas('guest', function ($query) use ($checkInDate, $checkOutDate) {
             $query->whereHas('reservation', function ($query) use ($checkInDate, $checkOutDate) {
-                $query->where('check_in_date', '<=', $checkInDate)
-                    ->where('check_out_date', '>=', $checkOutDate)
+                $query->where('check_in_date', '<=', $checkOutDate)
+                    ->where('check_out_date', '>=', $checkInDate)
                     ->whereNotIn('status', ['canceled', 'checked_out']);
             });
         });

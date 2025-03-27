@@ -42,12 +42,7 @@ function showCancelConfirmation() {
 }
 
 function cancelReservation() {
-    router.put(
-        route("reservation.editStatus", {
-            reservation_id: reservation.id,
-            status: "canceled",
-        })
-    );
+    router.put(route("reservation.cancel", { id: reservation.id }));
 }
 
 // Display flash success or error message as sonner or toast

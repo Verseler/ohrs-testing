@@ -1,5 +1,5 @@
 import type { Guest } from '@/Pages/Guest/guest.types';
-import type { Bed, Room } from '@/Pages/Admin/Room/room.types';
+import type { Bed, BedWithGuest, Room } from '@/Pages/Admin/Room/room.types';
 import type { Office } from '@/Pages/Admin/Office/office.types';
 
 export type ReservationStatus = 'pending' | 'confirmed' | 'canceled' | 'checked_in' | 'checked_out';
@@ -49,4 +49,6 @@ export type ReservationWithBeds = Omit<
     hostel_office: Office;
     beds: (Bed & { room: Room })[];
     reservedBeds: Bed[];
+    reserved_beds_with_guests: BedWithGuest[]
+
 };

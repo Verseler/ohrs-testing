@@ -1,4 +1,4 @@
-import { Gender } from '@/Pages/Guest/guest.types';
+import type { Gender, Guest, GuestBeds } from '@/Pages/Guest/guest.types';
 
 export type RoomStatus = 'available' | 'fully_occupied' | 'maintenance';
 
@@ -50,4 +50,10 @@ export type RoomWithBedCounts = Room & {
 
 export type RoomWithBed = Room & {
     beds: Bed[]
+}
+
+
+export type BedWithGuest = GuestBeds & {
+    bed: Bed;
+    guest: Guest;
 }

@@ -52,14 +52,14 @@ class ExtendReservationController extends Controller
                 $reservedBedIds = $guestBed->reservedBeds($oldCheckOutDate, $newCheckOutDate)
                     ->pluck('bed_id')->toArray();
 
-                $currentReservedBedIds = $reservation->reservedBeds->pluck('bed_id')->toArray();
+                $currentReservedBedIds = $reservation->reservedBeds->pluck('id')->toArray();
 
                 // Check if any of the currently reserved beds are already reserved by others
                 $overlappingBeds = array_intersect($reservedBedIds, $currentReservedBedIds);
 
                 if (!empty($overlappingBeds)) {
                     throw ValidationException::withMessages([
-                        'new_check_out_date' => 'The new check-out date overlaps with another reservation for the same beds.'
+                        'new_check_out_date' => 'Unable to extend the reservation because the current beds are already booked for future dates.'
                     ]);
                 }
 

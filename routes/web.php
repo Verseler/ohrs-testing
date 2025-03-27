@@ -47,11 +47,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reservations/extend', [ExtendReservationController::class, 'extend'])->name('reservation.extend');
     Route::get('/reservations/extend/{id}', [ExtendReservationController::class, 'extendForm'])->name('reservation.extendForm');
     Route::get('/reservations/edit-status/{id}', [ReservationStatusController::class, 'editStatusForm'])->name('reservation.editStatusForm');
+    Route::put('/reservations/cancel/{id}', [ReservationStatusController::class, 'cancel'])->name('reservation.cancel');
     Route::get('/reservations/edit-bed-assignment/{id}', [ReservationAssignBedsController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');
     Route::get('/reservations/payment/history/{id}', [PaymentController::class, 'paymentHistory'])->name('reservation.paymentHistory');
     Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
     Route::post('/waiting-list/assign-bed', [ReservationAssignBedsController::class, 'assignBeds'])->name('reservation.assignBeds');
     Route::get('/waiting-list/assign-bed/{id}', [ReservationAssignBedsController::class, 'assignBedsForm'])->name('reservation.assignBedsForm');
+    Route::put('/reservations/edit-assign-bed', [ReservationAssignBedsController::class, 'editAssignBed'])->name('reservation.editAssignBed');
+    Route::get('/reservations/edit-assign-bed/{id}', [ReservationAssignBedsController::class, 'editAssignBedForm'])->name('reservation.editAssignBedForm');
     Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
 });
 

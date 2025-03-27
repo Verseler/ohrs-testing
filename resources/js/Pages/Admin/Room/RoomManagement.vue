@@ -63,11 +63,7 @@ import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
-import {
-    debounce,
-    tomorrowDate,
-    yesterdayDate,
-} from "@/lib/utils";
+import { debounce, tomorrowDate, yesterdayDate } from "@/lib/utils";
 import { toast } from "vue-sonner";
 import { Label } from "@/Components/ui/label";
 import DatePicker from "@/Components/DatePicker.vue";
@@ -271,7 +267,7 @@ function handleDeleteRoom() {
                     <DatePicker
                         id="check_in"
                         class="text-sm rounded shadow-sm max-h-10 min-w-40 border-neutral-200"
-                        calendar-class='-right-10'
+                        calendar-class="-right-10"
                         v-model="form.check_in_date"
                         :min-value="yesterdayDate()"
                         :max-value="form.check_out_date"
@@ -287,7 +283,7 @@ function handleDeleteRoom() {
                     <DatePicker
                         id="check_out"
                         class="text-sm rounded shadow-sm max-h-10 min-w-40 border-neutral-200"
-                        calendar-class='right-0'
+                        calendar-class="right-0"
                         v-model="form.check_out_date"
                         :min-value="form.check_in_date"
                     />

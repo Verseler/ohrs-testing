@@ -56,4 +56,22 @@ class Bed extends Model
 
         return $availableBeds;
     }
+
+    public function isAvailable($reservation)
+    {
+        return $this->where('id', $this->id)
+            ->whereDoesntHave('guestBeds.reservation', function ($query) use ($reservation) {
+                $query->whereIn('status', ['confirmed', 'checked_in'])
+                    ->where(function ($q) use ($reservation) {
+                        $q->whereBetween('check_in_date', [$reservation->check_in_date, $reservation->check_out_date])
+                            ->orWhereBetween('check_out_date', [$reservation->check_in_date, $reservation->check_out_date])
+                            ->orWhere(function ($subQuery) use ($reservation) {
+                                $subQuery->where('check_in_date', '<=', $reservation->check_in_date)
+                                    ->where('check_out_date', '>=', $reservation->check_out_date);
+                            });
+                    });
+            })
+            ->exists();
+    }
+
 }

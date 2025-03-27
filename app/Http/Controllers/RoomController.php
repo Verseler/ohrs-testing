@@ -32,11 +32,17 @@ class RoomController extends Controller
         $guestBeds = new GuestBeds();
         $reservedBedIds = $guestBeds->reservedBeds($checkInDate, $checkOutDate)
             ->pluck('bed_id')->toArray();
-       
+
+        //NOTE: one of the rules of hostel is that if the bed is not yet paid it will be locked or
+        // not yet available until it get paid or if the payment_type is pay later.
+        $bedsWithBalance = $guestBeds->bedsWithBalance()->pluck('bed_id')->toArray();
+
+        $excludedBedIds = array_unique(array_merge($reservedBedIds, $bedsWithBalance));
+
         $query = Room::withCount([
             'beds',
-            'beds as available_beds' => function ($query) use ($reservedBedIds) {
-                $query->whereNotIn('id', $reservedBedIds);
+            'beds as available_beds' => function ($query) use ($excludedBedIds) {
+                $query->whereNotIn('id', $excludedBedIds);
             }
         ])
             //Bed prices

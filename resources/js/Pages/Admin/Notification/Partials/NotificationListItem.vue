@@ -20,7 +20,7 @@ const handleMarkAsRead = (): void => {
 <template>
     <div
         class="transition-colors duration-150 rounded-lg"
-        :class="notification.read_at ? 'bg-neutral-50' : 'bg-blue-50'"
+        :class="notification.read_at ? 'bg-neutral-50' : 'bg-primary-50'"
     >
         <div class="flex p-4 sm:p-5">
             <!-- Notification icon -->
@@ -28,7 +28,9 @@ const handleMarkAsRead = (): void => {
                 <div
                     class="flex items-center justify-center w-10 h-10 rounded-full"
                     :class="
-                        notification.read_at ? 'bg-neutral-100' : 'bg-blue-100'
+                        notification.read_at
+                            ? 'bg-neutral-100'
+                            : 'bg-primary-100'
                     "
                 >
                     <Bell
@@ -36,7 +38,7 @@ const handleMarkAsRead = (): void => {
                         :class="
                             notification.read_at
                                 ? 'text-neutral-500'
-                                : 'text-blue-500'
+                                : 'text-primary-500'
                         "
                     />
                 </div>
@@ -72,7 +74,7 @@ const handleMarkAsRead = (): void => {
                                 :class="
                                     notification.read_at
                                         ? 'text-neutral-400'
-                                        : 'text-blue-500'
+                                        : 'text-primary-500'
                                 "
                                 variant="link"
                             >

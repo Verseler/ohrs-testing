@@ -16,21 +16,28 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
             <div class="space-y-2">
                 <template v-if="reservation?.reserved_beds?.length > 0">
                     <div
-                        v-for="bed in reservation.reserved_beds"
+                        v-for="reserved in reservation.reserved_beds_with_guests"
                         class="flex text-sm gap-x-2"
                     >
-                        <p>{{ bed.room.name }}</p>
-                        <p>- {{ bed.name }}</p>
+                        <p>
+                            {{ reserved.guest.first_name }}
+                            {{ reserved.guest.last_name }}
+                        </p>
+
+                        <p>
+                            - {{ reserved.bed.room.name }}
+                            {{ reserved.bed.name }}
+                        </p>
 
                         <GenderBadge
                             class="ml-auto"
-                            v-if="roomScheduledEligibleGender(bed)"
-                            :gender="roomScheduledEligibleGender(bed)"
+                            v-if="roomScheduledEligibleGender(reserved.bed)"
+                            :gender="roomScheduledEligibleGender(reserved.bed)"
                         />
                         <GenderBadge
                             v-else
                             class="ml-auto"
-                            :gender="bed.room.eligible_gender"
+                            :gender="reserved.bed.room.eligible_gender"
                         />
                     </div>
                 </template>

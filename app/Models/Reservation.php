@@ -59,4 +59,9 @@ class Reservation extends Model
     {
         return $this->hasManyThrough(Bed::class, GuestBeds::class, 'reservation_id', 'id', 'id', 'bed_id');
     }
+
+    public function reservedBedsWithGuests()
+    {
+        return $this->guestBeds()->with(['bed.room.eligibleGenderSchedules', 'guest']);
+    }
 }
