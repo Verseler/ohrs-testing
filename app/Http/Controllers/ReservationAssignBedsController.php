@@ -109,11 +109,11 @@ class ReservationAssignBedsController extends Controller
                     // if the room status is "any" then set eligible gender schedule on that room
                     // with the gender of the first guest who occupied that room
                     // for the given period of time (check in and out)
-                    if($bed->room->eligible_gender == 'any') {
+                    if ($bed->room->eligible_gender == 'any') {
                         EligibleGenderSchedule::create([
                             "start_date" => $reservation->check_in_date,
                             "end_date" => $reservation->check_in_date,
-                            "eligible_gender" =>  $currentGuest->gender,
+                            "eligible_gender" => $currentGuest->gender,
                             "room_id" => $bed->room->id
                         ]);
                     }
@@ -146,9 +146,87 @@ class ReservationAssignBedsController extends Controller
     }
 
 
-
-    public function editBedAssignmentForm(int $id)
+    public function editAssignBedForm(int $id)
     {
-        return Inertia::render('Admin/Reservation/EditBedAssignment');
+        $reservation = Reservation::with([
+            'guests',
+            'guestBeds.guest',
+            'guestBeds.bed.room',
+            'guestOffice.region',
+            'hostelOffice.region',
+        ])->where([
+                    ['hostel_office_id', Auth::user()->office_id],
+                    ['status', 'checked_in']
+                ])->findOrFail($id);
+
+        $checkInDate = $reservation->check_in_date;
+        $checkOutDate = $reservation->check_out_date;
+
+        $bed = new Bed();
+        $availableBeds = $bed->availableBeds(
+            $checkInDate,
+            $checkOutDate,
+            $reservation->hostel_office_id
+        );
+
+        return Inertia::render('Admin/Reservation/EditBedAssignment/EditBedAssignment', [
+            'reservation' => $reservation,
+            'availableBeds' => $availableBeds
+        ]);
+    }
+
+    // public function editAssignBed(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         "reservation_id" => ['required', 'exists:reservations,id'],
+    //         "selected_guest_id" => ['required', 'exists:guests,id'],
+    //         "selected_bed_id" => ['required', 'exists:beds,id']
+    //     ]);
+
+    //     dd($validated);
+    // }
+
+    public function editAssignBed(Request $request)
+    {
+        $validated = $request->validate([
+            "reservation_id" => ['required', 'exists:reservations,id'],
+            "selected_guest_id" => ['required', 'exists:guests,id'],
+            "selected_bed_id" => ['required', 'exists:beds,id']
+        ]);
+
+        try {
+            DB::transaction(function () use ($validated) {
+                $reservation = Reservation::findOrFail($validated['reservation_id']);
+                $bed = Bed::findOrFail($validated['selected_bed_id']);
+
+                if (!$bed->isAvailable($reservation)) {
+                    throw ValidationException::withMessages([
+                        'selected_bed_id' => 'The selected bed is not available for the reservation period.'
+                    ]);
+                }
+
+                // Find the current bed assignment for this guest
+                $currentGuestBed = GuestBeds::where('guest_id', $validated['selected_guest_id'])
+                    ->where('reservation_id', $validated['reservation_id'])
+                    ->first();
+
+                if ($currentGuestBed) {
+                    // Delete the old assignment
+                    $currentGuestBed->delete();
+                }
+
+                // Create new bed assignment
+                GuestBeds::create([
+                    'bed_id' => $validated['selected_bed_id'],
+                    'guest_id' => $validated['selected_guest_id'],
+                    'reservation_id' => $validated['reservation_id']
+                ]);
+            });
+        } catch (\Exception $e) {
+            return redirect()->back()->with(['error' => $e->getMessage()]);
+        }
+
+        return to_route('reservation.show', ['id' => $validated['reservation_id']])
+            ->with('success', 'Bed assignment updated successfully.');
     }
 }

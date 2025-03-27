@@ -53,6 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
     Route::post('/waiting-list/assign-bed', [ReservationAssignBedsController::class, 'assignBeds'])->name('reservation.assignBeds');
     Route::get('/waiting-list/assign-bed/{id}', [ReservationAssignBedsController::class, 'assignBedsForm'])->name('reservation.assignBedsForm');
+    Route::put('/reservations/edit-assign-bed', [ReservationAssignBedsController::class, 'editAssignBed'])->name('reservation.editAssignBed');
+    Route::get('/reservations/edit-assign-bed/{id}', [ReservationAssignBedsController::class, 'editAssignBedForm'])->name('reservation.editAssignBedForm');
     Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
 });
 
