@@ -54,13 +54,6 @@ const markAllAsRead = (): void => {
                 </div>
 
                 <div class="space-x-2">
-                    <LinkButton
-                        :href="route('notification.list')"
-                        size="icon"
-                        variant="ghost"
-                    >
-                        <RefreshCwIcon class="size-4" />
-                    </LinkButton>
                     <Button
                         @click="markAllAsRead"
                         class="bg-primary-500 hover:bg-primary-600"
