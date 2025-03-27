@@ -30,6 +30,12 @@ type EditReservationStatusProps = {
 
 const { reservation } = defineProps<EditReservationStatusProps>();
 
+const cancelable = computed(
+    () =>
+        reservation.status !== "checked_in" &&
+        reservation.status !== "checked_out"
+);
+
 //In chronological order
 const status: ReservationStatus[] = [
     "pending",
@@ -61,11 +67,15 @@ function showCancelConfirmation() {
 
 function changeStatus(newStatus: ReservationStatus) {
     router.put(
-        route("reservation.editStatus", {
-            reservation_id: reservation.id,
+        route("reservation.cancel", {
+            id: reservation.id,
             status: newStatus,
         })
     );
+}
+
+function cancelStatus() {
+    router.put(route("reservation.cancel", { id: reservation.id }));
 }
 </script>
 
@@ -140,9 +150,15 @@ function changeStatus(newStatus: ReservationStatus) {
                         @click="showConfirmation()"
                     />
 
-                    <p class="my-2 text-center text-neutral-500">or</p>
+                    <p
+                        v-if="cancelable"
+                        class="my-2 text-center text-neutral-500"
+                    >
+                        or
+                    </p>
 
                     <Button
+                        v-if="cancelable"
                         variant="outline"
                         size="lg"
                         class="w-full h-12 text-lg text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600"
@@ -171,7 +187,7 @@ function changeStatus(newStatus: ReservationStatus) {
         <Alert
             :open="cancelConfirmation"
             @update:open="cancelConfirmation = $event"
-            :onConfirm="() => changeStatus('canceled')"
+            :onConfirm="cancelStatus"
             title="Are you sure you want to cancel the reservation?"
             description="This action cannot be undone. Please confirm your action to cancel the reservation."
             severity="danger"

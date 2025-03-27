@@ -58,6 +58,20 @@ onMounted(() => {
             page.props.flash.success = null;
         }, 300);
     }
+
+    if (page.props.flash.error) {
+        toast.error(page.props.flash.error, {
+            style: {
+                background: "#ef4444",
+                color: "white",
+            },
+            position: "top-center",
+        });
+
+        setTimeout(() => {
+            page.props.flash.error = null;
+        }, 300);
+    }
 });
 </script>
 
