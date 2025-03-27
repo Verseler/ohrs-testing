@@ -170,7 +170,7 @@ onMounted(() => {
                             class="flex-1 bg-blue-500 hover:bg-blue-600"
                             :href="
                                 route(
-                                    'reservation.editBedAssignmentForm',
+                                    'reservation.editAssignBedForm',
                                     reservation.id
                                 )
                             "

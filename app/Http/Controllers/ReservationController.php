@@ -80,7 +80,8 @@ class ReservationController extends Controller
             'guests',
             'guestOffice.region',
             'hostelOffice.region',
-            'reservedBeds.room.eligibleGenderSchedules'
+            'reservedBeds.room.eligibleGenderSchedules',
+            'reservedBedsWithGuests'
         ])->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
 
         return Inertia::render("Admin/Reservation/ReservationDetails/ReservationDetails", [
