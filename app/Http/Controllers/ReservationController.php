@@ -115,19 +115,17 @@ class ReservationController extends Controller
         }
 
         // Sorting updates
-        if ($request->filled('sort_by')) {
-            $sortBy = in_array($request->sort_by, [
-                'reservation_code',
-                'created_at',
-                'first_name',
-                'check_in_date',
-                'check_out_date',
-                'guest_office_id'
-            ]) ? $request->sort_by : 'reservation_code';
+        $sortBy = $request->filled('sort_by') && in_array($request->sort_by, [
+            'reservation_code',
+            'created_at',
+            'first_name',
+            'check_in_date',
+            'check_out_date',
+            'guest_office_id'
+        ]) ? $request->sort_by : 'created_at';
 
-            $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
-            $query->orderBy($sortBy, $sortOrder);
-        }
+        $sortOrder = $request->filled('sort_order') && $request->sort_order === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($sortBy, $sortOrder);
 
         $reservations = $query->paginate(10);
 
