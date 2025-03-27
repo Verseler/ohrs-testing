@@ -50,7 +50,7 @@ import {
     PopoverTrigger,
 } from "@/Components/ui/popover";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
-import type { LaravelPagination, SharedData } from "@/types/index";
+import type { LaravelPagination, PageProps } from "@/types/index";
 import type {
     Bed,
     RoomFilters,
@@ -67,6 +67,9 @@ import { debounce, tomorrowDate, yesterdayDate } from "@/lib/utils";
 import { toast } from "vue-sonner";
 import { Label } from "@/Components/ui/label";
 import DatePicker from "@/Components/DatePicker.vue";
+import { usePoll } from "@inertiajs/vue3";
+
+usePoll(5000);
 
 const ROOMS_COLUMNS = [
     "name",
@@ -86,17 +89,21 @@ type RoomManagementProps = {
 const { rooms, filters } = defineProps<RoomManagementProps>();
 
 function getBedPrice(beds: Bed[]) {
+    if (beds.length === 0) {
+        return "N/A";
+    }
+
     const minPrice = Math.min(...beds.map((bed) => bed.price));
     const maxPrice = Math.max(...beds.map((bed) => bed.price));
 
     if (minPrice === maxPrice) {
-        return `${minPrice}`;
+        return `₱${minPrice}`;
     }
 
     return `${minPrice} - ${maxPrice}`;
 }
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const selectedRoom = ref<Room | null>(null);
 
@@ -297,6 +304,7 @@ function handleDeleteRoom() {
                     <TableRow class="bg-primary-500 hover:bg-primary-600">
                         <TableHead class="text-white"> Room Name </TableHead>
                         <TableHead class="text-white"> Total Beds </TableHead>
+
                         <TableHead class="text-white">
                             Available Beds
                         </TableHead>
@@ -354,9 +362,9 @@ function handleDeleteRoom() {
                                 </Badge>
                             </TableCell>
                             <TableCell>
-                                <span class="text-xs text-neutral-700"
-                                    >₱{{ getBedPrice(room.beds ?? []) }}</span
-                                >
+                                <span class="text-xs text-neutral-700">
+                                    {{ getBedPrice(room.beds ?? []) }}
+                                </span>
                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>
