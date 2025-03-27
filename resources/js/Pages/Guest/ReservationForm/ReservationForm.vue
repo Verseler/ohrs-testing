@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
-import { Table, TableCell, TableRow } from "@/Components/ui/table";
+import { Table, TableCell, TableRow, TableBody } from "@/Components/ui/table";
 import TableSectionHeading from "@/Pages/Guest/ReservationForm/Partials/TableSectionHeading.vue";
 import { Textarea } from "@/Components/ui/textarea";
 import { Input, InputError } from "@/Components/ui/input";
@@ -15,7 +15,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import type { Office, Region } from "@/Pages/Admin/Office/office.types";
-import type { SharedData } from "@/types";
+import type { PageProps } from "@/types";
 import { computed, ref, watch } from "vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import { yesterdayDate } from "@/lib/utils";
@@ -32,7 +32,7 @@ type ReservationFormProps = {
 
 const { canLogin, offices, hostelOffice } = defineProps<ReservationFormProps>();
 
-const page = usePage<SharedData>();
+const page = usePage<PageProps>();
 
 const DEFAULT_FIRST_GUEST = {
     first_name: undefined,
@@ -48,6 +48,7 @@ const form = useForm({
     hostel_office_id: hostelOffice.id,
     guests: [DEFAULT_FIRST_GUEST],
 
+    //contact info
     //contact info
     first_name: "",
     middle_initial: undefined,
@@ -89,9 +90,9 @@ function submit() {
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
         {{ page.props.flash.error }}
-        <div class="px-2 py-4 md:p-8">
+        <div class="container px-2 py-4 mx-auto md:p-8">
             <form @submit.prevent="showConfirmation">
-                <Table class="max-w-3xl">
+                <Table>
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
                             Region {{ hostelOffice.region.name }} -
@@ -99,213 +100,235 @@ function submit() {
                         </TableCell>
                     </TableRow>
 
-                    <TableRow class="grid border-none md:grid-cols-2">
-                        <TableCell class="space-y-2">
-                            <InputLabel>Check In</InputLabel>
-                            <DatePicker
-                                v-model="form.check_in_date"
-                                :invalid="!!form.errors.check_in_date"
-                                :min-value="yesterdayDate()"
-                                :max-value="form.check_out_date"
-                                calendar-class="left-14"
-                            />
-                            <InputError v-if="form.errors.check_in_date">
-                                {{ form.errors.check_in_date }}
-                            </InputError>
-                        </TableCell>
-                        <TableCell class="space-y-2">
-                            <InputLabel>Check Out</InputLabel>
-                            <DatePicker
-                                v-model="form.check_out_date"
-                                :invalid="!!form.errors.check_out_date"
-                                :min-value="form.check_in_date"
-                                calendar-class="left-14"
-                            />
-                            <InputError v-if="form.errors.check_out_date">
-                                {{ form.errors.check_out_date }}
-                            </InputError>
-                        </TableCell>
-                    </TableRow>
-
-                    <TableSectionHeading>
-                        Contact Person Info
-                    </TableSectionHeading>
-                    <TableRow
-                        class="grid grid-cols-1 border-none md:grid-cols-5"
-                    >
-                        <TableCell class="col-span-2 space-y-2">
-                            <InputLabel>First Name</InputLabel>
-                            <Input
-                                v-model="form.first_name"
-                                class="h-12 rounded-sm shadow-none border-primary-700"
-                                :invalid="!!form.errors.first_name"
-                            />
-                            <InputError v-if="form.errors.first_name">
-                                {{ form.errors.first_name }}
-                            </InputError>
-                        </TableCell>
-
-                        <TableCell class="col-span-1 space-y-2">
-                            <InputLabel optional>M.I.</InputLabel>
-                            <Input
-                                v-model="form.middle_initial"
-                                class="h-12 rounded-sm shadow-none border-primary-700"
-                                :invalid="!!form.errors.middle_initial"
-                                maxlength="1"
-                            />
-                            <InputError v-if="form.errors.middle_initial">
-                                {{ form.errors.middle_initial }}
-                            </InputError>
-                        </TableCell>
-
-                        <TableCell class="col-span-2 space-y-2">
-                            <InputLabel>Last Name</InputLabel>
-                            <Input
-                                v-model="form.last_name"
-                                class="h-12 rounded-sm shadow-none border-primary-700"
-                                :invalid="!!form.errors.last_name"
-                            />
-                            <InputError v-if="form.errors.last_name">
-                                {{ form.errors.last_name }}
-                            </InputError>
-                        </TableCell>
-                    </TableRow>
-
-                    <TableRow class="grid border-none md:grid-cols-2">
-                        <TableCell class="space-y-2">
-                            <InputLabel>Phone #</InputLabel>
-                            <Input
-                                type="number"
-                                v-model.number="form.phone"
-                                class="h-12 rounded-sm shadow-none border-primary-700"
-                                :invalid="!!form.errors.phone"
-                            />
-                            <InputError v-if="form.errors.phone">
-                                {{ form.errors.phone }}
-                            </InputError>
-                        </TableCell>
-                        <TableCell class="space-y-2">
-                            <InputLabel>Email</InputLabel>
-
-                            <Input
-                                v-model="form.email"
-                                class="h-12 rounded-sm shadow-none border-primary-700"
-                                :invalid="!!form.errors.email"
-                            />
-                            <InputError v-if="form.errors.email">
-                                {{ form.errors.email }}
-                            </InputError>
-                        </TableCell>
-                    </TableRow>
-
-                    <TableRow class="grid border-none md:grid-cols-2">
-                        <TableCell class="space-y-2">
-                            <InputLabel>Guest's Region</InputLabel>
-                            <Select v-model="selectedRegionId">
-                                <SelectTrigger
-                                    class="h-12 rounded-sm shadow-none border-primary-700"
-                                    :invalid="!!form.errors.guest_office_id"
-                                >
-                                    <SelectValue
-                                        placeholder="Select guest's region"
+                    <TableBody class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div>
+                            <TableRow class="grid border-none md:grid-cols-2">
+                                <TableCell class="space-y-2">
+                                    <InputLabel>Check In</InputLabel>
+                                    <DatePicker
+                                        v-model="form.check_in_date"
+                                        :invalid="!!form.errors.check_in_date"
+                                        :min-value="yesterdayDate()"
+                                        :max-value="form.check_out_date"
+                                        calendar-class="left-14"
                                     />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem
-                                            v-for="region in regions"
-                                            :Key="region.id"
-                                            :value="region.id"
-                                        >
-                                            {{ region.name }}
-                                        </SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <InputError v-if="form.errors.guest_office_id">
-                                {{ form.errors.guest_office_id }}
-                            </InputError>
-                        </TableCell>
-                        <TableCell class="space-y-2">
-                            <InputLabel>Guest's Office</InputLabel>
-                            <Select
-                                v-model="form.guest_office_id"
-                                :disabled="Boolean(selectedRegionId) === false"
-                            >
-                                <SelectTrigger
-                                    class="h-12 rounded-sm shadow-none border-primary-700"
-                                    :invalid="!!form.errors.guest_office_id"
-                                >
-                                    <SelectValue
-                                        placeholder="Select guest's office"
+                                    <InputError
+                                        v-if="form.errors.check_in_date"
+                                    >
+                                        {{ form.errors.check_in_date }}
+                                    </InputError>
+                                </TableCell>
+                                <TableCell class="space-y-2">
+                                    <InputLabel>Check Out</InputLabel>
+                                    <DatePicker
+                                        v-model="form.check_out_date"
+                                        :invalid="!!form.errors.check_out_date"
+                                        :min-value="form.check_in_date"
+                                        calendar-class="left-14"
                                     />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem
-                                            v-for="office in officesInARegion"
-                                            :Key="office.id"
-                                            :value="office.id"
-                                        >
-                                            {{ office.name }}
-                                        </SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <InputError v-if="form.errors.guest_office_id">
-                                {{ form.errors.guest_office_id }}
-                            </InputError>
-                        </TableCell>
-                    </TableRow>
-                    <TableRow class="grid border-none">
-                        <TableCell class="space-y-2">
-                            <InputLabel>Employee ID</InputLabel>
-                            <Input
-                                v-model="form.employee_id"
-                                class="h-12 rounded-sm shadow-none border-primary-700"
-                                :invalid="!!form.errors.employee_id"
-                            />
-                            <InputError v-if="form.errors.employee_id">
-                                {{ form.errors.employee_id }}
-                            </InputError>
-                        </TableCell>
-                    </TableRow>
+                                    <InputError
+                                        v-if="form.errors.check_out_date"
+                                    >
+                                        {{ form.errors.check_out_date }}
+                                    </InputError>
+                                </TableCell>
+                            </TableRow>
 
-                    <TableRow class="grid border-none">
-                        <TableCell class="space-y-2">
-                            <InputLabel optional>Purpose of stay</InputLabel>
-                            <Textarea
-                                v-model="form.purpose_of_stay"
-                                class="border border-primary-800"
-                                rows="4"
-                                cols="50"
-                            />
-                        </TableCell>
-                    </TableRow>
-
-                    <TableSectionHeading>
-                        <div class="flex items-center justify-between gap-x-1">
-                            <p>Guests Details</p>
-                            <p
-                                class="text-xs text-center pt-1.5 text-white rounded h-7 min-w-7 p-2 bg-primary-500"
+                            <TableSectionHeading>
+                                Contact Person Info
+                            </TableSectionHeading>
+                            <TableRow
+                                class="grid grid-cols-1 border-none md:grid-cols-5"
                             >
-                                {{ form.guests.length }}
-                            </p>
-                        </div>
-                    </TableSectionHeading>
+                                <TableCell class="col-span-2 space-y-2">
+                                    <InputLabel>First Name</InputLabel>
+                                    <Input
+                                        v-model="form.first_name"
+                                        class="h-12 rounded-sm shadow-none border-primary-700"
+                                        :invalid="!!form.errors.first_name"
+                                    />
+                                    <InputError v-if="form.errors.first_name">
+                                        {{ form.errors.first_name }}
+                                    </InputError>
+                                </TableCell>
 
-                    <GuestsDetailsInput :form="form" />
+                                <TableCell class="col-span-1 space-y-2">
+                                    <InputLabel optional>M.I.</InputLabel>
+                                    <Input
+                                        v-model="form.middle_initial"
+                                        class="h-12 rounded-sm shadow-none border-primary-700"
+                                        :invalid="!!form.errors.middle_initial"
+                                        maxlength="1"
+                                    />
+                                    <InputError
+                                        v-if="form.errors.middle_initial"
+                                    >
+                                        {{ form.errors.middle_initial }}
+                                    </InputError>
+                                </TableCell>
 
-                    <TableRow class="border-b-0">
-                        <TableCell>
+                                <TableCell class="col-span-2 space-y-2">
+                                    <InputLabel>Last Name</InputLabel>
+                                    <Input
+                                        v-model="form.last_name"
+                                        class="h-12 rounded-sm shadow-none border-primary-700"
+                                        :invalid="!!form.errors.last_name"
+                                    />
+                                    <InputError v-if="form.errors.last_name">
+                                        {{ form.errors.last_name }}
+                                    </InputError>
+                                </TableCell>
+                            </TableRow>
+
+                            <TableRow class="grid border-none md:grid-cols-2">
+                                <TableCell class="space-y-2">
+                                    <InputLabel>Phone #</InputLabel>
+                                    <Input
+                                        type="number"
+                                        v-model.number="form.phone"
+                                        class="h-12 rounded-sm shadow-none border-primary-700"
+                                        :invalid="!!form.errors.phone"
+                                    />
+                                    <InputError v-if="form.errors.phone">
+                                        {{ form.errors.phone }}
+                                    </InputError>
+                                </TableCell>
+                                <TableCell class="space-y-2">
+                                    <InputLabel>Email</InputLabel>
+
+                                    <Input
+                                        v-model="form.email"
+                                        class="h-12 rounded-sm shadow-none border-primary-700"
+                                        :invalid="!!form.errors.email"
+                                    />
+                                    <InputError v-if="form.errors.email">
+                                        {{ form.errors.email }}
+                                    </InputError>
+                                </TableCell>
+                            </TableRow>
+
+                            <TableRow class="grid border-none md:grid-cols-2">
+                                <TableCell class="space-y-2">
+                                    <InputLabel>Guest's Region</InputLabel>
+                                    <Select v-model="selectedRegionId">
+                                        <SelectTrigger
+                                            class="h-12 rounded-sm shadow-none border-primary-700"
+                                            :invalid="
+                                                !!form.errors.guest_office_id
+                                            "
+                                        >
+                                            <SelectValue
+                                                placeholder="Select guest's region"
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem
+                                                    v-for="region in regions"
+                                                    :Key="region.id"
+                                                    :value="region.id"
+                                                >
+                                                    {{ region.name }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError
+                                        v-if="form.errors.guest_office_id"
+                                    >
+                                        {{ form.errors.guest_office_id }}
+                                    </InputError>
+                                </TableCell>
+                                <TableCell class="space-y-2">
+                                    <InputLabel>Guest's Office</InputLabel>
+                                    <Select
+                                        v-model="form.guest_office_id"
+                                        :disabled="
+                                            Boolean(selectedRegionId) === false
+                                        "
+                                    >
+                                        <SelectTrigger
+                                            class="h-12 rounded-sm shadow-none border-primary-700"
+                                            :invalid="
+                                                !!form.errors.guest_office_id
+                                            "
+                                        >
+                                            <SelectValue
+                                                placeholder="Select guest's office"
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem
+                                                    v-for="office in officesInARegion"
+                                                    :Key="office.id"
+                                                    :value="office.id"
+                                                >
+                                                    {{ office.name }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError
+                                        v-if="form.errors.guest_office_id"
+                                    >
+                                        {{ form.errors.guest_office_id }}
+                                    </InputError>
+                                </TableCell>
+                            </TableRow>
+                            <TableRow class="grid border-none">
+                                <TableCell class="space-y-2">
+                                    <InputLabel>Employee ID</InputLabel>
+                                    <Input
+                                        v-model="form.employee_id"
+                                        class="h-12 rounded-sm shadow-none border-primary-700"
+                                        :invalid="!!form.errors.employee_id"
+                                    />
+                                    <InputError v-if="form.errors.employee_id">
+                                        {{ form.errors.employee_id }}
+                                    </InputError>
+                                </TableCell>
+                            </TableRow>
+
+                            <TableRow class="grid border-none">
+                                <TableCell class="space-y-2">
+                                    <InputLabel optional>
+                                        Purpose of stay
+                                    </InputLabel>
+                                    <Textarea
+                                        v-model="form.purpose_of_stay"
+                                        class="border border-primary-800"
+                                        rows="4"
+                                        cols="50"
+                                    />
+                                </TableCell>
+                            </TableRow>
+
                             <Button
                                 type="submit"
                                 class="w-full h-12 mt-4 text-base"
                             >
                                 Submit
                             </Button>
-                        </TableCell>
-                    </TableRow>
+                        </div>
+
+                        <div>
+                            <TableSectionHeading>
+                                <div
+                                    class="flex items-center justify-between gap-x-1"
+                                >
+                                    <p>Guests Details</p>
+                                    <p
+                                        class="text-xs text-center pt-1.5 text-white rounded h-7 min-w-7 p-2 bg-primary-500"
+                                    >
+                                        {{ form.guests.length }}
+                                    </p>
+                                </div>
+                            </TableSectionHeading>
+
+                            <GuestsDetailsInput :form="form" />
+                        </div>
+                    </TableBody>
                 </Table>
             </form>
         </div>
