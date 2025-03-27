@@ -33,6 +33,7 @@ import { InputError } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { PageProps } from "@/types";
 import { toast } from "vue-sonner";
+import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 
 type EditBedAssignmentProps = {
     reservation: ReservationWithBeds & {
@@ -78,6 +79,13 @@ watch(
         }
     }
 );
+
+// confirmation dialog
+const confirmation = ref(false);
+
+function showConfirmation() {
+    confirmation.value = true;
+}
 
 function submit() {
     form.put(route("reservation.editAssignBed"));
@@ -126,9 +134,8 @@ function submit() {
         </PageHeader>
 
         <!-- Main content -->
-
         <div class="grid max-w-6xl grid-cols-3 gap-6">
-            <form @submit.prevent="submit" class="col-span-2">
+            <form @submit.prevent="showConfirmation" class="col-span-2">
                 <Message severity="info" class="flex items-center mb-3 gap-x-2">
                     <Info class="size-4" />
                     Please select a guest to update their bed assignment
@@ -213,5 +220,13 @@ function submit() {
                 :bedName="selectedGuest.bed.name"
             />
         </div>
+
+        <Alert
+            :open="confirmation"
+            @update:open="confirmation = $event"
+            :onConfirm="submit"
+            title="Are you sure you want to save changes?"
+            description="Confirming the changes will update the guest's bed assignment. Please confirm your action to proceed."
+        />
     </AuthenticatedLayout>
 </template>
