@@ -2,14 +2,6 @@
 import LinkButton from "@/Components/LinkButton.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
 import { Button } from "@/Components/ui/button";
 import {
     Paginator,
@@ -39,7 +31,6 @@ import { Head, router, useForm } from "@inertiajs/vue3";
 import {
     Ellipsis,
     FilterX,
-    Home,
     Lock,
     Pencil,
     Plus,
@@ -64,10 +55,12 @@ import Searchbox from "@/Components/Searchbox.vue";
 import RoleBadge from "@/Pages/Admin/User/Partials/RoleBadge.vue";
 import { usePoll } from "@inertiajs/vue3";
 import { showSuccess } from "@/Composables/useFlash";
+import { data } from "@/Pages/Admin/User/data";
+import SelectField from "@/Components/SelectField.vue";
+import TableContainer from "@/Components/ui/table/TableContainer.vue";
+import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 
 usePoll(5000);
-
-const USER_COLUMNS = ["Name", "Email", "Hostel Office", "Role", ""];
 
 type UserManagementProps = {
     users: LaravelPagination<User>;
@@ -117,7 +110,6 @@ watch(
     debounce(applyFilter, 300)
 );
 
-// Display flash success message as sonner or toast
 onMounted(() => showSuccess());
 
 //delete confirmation
@@ -151,19 +143,7 @@ function deleteUser() {
 
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Office Management</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <Breadcrumbs :items="data.breadcrumbs" />
 
             <LinkButton :href="route('user.createForm')">
                 <Plus />Add User
@@ -195,34 +175,19 @@ function deleteUser() {
                 </SelectContent>
             </Select>
 
-            <Select v-model="form.role">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Role</SelectLabel>
-                        <SelectItem value="admin"> Admin </SelectItem>
-                        <SelectItem value="super_admin">
-                            Super Admin
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <SelectField
+                v-model="form.role"
+                placeholder="Select a role"
+                label="Role"
+                :items="data.filterRole"
+            />
 
-            <Select v-model="form.sort_by">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Sort by</SelectLabel>
-                        <SelectItem value="name"> Name </SelectItem>
-                        <SelectItem value="email"> Email </SelectItem>
-                        <SelectItem value="role"> Role </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <SelectField
+                v-model="form.sort_by"
+                placeholder="Sort by"
+                label="Sort by"
+                :items="data.sortBy"
+            />
 
             <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
 
@@ -238,26 +203,18 @@ function deleteUser() {
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="border rounded">
+        <TableContainer>
             <Table>
                 <TableHeader>
-                    <TableRow class="bg-primary-500 hover:bg-primary-600">
-                        <TableHead class="text-white"> Name </TableHead>
-                        <TableHead class="text-white"> Email </TableHead>
-                        <TableHead class="text-white">
-                            Hostel Office
+                    <TableRowHeader>
+                        <TableHead v-for="head in data.tableHeads">
+                            {{ head }}
                         </TableHead>
-                        <TableHead class="text-white"> Role </TableHead>
-                        <TableHead class="text-right"></TableHead>
-                    </TableRow>
+                    </TableRowHeader>
                 </TableHeader>
                 <TableBody>
                     <template v-if="users && users.data.length > 0">
-                        <TableRow
-                            v-for="user in users.data"
-                            :key="user.id"
-                            class="text-neutral-800"
-                        >
+                        <TableRow v-for="user in users.data" :key="user.id">
                             <TableCell>
                                 {{ user.name }}
                             </TableCell>
@@ -322,13 +279,13 @@ function deleteUser() {
                     </template>
 
                     <template v-else>
-                        <TableEmpty :colspan="USER_COLUMNS.length">
+                        <TableEmpty :colspan="data.tableHeads.length">
                             No results.
                         </TableEmpty>
                     </template>
                 </TableBody>
             </Table>
-            <TableFooter class="flex justify-center py-1.5">
+            <TableFooter>
                 <Paginator>
                     <PaginatorButton
                         variant="start"
@@ -358,7 +315,7 @@ function deleteUser() {
                     />
                 </Paginator>
             </TableFooter>
-        </div>
+        </TableContainer>
 
         <Alert
             :open="deleteConfirmation"

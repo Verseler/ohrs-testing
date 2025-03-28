@@ -1,23 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import {
-    Ellipsis,
-    FilterX,
-    Home,
-    Hotel,
-    Pencil,
-    Plus,
-    Trash,
-} from "lucide-vue-next";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
+import { Ellipsis, FilterX, Hotel, Pencil, Plus, Trash } from "lucide-vue-next";
 import {
     Table,
     TableBody,
@@ -63,10 +47,13 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { usePoll } from "@inertiajs/vue3";
+import { data } from "@/Pages/Admin/Office/data";
+import SelectField from "@/Components/SelectField.vue";
+import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
+import TableContainer from "@/Components/ui/table/TableContainer.vue";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
 usePoll(5000);
-
-const OFFICES_COLUMNS = ["region", "name"] as const;
 
 type OfficeManagementProps = {
     offices: LaravelPagination<Office>;
@@ -142,19 +129,7 @@ function handleDeleteOffice() {
 
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Office Management</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <Breadcrumbs :items="data.breadcrumbs" />
 
             <Link :href="route('office.upsertForm')">
                 <Button><Plus />Add Office</Button>
@@ -186,18 +161,12 @@ function handleDeleteOffice() {
                 </SelectContent>
             </Select>
 
-            <Select v-model="form.sort_by">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Sort by</SelectLabel>
-                        <SelectItem value="region_id"> Region </SelectItem>
-                        <SelectItem value="name"> Name </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <SelectField
+                v-model="form.sort_by"
+                :items="data.sortBy"
+                placeholder="Sort By"
+                label="Sort By"
+            />
 
             <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
 
@@ -213,21 +182,20 @@ function handleDeleteOffice() {
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="border rounded">
+        <TableContainer>
             <Table>
                 <TableHeader>
-                    <TableRow class="bg-primary-500 hover:bg-primary-600">
-                        <TableHead class="text-white"> Region </TableHead>
-                        <TableHead class="text-white"> Name </TableHead>
-                        <TableHead class="text-right"></TableHead>
-                    </TableRow>
+                    <TableRowHeader>
+                        <TableHead v-for="head in data.tableHeads">
+                            {{ head }}
+                        </TableHead>
+                    </TableRowHeader>
                 </TableHeader>
                 <TableBody>
                     <template v-if="offices && offices.data.length > 0">
                         <TableRow
                             v-for="office in offices.data"
                             :key="office.id"
-                            class="text-neutral-800"
                         >
                             <TableCell>
                                 {{ office.region.name }}
@@ -274,13 +242,13 @@ function handleDeleteOffice() {
                     </template>
 
                     <template v-else>
-                        <TableEmpty :colspan="OFFICES_COLUMNS.length">
+                        <TableEmpty :colspan="data.tableHeads.length">
                             No results.
                         </TableEmpty>
                     </template>
                 </TableBody>
             </Table>
-            <TableFooter class="flex justify-center py-1.5">
+            <TableFooter>
                 <Paginator>
                     <PaginatorButton
                         variant="start"
@@ -310,7 +278,8 @@ function handleDeleteOffice() {
                     />
                 </Paginator>
             </TableFooter>
-        </div>
+        </TableContainer>
+
         <Alert
             :open="deleteConfirmation"
             @update:open="deleteConfirmation = $event"

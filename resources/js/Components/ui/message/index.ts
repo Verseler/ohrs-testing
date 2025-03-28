@@ -16,7 +16,8 @@ export const messageVariants = cva(
           'border-red-400 text-red-500 bg-red-50',
         secondary:
           'border-neutral-400 text-neutral-500 bg-neutral-50',
-
+        primary:
+            'text-primary-700 border-primary-500 bg-white',
       },
       size: {
         default: 'p-2 rounded-md',

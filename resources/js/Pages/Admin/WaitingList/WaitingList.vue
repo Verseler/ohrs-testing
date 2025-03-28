@@ -2,21 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
-import {
-    Home,
-    Ellipsis,
-    Maximize,
-    CalendarClock,
-    FilterX,
-} from "lucide-vue-next";
+import { Ellipsis, Maximize, CalendarClock, FilterX } from "lucide-vue-next";
 import {
     Table,
     TableBody,
@@ -37,15 +23,6 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
 import { Button } from "@/Components/ui/button";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import type {
@@ -61,18 +38,13 @@ import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import { debounce, formatDateString, formatDateTimeString } from "@/lib/utils";
 import { usePoll } from "@inertiajs/vue3";
 import { showSuccess } from "@/Composables/useFlash";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import { data } from "@/Pages/Admin/WaitingList/data";
+import SelectField from "@/Components/SelectField.vue";
+import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
+import TableContainer from "@/Components/ui/table/TableContainer.vue";
 
 usePoll(5000);
-
-const RESERVATIONS_COLUMNS = [
-    "reservation_code",
-    "requested_date",
-    "book_by",
-    "check_in_date",
-    "check_out_date",
-    "total_guests",
-    "guest_office",
-] as const;
 
 type Reservation = Omit<
     ReservationWithBeds,
@@ -124,21 +96,7 @@ onMounted(() => showSuccess());
     <Head title="Waiting List" />
 
     <AuthenticatedLayout>
-        <div class="flex justify-between min-h-12">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Waiting List</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-        </div>
+        <Breadcrumbs :items="data.breadcrumbs" />
 
         <PageHeader>
             <template #icon><CalendarClock /></template>
@@ -147,32 +105,11 @@ onMounted(() => showSuccess());
 
         <!-- Search, Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
-            <Select v-model="form.sort_by">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Sort by</SelectLabel>
-                        <SelectItem value="reservation_code">
-                            Reservation code
-                        </SelectItem>
-                        <SelectItem value="created_at">
-                            Requested date
-                        </SelectItem>
-                        <SelectItem value="first_name"> Book by </SelectItem>
-                        <SelectItem value="check_in_date">
-                            Checked in
-                        </SelectItem>
-                        <SelectItem value="check_out_date">
-                            Checked out
-                        </SelectItem>
-                        <SelectItem value="guest_office_id">
-                            Guest Office
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <SelectField
+                placeholder="Sort by"
+                label="Sort by"
+                :items="data.sortBy"
+            />
 
             <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
 
@@ -188,30 +125,21 @@ onMounted(() => showSuccess());
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="border rounded">
+        <TableContainer>
             <Table>
                 <TableHeader>
-                    <TableRow class="bg-primary-500 hover:bg-primary-600">
-                        <TableHead class="text-white">
-                            Reservation Code
+                    <TableRowHeader>
+                        <TableHead v-for="head in data.tableHeads">
+                            {{ head }}
                         </TableHead>
-                        <TableHead class="text-white">
-                            Requested Date
-                        </TableHead>
-                        <TableHead class="text-white"> Book by </TableHead>
-                        <TableHead class="text-white"> Check in </TableHead>
-                        <TableHead class="text-white"> Check out </TableHead>
-                        <TableHead class="text-white"> Total Guests </TableHead>
-                        <TableHead class="text-white"> Guest Office </TableHead>
-                        <TableHead class="text-right"></TableHead>
-                    </TableRow>
+                    </TableRowHeader>
                 </TableHeader>
+
                 <TableBody>
                     <template v-if="reservations.data.length > 0">
                         <TableRow
                             v-for="reservation in reservations.data"
                             :key="reservation.id"
-                            class="text-neutral-800"
                         >
                             <TableCell class="font-medium">
                                 {{ reservation.reservation_code }}
@@ -255,20 +183,18 @@ onMounted(() => showSuccess());
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent class="p-0 max-w-28">
-                                        <div class="flex flex-col">
-                                            <PopoverLinkField
-                                                :href="
-                                                    route(
-                                                        'reservation.assignBedsForm',
-                                                        {
-                                                            id: reservation.id,
-                                                        }
-                                                    )
-                                                "
-                                            >
-                                                <Maximize />Show
-                                            </PopoverLinkField>
-                                        </div>
+                                        <PopoverLinkField
+                                            :href="
+                                                route(
+                                                    'reservation.assignBedsForm',
+                                                    {
+                                                        id: reservation.id,
+                                                    }
+                                                )
+                                            "
+                                        >
+                                            <Maximize />Show
+                                        </PopoverLinkField>
                                     </PopoverContent>
                                 </Popover>
                             </TableCell>
@@ -276,14 +202,14 @@ onMounted(() => showSuccess());
                     </template>
 
                     <template v-else>
-                        <TableEmpty :colspan="RESERVATIONS_COLUMNS.length">
+                        <TableEmpty :colspan="data.tableHeads.length">
                             No results.
                         </TableEmpty>
                     </template>
                 </TableBody>
             </Table>
 
-            <TableFooter class="flex justify-center py-1.5">
+            <TableFooter>
                 <Paginator>
                     <PaginatorButton
                         variant="start"
@@ -317,6 +243,6 @@ onMounted(() => showSuccess());
                     />
                 </Paginator>
             </TableFooter>
-        </div>
+        </TableContainer>
     </AuthenticatedLayout>
 </template>

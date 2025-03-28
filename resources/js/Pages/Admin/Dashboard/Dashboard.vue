@@ -1,31 +1,25 @@
 <script setup lang="ts">
-import PageHeader from "@/Components/PageHeader.vue";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {
     CalendarClockIcon,
     CalendarIcon,
     ChartColumnIncreasing,
     CreditCardIcon,
-    Home,
     UsersIcon,
 } from "lucide-vue-next";
-import { Head, useForm } from "@inertiajs/vue3";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
-import StatsCard from "@/Components/Analytics/StatsCard.vue";
-import { BarChart } from "@/Components/ui/chart-bar";
-import YearPicker from "@/Components/YearPicker.vue";
-import { formatYear, getMonthYear } from "@/lib/utils";
-import { onMounted, watch } from "vue";
-import type { MonthlyRevenue } from "@/Pages/Admin/Dashboard/dashboard.types";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NotificationLinkButton from "@/Components/NotificationLinkButton.vue";
+import type { MonthlyRevenue } from "@/Pages/Admin/Dashboard/dashboard.types";
+import StatsCard from "@/Components/Analytics/StatsCard.vue";
+import { formatYear, getMonthYear } from "@/lib/utils";
+import YearPicker from "@/Components/YearPicker.vue";
+import { BarChart } from "@/Components/ui/chart-bar";
+import PageHeader from "@/Components/PageHeader.vue";
+import { Message } from "@/Components/ui/message";
+import { computed, onMounted, watch } from "vue";
+import { Head, useForm } from "@inertiajs/vue3";
 import { usePoll } from "@inertiajs/vue3";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import { data } from "@/Pages/Admin/Dashboard/data";
 
 usePoll(5000);
 
@@ -34,7 +28,7 @@ type DashboardProps = {
     totalReservationsCount: number;
     totalGuestsCount: number;
     totalRevenue: number;
-    monthlyRevenue: MonthlyRevenue[];
+    monthlyRevenues: MonthlyRevenue[];
 };
 
 const {
@@ -42,8 +36,11 @@ const {
     totalGuestsCount,
     totalReservationsCount,
     totalRevenue,
-    monthlyRevenue,
+    monthlyRevenues,
 } = defineProps<DashboardProps>();
+
+const zeroReservation = computed(() => pendingReservationsCount <= 0);
+const zeroRevenue = computed(() => totalRevenue <= 0);
 
 const form = useForm({
     selected_date: new Date(),
@@ -71,20 +68,7 @@ function updateDashboardData() {
 
     <AuthenticatedLayout>
         <div class="flex items-center justify-between">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-
+            <Breadcrumbs :items="data.breadcrumbs" />
             <NotificationLinkButton />
         </div>
         <PageHeader>
@@ -93,21 +77,18 @@ function updateDashboardData() {
         </PageHeader>
 
         <!-- Main Content -->
-        <p
-            class="px-4 py-1.5 mb-2 mr-2 text-xl font-bold border rounded-lg text-primary-700 border-primary-500 max-w-max"
+        <Message
+            severity="primary"
+            class="px-4 py-1.5 mb-2 mr-2 text-xl font-bold rounded-lg max-w-max"
         >
             {{ getMonthYear(new Date()) }}
-        </p>
+        </Message>
 
         <section id="stats" class="grid grid-cols-4 gap-3">
             <StatsCard>
                 <template #title>Pending Reservations</template>
                 <template #value>
-                    <span
-                        :class="{
-                            'text-red-500': pendingReservationsCount > 0,
-                        }"
-                    >
+                    <span :class="{ 'text-red-500': zeroReservation }">
                         {{ pendingReservationsCount }}
                     </span>
                 </template>
@@ -127,14 +108,10 @@ function updateDashboardData() {
             <StatsCard>
                 <template #title>Revenue</template>
                 <template #value>
-                    <span
-                        :class="{
-                            'text-red-500': totalRevenue <= 0,
-                        }"
-                    >
+                    <span :class="{ 'text-red-500': zeroRevenue }">
                         ₱ {{ totalRevenue }}
-                    </span></template
-                >
+                    </span>
+                </template>
                 <template #icon><CreditCardIcon /></template>
             </StatsCard>
         </section>
@@ -155,7 +132,7 @@ function updateDashboardData() {
 
             <BarChart
                 class="w-full"
-                :data="monthlyRevenue"
+                :data="monthlyRevenues"
                 index="name"
                 :categories="['revenue']"
                 :y-formatter="

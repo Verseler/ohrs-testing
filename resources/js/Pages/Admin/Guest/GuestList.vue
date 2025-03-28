@@ -2,14 +2,6 @@
 import GenderBadge from "@/Components/GenderBadge.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import Searchbox from "@/Components/Searchbox.vue";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
 import { Button } from "@/Components/ui/button";
 import {
     Paginator,
@@ -42,21 +34,16 @@ import type { Gender, Guest, GuestsFilters } from "@/Pages/Guest/guest.types";
 import type { Region } from "@/Pages/Admin/Office/office.types";
 import type { LaravelPagination } from "@/types";
 import { Head, useForm } from "@inertiajs/vue3";
-import { FilterX, Home, Users } from "lucide-vue-next";
+import { FilterX, Users } from "lucide-vue-next";
 import { computed, watch } from "vue";
 import { usePoll } from "@inertiajs/vue3";
+import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
+import TableContainer from "@/Components/ui/table/TableContainer.vue";
+import SelectField from "@/Components/SelectField.vue";
+import { data } from "@/Pages/Admin/Guest/data";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
 usePoll(5000);
-
-const GUESTS_COLUMNS = [
-    "name",
-    "gender",
-    "phone",
-    "region",
-    "office_id",
-    "check_in_date",
-    "check_out_date",
-] as const;
 
 type GuestListProps = {
     guests: LaravelPagination<Guest>;
@@ -110,22 +97,7 @@ watch(
     <Head title="Guests" />
 
     <AuthenticatedLayout>
-        <div class="flex justify-between min-h-12">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Guests</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-        </div>
-
+        <Breadcrumbs :items="data.breadcrumbs" />
         <PageHeader>
             <template #icon><Users /></template>
             <template #title>Guests</template>
@@ -150,43 +122,18 @@ watch(
                     </SelectGroup>
                 </SelectContent>
             </Select>
-
-            <Select v-model="form.gender">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Select a gender" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Gender</SelectLabel>
-                        <SelectItem value="male"> Male </SelectItem>
-                        <SelectItem value="female"> Female </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
-            <Select v-model="form.sort_by as string">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Sort by</SelectLabel>
-                        <SelectItem value="first_name"> First Name </SelectItem>
-                        <SelectItem value="last_name"> Last Name </SelectItem>
-                        <SelectItem value="gender"> Gender </SelectItem>
-                        <SelectItem value="phone"> Phone </SelectItem>
-                        <SelectItem value="region_id"> Region </SelectItem>
-                        <SelectItem value="office_id"> Office </SelectItem>
-                        <SelectItem value="check_in_date">
-                            Check In
-                        </SelectItem>
-                        <SelectItem value="check_out_date">
-                            Check Out
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
+            <SelectField
+                v-model="form.gender"
+                :items="data.filterGender"
+                placeholder="Select a gender"
+                label="Gender"
+            />
+            <SelectField
+                v-model="form.sort_by"
+                :items="data.sortBy"
+                placeholder="Sort by"
+                label="Sort by"
+            />
             <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
 
             <Button
@@ -197,41 +144,36 @@ watch(
             >
                 <FilterX />
             </Button>
-
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="border rounded">
+        <TableContainer>
             <Table>
                 <TableHeader>
-                    <TableRow class="bg-primary-500 hover:bg-primary-600">
-                        <TableHead class="text-white"> Name </TableHead>
-                        <TableHead class="text-white"> Gender </TableHead>
-                        <TableHead class="text-white"> Phone </TableHead>
-                        <TableHead class="text-white"> Region </TableHead>
-                        <TableHead class="text-white"> Office </TableHead>
-                        <TableHead class="text-white"> Check In </TableHead>
-                        <TableHead class="text-white"> Check Out </TableHead>
-                    </TableRow>
+                    <TableRowHeader>
+                        <TableHead v-for="head in data.tableHeads">
+                            {{ head }}
+                        </TableHead>
+                    </TableRowHeader>
                 </TableHeader>
                 <TableBody>
                     <template v-if="guests && guests.data.length > 0">
-                        <TableRow
-                            v-for="guest in guests.data"
-                            :key="guest.id"
-                            class="text-neutral-800"
-                        >
+                        <TableRow v-for="guest in guests.data" :key="guest.id">
                             <TableCell class="font-medium capitalize">
                                 {{ `${guest.first_name} ${guest.last_name}` }}
                             </TableCell>
                             <TableCell>
                                 <GenderBadge :gender="guest.gender as Gender" />
                             </TableCell>
-                            <TableCell> {{ guest.phone ?? " - " }} </TableCell>
+                            <TableCell>
+                                {{ guest.phone ?? " - " }}
+                            </TableCell>
                             <TableCell>
                                 Region {{ guest.office.region.name }}
                             </TableCell>
-                            <TableCell> {{ guest.office.name }} </TableCell>
+                            <TableCell>
+                                {{ guest.office.name }}
+                            </TableCell>
                             <TableCell>
                                 {{
                                     formatDateString(
@@ -250,13 +192,14 @@ watch(
                     </template>
 
                     <template v-else>
-                        <TableEmpty :colspan="GUESTS_COLUMNS.length">
+                        <TableEmpty :colspan="data.tableHeads.length">
                             No results.
                         </TableEmpty>
                     </template>
                 </TableBody>
             </Table>
-            <TableFooter class="flex justify-center py-1.5">
+
+            <TableFooter>
                 <Paginator>
                     <PaginatorButton
                         variant="start"
@@ -286,6 +229,6 @@ watch(
                     />
                 </Paginator>
             </TableFooter>
-        </div>
+        </TableContainer>
     </AuthenticatedLayout>
 </template>

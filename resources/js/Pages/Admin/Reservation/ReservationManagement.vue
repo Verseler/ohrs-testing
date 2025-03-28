@@ -1,22 +1,8 @@
 <script setup lang="ts">
 import { Head, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
 import PageHeader from "@/Components/PageHeader.vue";
-import {
-    Home,
-    CalendarCheck,
-    Ellipsis,
-    FilterX,
-    Maximize,
-} from "lucide-vue-next";
+import { CalendarCheck, Ellipsis, FilterX, Maximize } from "lucide-vue-next";
 import {
     Table,
     TableBody,
@@ -45,35 +31,19 @@ import {
 import { Button } from "@/Components/ui/button";
 import { computed, watch } from "vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import { debounce } from "@/lib/utils";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import StatusBadge from "@/Components/StatusBadge.vue";
 import { usePoll } from "@inertiajs/vue3";
+import SelectField from "@/Components/SelectField.vue";
+import { data } from "@/Pages/Admin/Reservation/data";
+import TableContainer from "@/Components/ui/table/TableContainer.vue";
+import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
 usePoll(5000);
-
-const RESERVATIONS_COLUMNS = [
-    "reservation_code",
-    "book_by",
-    "check_in_date",
-    "check_out_date",
-    "total_billing",
-    "remaining_balance",
-    "total_guests",
-    "guest_office",
-    "status",
-] as const;
 
 type Reservation = Omit<
     ReservationWithBeds,
@@ -135,22 +105,7 @@ watch(
     <Head title="Reservation Management" />
 
     <AuthenticatedLayout>
-        <div class="flex justify-between min-h-12">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Reservation Management</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-        </div>
-
+        <Breadcrumbs :items="data.breadcrumbs" />
         <PageHeader>
             <template #icon><CalendarCheck /></template>
             <template #title>Reservation Management</template>
@@ -158,62 +113,24 @@ watch(
 
         <!-- Search, Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
-            <Select v-model="form.status">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Reservation Status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Status</SelectLabel>
-                        <SelectItem value="confirmed"> Confirmed </SelectItem>
-                        <SelectItem value="checked_in"> Checked In </SelectItem>
-                        <SelectItem value="checked_out">
-                            Checked Out
-                        </SelectItem>
-                        <SelectItem value="canceled"> Canceled </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
-            <Select v-model="form.balance">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Balance Status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Balance</SelectLabel>
-                        <SelectItem value="paid"> Paid </SelectItem>
-                        <SelectItem value="has_balance">
-                            Has Balance
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
-            <Select v-model="form.sort_by">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Sort by</SelectLabel>
-                        <SelectItem value="reservation_code">
-                            Reservation code
-                        </SelectItem>
-                        <SelectItem value="first_name"> Book by </SelectItem>
-                        <SelectItem value="check_in_date">
-                            Checked in
-                        </SelectItem>
-                        <SelectItem value="check_out_date">
-                            Checked out
-                        </SelectItem>
-                        <SelectItem value="total_billing">
-                            Total billing
-                        </SelectItem>
-                        <SelectItem value="status"> Status </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <SelectField
+                v-model="(form.status as string)"
+                placeholder="Reservation Status"
+                label="Status"
+                :items="data.filterStatus"
+            />
+            <SelectField
+                v-model="form.balance"
+                placeholder="Balance Status"
+                label="Balance"
+                :items="data.filterStatus"
+            />
+            <SelectField
+                v-model="form.sort_by"
+                placeholder="Sort by"
+                label="Sort by"
+                :items="data.filterStatus"
+            />
 
             <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
 
@@ -229,34 +146,20 @@ watch(
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 
-        <div class="border rounded">
+        <TableContainer>
             <Table>
                 <TableHeader>
-                    <TableRow class="bg-primary-500 hover:bg-primary-600">
-                        <TableHead class="text-white">
-                            Reservation Code
+                    <TableRowHeader>
+                        <TableHead v-for="head in data.tableHeads">
+                            {{ head }}
                         </TableHead>
-                        <TableHead class="text-white"> Book by </TableHead>
-                        <TableHead class="text-white"> Check in </TableHead>
-                        <TableHead class="text-white"> Check out </TableHead>
-                        <TableHead class="text-white">
-                            Total Billing
-                        </TableHead>
-                        <TableHead class="text-white">
-                            Remaining Balance
-                        </TableHead>
-                        <TableHead class="text-white"> Total Guests </TableHead>
-                        <TableHead class="text-white"> Guest Office </TableHead>
-                        <TableHead class="text-white"> Status </TableHead>
-                        <TableHead class="text-right"></TableHead>
-                    </TableRow>
+                    </TableRowHeader>
                 </TableHeader>
                 <TableBody>
                     <template v-if="reservations.data.length > 0">
                         <TableRow
                             v-for="reservation in reservations.data"
                             :key="reservation.id"
-                            class="text-neutral-800"
                         >
                             <TableCell class="font-medium">
                                 {{ reservation.reservation_code }}
@@ -318,14 +221,14 @@ watch(
                     </template>
 
                     <template v-else>
-                        <TableEmpty :colspan="RESERVATIONS_COLUMNS.length">
+                        <TableEmpty :colspan="data.tableHeads.length">
                             No results.
                         </TableEmpty>
                     </template>
                 </TableBody>
             </Table>
 
-            <TableFooter class="flex justify-center py-1.5">
+            <TableFooter>
                 <Paginator>
                     <PaginatorButton
                         variant="start"
@@ -359,6 +262,6 @@ watch(
                     />
                 </Paginator>
             </TableFooter>
-        </div>
+        </TableContainer>
     </AuthenticatedLayout>
 </template>

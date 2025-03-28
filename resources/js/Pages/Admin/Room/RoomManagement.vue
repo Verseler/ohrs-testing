@@ -1,24 +1,14 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import Badge from "@/Components/ui/badge/Badge.vue";
 import {
     Bed as BedIcon,
     Ellipsis,
     FilterX,
-    Home,
     Pencil,
     Plus,
     Trash,
 } from "lucide-vue-next";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
 import {
     Table,
     TableBody,
@@ -35,15 +25,6 @@ import {
     PaginatorInfo,
 } from "@/Components/ui/paginator";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
-import {
     Popover,
     PopoverContent,
     PopoverField,
@@ -57,7 +38,6 @@ import type {
     Room,
     RoomWithBedCounts,
 } from "@/Pages/Admin/Room/room.types";
-import type { Gender } from "@/Pages/Guest/guest.types";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
@@ -67,17 +47,15 @@ import { debounce, tomorrowDate, yesterdayDate } from "@/lib/utils";
 import { Label } from "@/Components/ui/label";
 import DatePicker from "@/Components/DatePicker.vue";
 import { usePoll } from "@inertiajs/vue3";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import { data } from "@/Pages/Admin/Room/data";
+import SelectField from "@/Components/SelectField.vue";
+import TableContainer from "@/Components/ui/table/TableContainer.vue";
+import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
+import AvailabilityBadge from "@/Components/AvailabilityBadge.vue";
+import GenderBadge from "@/Components/GenderBadge.vue";
 
 usePoll(5000);
-
-const ROOMS_COLUMNS = [
-    "name",
-    "eligible_gender",
-    "bed price",
-    "beds_count",
-    "status",
-    "available_beds",
-] as const;
 
 type RoomManagementProps = {
     rooms: LaravelPagination<RoomWithBedCounts>;
@@ -169,19 +147,7 @@ function handleDeleteRoom() {
 
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Room Management</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
+            <Breadcrumbs :items="data.breadcrumbs" />
 
             <Link :href="route('room.createForm')">
                 <Button><Plus />Add Room</Button>
@@ -195,39 +161,16 @@ function handleDeleteRoom() {
 
         <!-- Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
-            <Select v-model="form.eligible_gender as Gender">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Select a gender" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Gender</SelectLabel>
-                        <SelectItem value="any"> Any </SelectItem>
-                        <SelectItem value="male"> Male </SelectItem>
-                        <SelectItem value="female"> Female </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
-            <Select v-model="form.sort_by as string">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Sort by</SelectLabel>
-                        <SelectItem value="name"> Name </SelectItem>
-                        <SelectItem value="eligible_gender">
-                            Eligible Gender
-                        </SelectItem>
-                        <SelectItem value="beds_count"> Total Beds </SelectItem>
-                        <SelectItem value="available_beds">
-                            Available Beds
-                        </SelectItem>
-                        <SelectItem value="bed_price"> Bed Price </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            <SelectField
+                placeholder="Select a gender"
+                label="Gender"
+                :items="data.filterGender"
+            />
+            <SelectField
+                placeholder="Sort by"
+                label="Sort by"
+                :items="data.sortBy"
+            />
 
             <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
 
@@ -275,68 +218,36 @@ function handleDeleteRoom() {
             </div>
         </div>
 
-        <div class="border rounded">
+        <TableContainer>
             <Table>
                 <TableHeader>
-                    <TableRow class="bg-primary-500 hover:bg-primary-600">
-                        <TableHead class="text-white"> Room Name </TableHead>
-                        <TableHead class="text-white"> Total Beds </TableHead>
-
-                        <TableHead class="text-white">
-                            Available Beds
+                    <TableRowHeader>
+                        <TableHead v-for="head in data.tableHeads">
+                            {{ head }}
                         </TableHead>
-                        <TableHead class="text-white"> Status </TableHead>
-                        <TableHead class="text-white">
-                            Eligible Gender
-                        </TableHead>
-                        <TableHead class="text-white"> Bed Price </TableHead>
-                        <TableHead class="text-right"></TableHead>
-                    </TableRow>
+                    </TableRowHeader>
                 </TableHeader>
 
                 <TableBody>
                     <template v-if="rooms.data.length > 0">
-                        <TableRow
-                            v-for="room in rooms.data"
-                            :key="room.id"
-                            class="text-neutral-800"
-                        >
+                        <TableRow v-for="room in rooms.data" :key="room.id">
                             <TableCell class="font-medium">
                                 {{ room.name }}
                             </TableCell>
-                            <TableCell>{{ room.beds_count }}</TableCell>
-                            <TableCell>{{ room.available_beds }}</TableCell>
                             <TableCell>
-                                <Badge
-                                    v-if="
-                                        room.available_beds !== null &&
-                                        room.available_beds !== undefined
-                                    "
-                                    :severity="
-                                        room.available_beds <= 0
-                                            ? 'danger'
-                                            : 'success'
-                                    "
-                                >
-                                    {{
-                                        room.available_beds <= 0
-                                            ? "Fully Occupied"
-                                            : "Available"
-                                    }}
-                                </Badge>
+                                {{ room.beds_count }}
                             </TableCell>
                             <TableCell>
-                                <Badge
-                                    :severity="
-                                        room.eligible_gender === 'male'
-                                            ? 'info'
-                                            : room.eligible_gender === 'female'
-                                            ? 'danger'
-                                            : 'secondary'
-                                    "
-                                >
-                                    {{ room.eligible_gender }}
-                                </Badge>
+                                {{ room.available_beds }}
+                            </TableCell>
+                            <TableCell>
+                                <AvailabilityBadge
+                                    v-if="room.available_beds"
+                                    :available="room.available_beds <= 0"
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <GenderBadge :gender="room.eligible_gender" />
                             </TableCell>
                             <TableCell>
                                 <span class="text-xs text-neutral-700">
@@ -380,14 +291,14 @@ function handleDeleteRoom() {
                     </template>
 
                     <template v-else>
-                        <TableEmpty :colspan="ROOMS_COLUMNS.length">
+                        <TableEmpty :colspan="data.tableHeads.length">
                             No results.
                         </TableEmpty>
                     </template>
                 </TableBody>
             </Table>
 
-            <TableFooter class="flex justify-center py-1.5">
+            <TableFooter>
                 <Paginator>
                     <PaginatorButton
                         variant="start"
@@ -417,7 +328,7 @@ function handleDeleteRoom() {
                     />
                 </Paginator>
             </TableFooter>
-        </div>
+        </TableContainer>
 
         <Alert
             :open="deleteConfirmation"
