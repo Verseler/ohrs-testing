@@ -65,12 +65,13 @@ class ReservationProcessController extends Controller
             ]
         );
 
-        //validate if guest and hostel office exists
-        $guestOffice = Office::findOrFail($validated['guest_office_id']);
-        $hostelOffice = Office::where('has_hostel', true)->findOrFail($validated['hostel_office_id']);
-
         try {
-            DB::transaction(function () use ($guestOffice, $hostelOffice, $validated) {
+            DB::transaction(function () use ($validated) {
+                //validate if guest and hostel office exists
+                $guestOffice = Office::findOrFail($validated['guest_office_id']);
+                $hostelOffice = Office::where('has_hostel', true)->findOrFail($validated['hostel_office_id']);
+
+
                 //create an initial reservation
                 $reservation = Reservation::create([
                     'reservation_code' => $this->generateReservationCode($guestOffice->id, $hostelOffice->id),
