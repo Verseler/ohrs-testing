@@ -59,8 +59,9 @@ import { data } from "@/Pages/Admin/User/data";
 import SelectField from "@/Components/SelectField.vue";
 import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
-usePoll(5000);
+usePoll(25000);
 
 type UserManagementProps = {
     users: LaravelPagination<User>;

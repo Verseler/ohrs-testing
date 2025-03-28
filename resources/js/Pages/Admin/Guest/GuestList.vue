@@ -43,7 +43,7 @@ import SelectField from "@/Components/SelectField.vue";
 import { data } from "@/Pages/Admin/Guest/data";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
-usePoll(5000);
+usePoll(8000);
 
 type GuestListProps = {
     guests: LaravelPagination<Guest>;

@@ -55,7 +55,7 @@ import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import AvailabilityBadge from "@/Components/AvailabilityBadge.vue";
 import GenderBadge from "@/Components/GenderBadge.vue";
 
-usePoll(5000);
+usePoll(20000);
 
 type RoomManagementProps = {
     rooms: LaravelPagination<RoomWithBedCounts>;
@@ -162,11 +162,13 @@ function handleDeleteRoom() {
         <!-- Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
             <SelectField
+                v-model="form.eligible_gender"
                 placeholder="Select a gender"
                 label="Gender"
                 :items="data.filterGender"
             />
             <SelectField
+                v-model="form.sort_by"
                 placeholder="Sort by"
                 label="Sort by"
                 :items="data.sortBy"

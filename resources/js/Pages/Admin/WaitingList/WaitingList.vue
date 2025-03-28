@@ -44,7 +44,7 @@ import SelectField from "@/Components/SelectField.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import TableContainer from "@/Components/ui/table/TableContainer.vue";
 
-usePoll(5000);
+usePoll(10000);
 
 type Reservation = Omit<
     ReservationWithBeds,
@@ -106,6 +106,7 @@ onMounted(() => showSuccess());
         <!-- Search, Filter and Sort -->
         <div class="flex mb-2 gap-x-2">
             <SelectField
+                v-model="form.sort_by"
                 placeholder="Sort by"
                 label="Sort by"
                 :items="data.sortBy"
