@@ -17,13 +17,10 @@ import ValueAdjuster from "@/Components/ValueAdjuster.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import { Bed as BedIcon, Home, Trash } from "lucide-vue-next";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { Bed, Room, RoomWithBed } from "@/Pages/Admin/Room/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
 import { Button } from "@/Components/ui/button";
-import { usePage } from "@inertiajs/vue3";
-import type { PageProps } from "@/types";
-import { toast } from "vue-sonner";
 
 type InsertRoomProps = {
     room: RoomWithBed | null;
@@ -31,7 +28,6 @@ type InsertRoomProps = {
 
 const { room } = defineProps<InsertRoomProps>();
 
-const page = usePage<PageProps>();
 const counter = ref(room?.beds.length ?? 1);
 
 type UpsertRoomForm = Partial<
@@ -76,26 +72,6 @@ function removeLastBed() {
         form.beds.pop();
     }
 }
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.error(page.props.flash.error, {
-                style: {
-                    background: "#ef4444",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
-);
 
 function showSubmitConfirmation() {
     if (!room || !room.id) return;

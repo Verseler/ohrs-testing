@@ -50,7 +50,7 @@ import {
     PopoverTrigger,
 } from "@/Components/ui/popover";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
-import type { LaravelPagination, PageProps } from "@/types/index";
+import type { LaravelPagination } from "@/types/index";
 import type {
     Bed,
     RoomFilters,
@@ -58,13 +58,12 @@ import type {
     RoomWithBedCounts,
 } from "@/Pages/Admin/Room/room.types";
 import type { Gender } from "@/Pages/Guest/guest.types";
-import { Head, Link, router, useForm, usePage } from "@inertiajs/vue3";
+import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import { debounce, tomorrowDate, yesterdayDate } from "@/lib/utils";
-import { toast } from "vue-sonner";
 import { Label } from "@/Components/ui/label";
 import DatePicker from "@/Components/DatePicker.vue";
 import { usePoll } from "@inertiajs/vue3";
@@ -102,8 +101,6 @@ function getBedPrice(beds: Bed[]) {
 
     return `${minPrice} - ${maxPrice}`;
 }
-
-const page = usePage<PageProps>();
 
 const selectedRoom = ref<Room | null>(null);
 
@@ -151,26 +148,6 @@ function showDeleteConfirmation(room: Room) {
 
     deleteConfirmation.value = true;
 }
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.error(page.props.flash.error, {
-                style: {
-                    background: "#ef4444",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
-);
 
 function handleDeleteRoom() {
     if (!selectedRoom.value) return;

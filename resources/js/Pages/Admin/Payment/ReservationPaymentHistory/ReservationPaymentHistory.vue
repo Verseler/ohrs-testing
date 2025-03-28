@@ -17,7 +17,7 @@ import {
     DialogTitle,
 } from "@/Components/ui/dialog";
 import { ReceiptIcon, History, Home, Maximize } from "lucide-vue-next";
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {
     Breadcrumb,
@@ -37,9 +37,6 @@ import {
     formatDateTimeString,
 } from "@/lib/utils";
 import AmountCard from "@/Pages/Admin/Payment/ReservationPaymentHistory/Partials/AmountCard.vue";
-import { watch } from "vue";
-import type { PageProps } from "@/types";
-import { toast } from "vue-sonner";
 import { usePoll } from "@inertiajs/vue3";
 
 usePoll(15000);
@@ -52,8 +49,6 @@ type ReservationPaymentHistoryProps = {
 
 const { reservationPaymentHistory } =
     defineProps<ReservationPaymentHistoryProps>();
-
-const page = usePage<PageProps>();
 
 const totalBillings = computed(() =>
     formatCurrency(reservationPaymentHistory.total_billings)
@@ -88,26 +83,6 @@ const closeReceiptDialog = () => {
         selectedPayment.value = null;
     }, 100);
 };
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.success,
-    () => {
-        if (page.props.flash.success) {
-            toast.success(page.props.flash.success, {
-                style: {
-                    background: "#22c55e",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.success = null;
-            }, 300);
-        }
-    }
-);
 </script>
 
 <template>

@@ -34,8 +34,8 @@ import {
     TableRow,
 } from "@/Components/ui/table";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import type { LaravelPagination, PageProps, User } from "@/types";
-import { Head, router, useForm, usePage } from "@inertiajs/vue3";
+import type { LaravelPagination, User } from "@/types";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import {
     Ellipsis,
     FilterX,
@@ -47,7 +47,6 @@ import {
     Trash,
 } from "lucide-vue-next";
 import { computed, onMounted, ref, watch } from "vue";
-import { toast } from "vue-sonner";
 import type { UserFilters } from "@/Pages/Admin/User/user.types";
 import type { Region } from "@/Pages/Admin/Office/office.types";
 import { debounce } from "@/lib/utils";
@@ -64,6 +63,7 @@ import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import RoleBadge from "@/Pages/Admin/User/Partials/RoleBadge.vue";
 import { usePoll } from "@inertiajs/vue3";
+import { showSuccess } from "@/Composables/useFlash";
 
 usePoll(5000);
 
@@ -76,8 +76,6 @@ type UserManagementProps = {
 };
 
 const { users, filters } = defineProps<UserManagementProps>();
-
-const page = usePage<PageProps>();
 
 const form = useForm<Partial<UserFilters>>({
     region_id: filters?.region_id,
@@ -120,40 +118,7 @@ watch(
 );
 
 // Display flash success message as sonner or toast
-onMounted(() => {
-    if (page.props.flash.success) {
-        toast.success(page.props.flash.success, {
-            style: {
-                background: "#22c55e",
-                color: "white",
-            },
-            position: "top-center",
-        });
-
-        setTimeout(() => {
-            page.props.flash.success = null;
-        }, 300);
-    }
-});
-
-watch(
-    () => page.props.flash.success,
-    () => {
-        if (page.props.flash.success) {
-            toast.success(page.props.flash.success, {
-                style: {
-                    background: "#22c55e",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.success = null;
-            }, 300);
-        }
-    }
-);
+onMounted(() => showSuccess());
 
 //delete confirmation
 const selectedUser = ref<User | null>(null);
@@ -303,7 +268,6 @@ function deleteUser() {
                                 Region {{ user.office?.region?.name }} -
                                 {{ user.office?.name }}
                             </TableCell>
-                            <!-- TODO:create a user role badge -->
                             <TableCell class="font-medium">
                                 <RoleBadge :role="user.role" />
                             </TableCell>

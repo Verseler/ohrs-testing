@@ -12,7 +12,7 @@ import {
     Home,
     ReceiptText,
 } from "lucide-vue-next";
-import { Head, router, useForm, usePage } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import { formatCurrency, formatDateString } from "@/lib/utils";
@@ -26,7 +26,6 @@ import {
     CardTitle,
 } from "@/Components/ui/card";
 import type { PageProps } from "@/types";
-import { toast } from "vue-sonner";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -54,8 +53,6 @@ type ReservationDetailsProps = {
 };
 
 const { reservation } = defineProps<ReservationDetailsProps>();
-
-const page = usePage<PageProps>();
 
 const form = useForm<Partial<Payment>>({
     amount: reservation.remaining_balance,
@@ -111,27 +108,6 @@ function showPayLaterConfirmation() {
 function submitPayLater() {
     router.post(route('reservation.payLater', { id: reservation.id }));
 }
-
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.error(page.props.flash.error, {
-                style: {
-                    background: "#ef4444",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
-);
 </script>
 
 <template>

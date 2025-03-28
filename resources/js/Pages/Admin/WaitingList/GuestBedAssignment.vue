@@ -3,7 +3,7 @@ import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { CalendarCheck, Home, Info, XCircle } from "lucide-vue-next";
 import PageHeader from "@/Components/PageHeader.vue";
-import { Head, router, usePage } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -13,9 +13,7 @@ import {
     BreadcrumbPage,
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
-import { onMounted, ref, watch } from "vue";
-import type { PageProps } from "@/types";
-import { toast } from "vue-sonner";
+import { onMounted, ref } from "vue";
 import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
 import AssignGuestList from "@/Pages/Admin/WaitingList/Partials/AssignGuestList.vue";
 import { Bed } from "@/Pages/Admin/Room/room.types";
@@ -23,8 +21,9 @@ import { Message } from "@/Components/ui/message";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { usePoll } from "@inertiajs/vue3";
+import { showSuccess } from "@/Composables/useFlash";
 
-usePoll(5000);
+usePoll(15000);
 
 type GuestBedAssignmentProps = {
     reservation: ReservationWithBeds;
@@ -32,8 +31,6 @@ type GuestBedAssignmentProps = {
 };
 
 const { reservation, availableBeds } = defineProps<GuestBedAssignmentProps>();
-
-const page = usePage<PageProps>();
 
 const cancelConfirmation = ref(false);
 
@@ -45,41 +42,7 @@ function cancelReservation() {
     router.put(route("reservation.cancel", { id: reservation.id }));
 }
 
-// Display flash success or error message as sonner or toast
-onMounted(() => {
-    if (page.props.flash.success) {
-        toast.success(page.props.flash.success, {
-            style: {
-                background: "#22c55e",
-                color: "white",
-            },
-            position: "top-center",
-        });
-
-        setTimeout(() => {
-            page.props.flash.success = null;
-        }, 300);
-    }
-});
-
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.error(page.props.flash.error, {
-                style: {
-                    background: "#ef4444",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
-);
+onMounted(() => showSuccess());
 </script>
 
 <template>

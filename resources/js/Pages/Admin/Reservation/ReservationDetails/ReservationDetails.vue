@@ -14,7 +14,7 @@ import {
     Pencil,
 } from "lucide-vue-next";
 import PageHeader from "@/Components/PageHeader.vue";
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import {
     Breadcrumb,
@@ -32,9 +32,8 @@ import ReservedBeds from "@/Pages/Admin/Reservation/ReservationDetails/Partials/
 import LinkButton from "@/Components/LinkButton.vue";
 import ReservationCode from "./Partials/ReservationCode.vue";
 import { onMounted } from "vue";
-import type { PageProps } from "@/types";
-import { toast } from "vue-sonner";
 import { usePoll } from "@inertiajs/vue3";
+import { showError, showSuccess } from "@/Composables/useFlash";
 
 usePoll(5000);
 
@@ -45,37 +44,9 @@ type ReservationDetailsProps = {
 
 const { reservation, canExempt } = defineProps<ReservationDetailsProps>();
 
-const page = usePage<PageProps>();
-
-// Display flash success or error message as sonner or toast
 onMounted(() => {
-    if (page.props.flash.success) {
-        toast.success(page.props.flash.success, {
-            style: {
-                background: "#22c55e",
-                color: "white",
-            },
-            position: "top-center",
-        });
-
-        setTimeout(() => {
-            page.props.flash.success = null;
-        }, 300);
-    }
-
-    if (page.props.flash.error) {
-        toast.error(page.props.flash.error, {
-            style: {
-                background: "#ef4444",
-                color: "white",
-            },
-            position: "top-center",
-        });
-
-        setTimeout(() => {
-            page.props.flash.error = null;
-        }, 300);
-    }
+    showSuccess();
+    showError();
 });
 </script>
 

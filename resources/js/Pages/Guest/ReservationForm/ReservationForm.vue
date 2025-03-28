@@ -89,7 +89,6 @@ function submit() {
     <div class="w-full min-h-screen">
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
-        {{ page.props.flash.error }}
         <div class="container px-2 py-4 mx-auto md:p-8">
             <form @submit.prevent="showConfirmation">
                 <Table>

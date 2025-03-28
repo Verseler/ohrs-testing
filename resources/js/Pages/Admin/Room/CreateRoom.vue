@@ -19,12 +19,6 @@ import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import { Bed as BedIcon, Home } from "lucide-vue-next";
 import { Room } from "@/Pages/Admin/Room/room.types";
 import { Button } from "@/Components/ui/button";
-import { usePage } from "@inertiajs/vue3";
-import type { PageProps } from "@/types";
-import { toast } from "vue-sonner";
-import { watch } from "vue";
-
-const page = usePage<PageProps>();
 
 type CreateRoomForm = Omit<
     Room,
@@ -51,26 +45,6 @@ function decreaseBed() {
 
     form.number_of_beds--;
 }
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.error(page.props.flash.error, {
-                style: {
-                    background: "#ef4444",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
-);
 
 function showSubmitConfirmation() {
     form.post(route("room.create"));

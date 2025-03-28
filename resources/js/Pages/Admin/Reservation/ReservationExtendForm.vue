@@ -25,7 +25,7 @@ import {
     formatDateString,
     getDaysDifference,
 } from "@/lib/utils";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import StatusBadge from "@/Components/StatusBadge.vue";
 import { Separator } from "@/Components/ui/separator";
 import { Label } from "@/Components/ui/label";
@@ -35,7 +35,6 @@ import { InputError } from "@/Components/ui/input";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Badge } from "@/Components/ui/badge";
 import type { PageProps } from "@/types";
-import { toast } from "vue-sonner";
 
 type ReservationExtendFormProps = {
     reservation: Reservation;
@@ -86,26 +85,6 @@ function showConfirmation() {
 function submitExtendReservation() {
     form.post(route("reservation.extend", { id: reservation.id }));
 }
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.error(page.props.flash.error, {
-                style: {
-                    background: "#ef4444",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
-);
 </script>
 
 <template>

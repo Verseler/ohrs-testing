@@ -1,6 +1,10 @@
 <script setup>
 import Sidebar from "@/Components/Sidebar/Sidebar.vue";
 import { Toaster } from "@/Components/ui/sonner";
+import { useFlashError, useFlashSuccess } from "@/Composables/useFlash";
+
+useFlashError();
+useFlashSuccess();
 </script>
 
 <template>

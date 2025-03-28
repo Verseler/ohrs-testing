@@ -10,13 +10,12 @@ import {
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, useForm, usePage } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import { Home, Info, Pen } from "lucide-vue-next";
-import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import type { Bed } from "@/Pages/Admin/Room/room.types";
 import { Gender, GuestBeds } from "@/Pages/Guest/guest.types";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import {
     Select,
     SelectContent,
@@ -31,8 +30,6 @@ import GuestDetailCard from "@/Pages/Admin/Reservation/EditBedAssignment/Partial
 import InputLabel from "@/Components/ui/input/InputLabel.vue";
 import { InputError } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import { PageProps } from "@/types";
-import { toast } from "vue-sonner";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 
 type EditBedAssignmentProps = {
@@ -43,8 +40,6 @@ type EditBedAssignmentProps = {
 };
 
 const { reservation } = defineProps<EditBedAssignmentProps>();
-
-const page = usePage<PageProps>();
 
 const form = useForm({
     reservation_id: reservation.id,
@@ -59,26 +54,6 @@ const selectedGuest = computed<GuestBeds | null>(() => {
 
     return guest ?? null;
 });
-
-// Display flash success or error message as sonner or toast
-watch(
-    () => page.props.flash.error,
-    () => {
-        if (page.props.flash.error) {
-            toast.error(page.props.flash.error, {
-                style: {
-                    background: "#ef4444",
-                    color: "white",
-                },
-                position: "top-center",
-            });
-
-            setTimeout(() => {
-                page.props.flash.error = null;
-            }, 300);
-        }
-    }
-);
 
 // confirmation dialog
 const confirmation = ref(false);
