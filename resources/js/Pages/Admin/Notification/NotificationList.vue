@@ -58,6 +58,7 @@ const markAllAsRead = (): void => {
 
                 <div class="space-x-2">
                     <Button
+                        v-if="unreadCount > 1"
                         @click="markAllAsRead"
                         class="bg-primary-500 hover:bg-primary-600"
                     >
