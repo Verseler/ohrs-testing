@@ -17,6 +17,10 @@ import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import * as htmlToImage from "html-to-image";
 import { toast } from "vue-sonner";
 import { onMounted } from "vue";
+import LinkButton from "@/Components/LinkButton.vue";
+import ListItem from "@/Pages/Guest/Partials/ListItem.vue";
+import Code from "@/Pages/Guest/Partials/Code.vue";
+import PendingStatus from "@/Pages/Guest/Partials/PendingStatus.vue";
 
 type ReservationConfirmationProps = {
     canLogin: boolean;
@@ -37,6 +41,7 @@ function downloadConfirmation() {
     htmlToImage
         .toJpeg(document.getElementById("confirmation") as HTMLElement, {
             quality: 1,
+            skipFonts: true
         })
         .then(function (dataUrl) {
             var link = document.createElement("a");
@@ -67,6 +72,7 @@ onMounted(() => {
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
         <div class="container max-w-xl px-4 py-8 mx-auto">
+            <!-- Check Icon -->
             <div class="flex items-center justify-center mb-8">
                 <div class="p-3 bg-green-600 rounded-full">
                     <Check class="w-8 h-8 text-white" />
@@ -91,96 +97,61 @@ onMounted(() => {
 
             <Card id="confirmation" class="rounded-sm shadow">
                 <CardHeader class="pb-4 text-center">
-                    <div class="mb-2 text-sm font-semibold text-neutral-500">
+                    <h2 class="mb-2 text-sm font-semibold text-neutral-500">
                         RESERVATION CODE
-                    </div>
-                    <div class="py-4 rounded-md bg-neutral-200">
-                        <h2
-                            class="text-3xl font-bold tracking-wider text-primary-900"
-                        >
-                            {{ reservation.reservation_code }}
-                        </h2>
-                    </div>
+                    </h2>
+                    <Code>{{ reservation.reservation_code }}</Code>
                 </CardHeader>
 
                 <CardContent class="space-y-6">
-                    <div class="p-4 rounded-lg bg-muted">
-                        <div class="flex items-center justify-between">
-                            <div class="font-medium">Status</div>
-                            <div class="flex items-center gap-2">
-                                <span
-                                    class="bg-yellow-500 rounded-full size-2"
-                                ></span>
-                                <span
-                                    class="font-medium text-yellow-500 capitalize"
-                                >
-                                    {{ reservation.status }}
-                                </span>
-                            </div>
-                        </div>
+                    <div
+                        class="flex items-center justify-between p-4 rounded-lg bg-muted"
+                    >
+                        <div class="font-medium">Status</div>
+                        <PendingStatus>{{ reservation.status }}</PendingStatus>
                     </div>
 
                     <Separator />
 
                     <div class="space-y-4">
-                        <div class="flex items-start gap-4">
-                            <Calendar class="mt-0.5 w-5 h-5 text-neutral-500" />
-                            <div>
-                                <div class="font-medium">Check In</div>
-                                <div class="text-neutral-500">
-                                    {{ reservation.check_in_date }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-4">
-                            <Calendar class="mt-0.5 w-5 h-5 text-neutral-500" />
-                            <div>
-                                <div class="font-medium">Check Out</div>
-                                <div class="text-neutral-500">
-                                    {{ reservation.check_out_date }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-4">
-                            <Users class="mt-0.5 w-5 h-5 text-neutral-500" />
-                            <div>
-                                <div class="font-medium">Total Guests</div>
-                                <div class="text-neutral-500">
-                                    {{ reservation.total_guests }}
-                                    {{
-                                        reservation.total_guests > 1
-                                            ? "guests"
-                                            : "guest"
-                                    }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-4">
-                            <Hotel class="mt-0.5 w-5 h-5 text-neutral-500" />
-                            <div>
-                                <div class="font-medium">Hostel Office</div>
-                                <div class="text-neutral-500">
-                                    {{ reservation.hostel_office_name }}
-                                </div>
-                            </div>
-                        </div>
+                        <ListItem
+                            :icon="Calendar"
+                            label="Check In"
+                            :value="reservation.check_in_date"
+                        />
+                        <ListItem
+                            :icon="Calendar"
+                            label="Check Out"
+                            :value="reservation.check_out_date"
+                        />
+                        <ListItem
+                            :icon="Users"
+                            label="Total Guests"
+                            :value="`${reservation.total_guests} ${
+                                reservation.total_guests > 1
+                                    ? 'guests'
+                                    : 'guest'
+                            }`"
+                        />
+                        <ListItem
+                            :icon="Hotel"
+                            label="Hostel Office"
+                            :value="reservation.hostel_office_name"
+                        />
                     </div>
                 </CardContent>
             </Card>
 
             <div class="flex items-center mt-3 gap-x-2">
-                <Link href="/">
-                    <Button
-                        variant="outline"
-                        class="text-primary-500 border-primary-500 hover:bg-primary-50 hover:text-primary-600"
-                        size="lg"
-                    >
-                        <ArrowLeft />Back
-                    </Button>
-                </Link>
+                <LinkButton
+                    href="/"
+                    variant="outline"
+                    class="text-primary-500 border-primary-500 hover:bg-primary-50 hover:text-primary-600"
+                    size="lg"
+                >
+                    <ArrowLeft />Back
+                </LinkButton>
+
                 <Button @click="downloadConfirmation" class="flex-1" size="lg">
                     <Download />Download
                 </Button>
