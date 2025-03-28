@@ -21,6 +21,8 @@ import { computed, ref } from "vue";
 import { Bed, Room, RoomWithBed } from "@/Pages/Admin/Room/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
 import { Button } from "@/Components/ui/button";
+import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import { editRoomData } from "./data";
 
 type InsertRoomProps = {
     room: RoomWithBed | null;
@@ -84,26 +86,7 @@ function showSubmitConfirmation() {
     <Head title="Edit Room" />
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
-            <Breadcrumb>
-                <BreadcrumbList>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('dashboard')">
-                            <Home class="size-4" />
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('room.list')">
-                            Room Management
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Edit Room</BreadcrumbPage>
-                    </BreadcrumbItem>
-                </BreadcrumbList>
-            </Breadcrumb>
-
+            <Breadcrumbs :items="editRoomData.breadcrumbs" />
             <BackLink />
         </div>
 
@@ -140,24 +123,11 @@ function showSubmitConfirmation() {
                 >
                     <div class="flex w-full gap-4">
                         <RadioButtonCard
-                            id="any"
-                            value="any"
-                            label="Any"
-                            :active="form.eligible_gender === 'any'"
-                            class="flex-1"
-                        />
-                        <RadioButtonCard
-                            id="male"
-                            value="male"
-                            label="Male"
-                            :active="form.eligible_gender === 'male'"
-                            class="flex-1"
-                        />
-                        <RadioButtonCard
-                            id="female"
-                            value="female"
-                            label="Female"
-                            :active="form.eligible_gender === 'female'"
+                            v-for="item in editRoomData.eligibleGenderRadioButtons"
+                            :id="item"
+                            :value="item"
+                            :label="item"
+                            :active="form.eligible_gender === item"
                             class="flex-1"
                         />
                     </div>

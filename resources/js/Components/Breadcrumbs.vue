@@ -29,11 +29,12 @@ const { items } = defineProps<BreadcrumbsProps>();
                     <Home class="size-4" />
                 </BreadcrumbLink>
             </BreadcrumbItem>
+
             <template v-for="item in items" :key="item.label">
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                     <BreadcrumbLink v-if="item.href" :href="item.href">
-                        <Home class="size-4" />
+                        {{ item.label }}
                     </BreadcrumbLink>
                     <BreadcrumbPage v-else>{{ item.label }}</BreadcrumbPage>
                 </BreadcrumbItem>

@@ -16,10 +16,10 @@ const { canLogin, user } = defineProps<HeaderProps>();
 
 <template>
     <header
-        class="container flex justify-between items-center p-2 mx-auto w-full bg-white md:px-4"
+        class="flex items-center justify-between w-full p-2 bg-white md:px-4"
     >
         <Link href="/">
-            <div class="flex gap-x-2 items-center">
+            <div class="flex items-center gap-x-2">
                 <ApplicationLogo />
                 <p class="text-xl font-bold text-primary-500">
                     <span class="text-yellow-300">H</span>ostel
@@ -29,8 +29,8 @@ const { canLogin, user } = defineProps<HeaderProps>();
             </div>
         </Link>
 
-        <div class="inline-flex gap-2 items-center">
-            <nav class="flex gap-x-2 items-center">
+        <div class="inline-flex items-center gap-2">
+            <nav class="flex items-center gap-x-2">
                 <Link :href="route('reservation.checkStatusForm')">
                     <Button class="px-3"><ScanSearch /> Reservation Status</Button>
                 </Link>

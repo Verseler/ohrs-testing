@@ -11,7 +11,7 @@ import BackLink from "@/Components/BackLink.vue";
 
 import { Home, CalendarCheck, Loader2Icon } from "lucide-vue-next";
 import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types.ts";
-import { Head, useForm, usePage } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import {
@@ -34,7 +34,6 @@ import DatePicker from "@/Components/DatePicker.vue";
 import { InputError } from "@/Components/ui/input";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Badge } from "@/Components/ui/badge";
-import type { PageProps } from "@/types";
 
 type ReservationExtendFormProps = {
     reservation: Reservation;
@@ -42,11 +41,10 @@ type ReservationExtendFormProps = {
 
 const { reservation } = defineProps<ReservationExtendFormProps>();
 
-const page = usePage<PageProps>();
-
 const form = useForm({
     reservation_id: reservation.id,
     new_check_out_date: new Date(reservation.check_out_date),
+    processing: false, // Ensure processing is initialized as a boolean
 });
 
 const additionalDays = computed(() => {
@@ -61,22 +59,26 @@ const additionalCharge = computed(() => {
 });
 
 const bookBy = computed(() => {
-    return `${reservation.first_name}
-    ${reservation?.middle_initial ? reservation.middle_initial + "." : ""}
-    ${reservation.last_name}`;
+    const firstName = reservation.first_name || "N/A";
+    const middleInitial = reservation.middle_initial
+        ? reservation.middle_initial + "."
+        : "";
+    const lastName = reservation.last_name || "N/A";
+
+    return `${firstName} ${middleInitial} ${lastName}`;
 });
 
 function extendByDays(days: number) {
     const currentCheckout = new Date(reservation.check_out_date);
     const newDate = new Date(currentCheckout);
+
     newDate.setDate(newDate.getDate() + days);
     const newCheckoutDate = new Date(newDate.toISOString().split("T")[0]);
 
     form.new_check_out_date = newCheckoutDate;
 }
-
 //Confirmation Dialog
-const confirmation = ref(false);
+const confirmation = ref<boolean>(false);
 
 function showConfirmation() {
     confirmation.value = true;

@@ -58,6 +58,7 @@ const handleMarkAsRead = (): void => {
                         >
                             {{ notification.type }}
                         </h3>
+
                         <p
                             class="mt-1 text-sm"
                             :class="
@@ -67,6 +68,7 @@ const handleMarkAsRead = (): void => {
                             "
                         >
                             {{ notification.data.message }}
+
                             <LinkButton
                                 v-if="notification.data.link"
                                 :href="notification.data.link"

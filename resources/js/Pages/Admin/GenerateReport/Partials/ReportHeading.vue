@@ -22,8 +22,6 @@ import { formatDateTimeString, getMonthYear } from "@/lib/utils";
             }"
         >
             <!-- Image Left Side -->
-            <!-- src="https://denr10.com.ph/resources/assets/images/denr10.png" -->
-
             <img
                 src="/images/denr10Logo.png"
                 :style="{
@@ -48,15 +46,11 @@ import { formatDateTimeString, getMonthYear } from "@/lib/utils";
                 </h3>
                 <div>Brgy. Puntod, Cagayan de Oro City</div>
             </div>
-            <!-- Space Right Side -->
-            <div
-                :style="{
-                    width: '100px',
-                    height: '100px',
-                }"
-            />
+            <!-- Space Right Side to balance the content of flex -->
+            <div :style="{ width: '100px', height: '100px' }" />
         </div>
 
+        <!-- Divider -->
         <hr
             :style="{
                 width: '100%',

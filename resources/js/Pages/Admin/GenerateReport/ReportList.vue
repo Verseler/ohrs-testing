@@ -117,7 +117,7 @@ watch(() => form.selected_date, changeDate);
                             </TableRow>
                         </template>
                     </TableBody>
-                    <TableFooter class="bg-white">
+                    <TableFooter class="table-footer-group bg-white">
                         <TableRow>
                             <TableCell colspan="4" class="text-right">
                                 Total Amount:

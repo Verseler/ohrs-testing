@@ -21,6 +21,17 @@ export const data = {
         "Available Beds",
         "Status",
         "Eligible Gender",
-        "Bed Price"
+        "Bed Price",
+        ""
     ],
 };
+
+
+export const editRoomData = {
+    breadcrumbs: [
+        { label: 'Room Management', href: route('room.list') },
+        { label: 'Edit Room', href: null }
+    ],
+    eligibleGenderRadioButtons: ['any', 'male', 'female'],
+};
+

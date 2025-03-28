@@ -66,7 +66,7 @@ class DashboardController extends Controller
             ->sum('amount');
 
         //For monthly revenue of selected year ($monthlyRevenueYear)
-        $monthlyRevenue = [
+        $monthlyRevenues = [
             ['name' => 'Jan', 'revenue' => 0],
             ['name' => 'Feb', 'revenue' => 0],
             ['name' => 'Mar', 'revenue' => 0],
@@ -81,7 +81,7 @@ class DashboardController extends Controller
             ['name' => 'Dec', 'revenue' => 0],
         ];
 
-        foreach ($monthlyRevenue as &$monthData) {
+        foreach ($monthlyRevenues as &$monthData) {
             $monthNumber = array_search($monthData['name'], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']) + 1;
             $monthData['revenue'] = Payment::whereHas('reservation', function ($query) use ($monthlyRevenueYear, $monthNumber) {
                 $query->where([
@@ -98,7 +98,7 @@ class DashboardController extends Controller
             'totalReservationsCount' => $totalReservationsCount,
             'totalGuestsCount' => $totalGuestsCount,
             'totalRevenue' => $totalRevenue,
-            'monthlyRevenue' => $monthlyRevenue
+            'monthlyRevenues' => $monthlyRevenues
         ]);
     }
 }
