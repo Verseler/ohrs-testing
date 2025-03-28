@@ -40,9 +40,10 @@ usePoll(5000);
 
 type ReservationDetailsProps = {
     reservation: ReservationWithBeds;
+    canExempt: boolean;
 };
 
-const { reservation } = defineProps<ReservationDetailsProps>();
+const { reservation, canExempt } = defineProps<ReservationDetailsProps>();
 
 const page = usePage<PageProps>();
 
@@ -111,7 +112,7 @@ onMounted(() => {
             <template #title>Reservation Details</template>
         </PageHeader>
 
-        <div class="max-w-4xl">
+        <div class="max-w-6xl">
             <div class="flex flex-col gap-3">
                 <!-- Header with status badge -->
                 <div>
@@ -155,6 +156,21 @@ onMounted(() => {
                         >
                             <History class="mr-1" />
                             Payment History
+                        </LinkButton>
+
+                        <!-- Payment Exemption -->
+                        <LinkButton
+                            v-if="canExempt"
+                            class="flex-1 bg-violet-500 hover:bg-violet-600"
+                            :href="
+                                route(
+                                    'reservation.exemptPaymentForm',
+                                    reservation.id
+                                )
+                            "
+                        >
+                            <CreditCard class="mr-1" />
+                            Payment Exemption
                         </LinkButton>
 
                         <!-- Extend a reservation -->
@@ -233,8 +249,14 @@ onMounted(() => {
                             <CardTitle>Purpose of Stay</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p class="font-medium">
-                                {{ reservation.purpose_of_stay || "-" }}
+                            <p
+                                v-if="reservation.purpose_of_stay"
+                                class="font-medium"
+                            >
+                                {{ reservation.purpose_of_stay }}
+                            </p>
+                            <p v-else class="text-xs italic text-neutral-500">
+                                Not provided
                             </p>
                         </CardContent>
                     </Card>

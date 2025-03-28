@@ -84,8 +84,17 @@ class ReservationController extends Controller
             'reservedBedsWithGuests'
         ])->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
 
+        $isSuperAdmin = Auth::user()->role === 'super_admin';
+        $hasRemainingBalance = $reservation->remaining_balance > 0;
+        $validReservationStatus = $reservation->status !== 'pending'
+            && $reservation->status !== 'checked_out'
+            && $reservation->status !== 'canceled';
+
+        $canExempt = $isSuperAdmin && $hasRemainingBalance && $validReservationStatus;
+
         return Inertia::render("Admin/Reservation/ReservationDetails/ReservationDetails", [
             'reservation' => $reservation,
+            'canExempt' => $canExempt
         ]);
     }
 

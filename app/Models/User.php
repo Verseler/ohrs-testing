@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->belongsTo(Office::class);
     }
 
+    public function PaymentExemption()
+    {
+        return $this->haMany(PaymentExemption::class);
+    }
+
     public function isSuperAdmin()
     {
 

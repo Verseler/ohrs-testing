@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Office;
+use App\Models\Bed;
+use App\Models\Guest;
 use App\Models\Payment;
+use App\Models\PaymentExemption;
 use App\Models\Reservation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -97,5 +100,77 @@ class PaymentController extends Controller
         });
 
         return to_route('reservation.show', ['id' => $reservation->id])->with('success', 'Successfully change to pay later.');
+    }
+
+    public function exemptPaymentForm(int $id)
+    {
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+            ->whereNotIn('status', ['checked_out', 'canceled'])
+            ->with(['guests.guestBeds.bed.room'])
+            ->findOrFail($id);
+
+        return Inertia::render('Admin/Payment/ExemptPayment/ExemptPaymentForm', [
+            'reservation' => $reservation
+        ]);
+    }
+
+    public function exemptPayment(Request $request)
+    {
+        $validated = $request->validate([
+            'reservation_id' => ['required', 'exists:reservations,id'],
+            'selected_guest_id' => ['required', 'exists:guests,id'],
+            'reason' => ['required', 'string'],
+        ]);
+
+        try {
+            DB::transaction(function () use ($validated) {
+                $reservation = Reservation::findOrFail($validated['reservation_id']);
+                $guest = Guest::whereHas('reservation', function ($query) use ($reservation) {
+                    $query->where('id', $reservation->id);
+                })->findOrFail($validated['selected_guest_id']);
+
+                $bed = Bed::whereHas('guestBeds', function ($query) use ($reservation, $guest) {
+                    $query->where('reservation_id', $reservation->id)
+                        ->where('guest_id', $guest->id);
+                })->first();
+
+                if (!$bed || !$bed->price) {
+                    throw new \Exception('The selected guest does not have an associated bed.');
+                }
+
+                PaymentExemption::create([
+                    'reservation_id' => $validated['reservation_id'],
+                    'price' => $bed->price,
+                    'guest_id' => $guest->id,
+                    'user_id' => Auth::user()->id,
+                    'reason' => $validated['reason'],
+                ]);
+
+                //update the total amount, daily_rate, and remaining balance
+                $checkInDate = Carbon::parse($reservation->check_in_date);
+                $checkOutDate = Carbon::parse($reservation->check_out_date);
+                $lengthOfStay = $checkInDate->diffInDays($checkOutDate, false);
+
+                $totalPayed = Payment::where('reservation_id', $reservation->id)
+                    ->get()
+                    ->sum('amount');
+
+                $newDailyRate = $reservation->daily_rate - $bed->price;
+                $newTotalBillings = $newDailyRate * $lengthOfStay;
+                $newRemainingBalance = $newTotalBillings - $totalPayed;
+
+                $reservation->update([
+                    'daily_rate' => $newDailyRate,
+                    'total_billings' => $newTotalBillings,
+                    'remaining_balance' => $newRemainingBalance
+                ]);
+            });
+        } catch (\Exception $e) {
+            return redirect()->back()->with("error", $e->getMessage());
+        }
+
+        return redirect()->route('reservation.show', [
+            'id' => $validated['reservation_id']
+        ]);
     }
 }

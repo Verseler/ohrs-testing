@@ -33,4 +33,9 @@ class Guest extends Model
     {
         return $this->hasMany(GuestBeds::class);
     }
+
+    public function paymentExemption()
+    {
+        return $this->hasOne(PaymentExemption::class);
+    }
 }
