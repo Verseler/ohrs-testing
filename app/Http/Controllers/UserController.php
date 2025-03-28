@@ -153,6 +153,14 @@ class UserController extends Controller
 
         $user = User::findOrFail($id);
 
+        if ($user->role === 'super_admin') {
+            $superAdminCount = User::where('role', 'super_admin')->count();
+            
+            if ($superAdminCount <= 1) {
+                return redirect()->back()->with('error', 'Cannot delete the only remaining super admin account.');
+            }
+        }
+
         $user->delete();
 
         return redirect()->back()->with('success', 'Successfully deleted the user account.');
