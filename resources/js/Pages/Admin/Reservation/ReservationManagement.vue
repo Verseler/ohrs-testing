@@ -43,7 +43,7 @@ import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 
-usePoll(5000);
+usePoll(10000);
 
 type Reservation = Omit<
     ReservationWithBeds,
@@ -123,13 +123,13 @@ watch(
                 v-model="form.balance"
                 placeholder="Balance Status"
                 label="Balance"
-                :items="data.filterStatus"
+                :items="data.filterBalance"
             />
             <SelectField
                 v-model="form.sort_by"
                 placeholder="Sort by"
                 label="Sort by"
-                :items="data.filterStatus"
+                :items="data.sortBy"
             />
 
             <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
