@@ -154,10 +154,12 @@ class ReservationAssignBedsController extends Controller
             'guestBeds.bed.room',
             'guestOffice.region',
             'hostelOffice.region',
-        ])->where([
-                    ['hostel_office_id', Auth::user()->office_id],
-                    ['status', 'checked_in']
-                ])->findOrFail($id);
+        ])->where(
+                'hostel_office_id',
+                Auth::user()->office_id
+            )
+            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->findOrFail($id);
 
         $checkInDate = $reservation->check_in_date;
         $checkOutDate = $reservation->check_out_date;
@@ -174,17 +176,6 @@ class ReservationAssignBedsController extends Controller
             'availableBeds' => $availableBeds
         ]);
     }
-
-    // public function editAssignBed(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         "reservation_id" => ['required', 'exists:reservations,id'],
-    //         "selected_guest_id" => ['required', 'exists:guests,id'],
-    //         "selected_bed_id" => ['required', 'exists:beds,id']
-    //     ]);
-
-    //     dd($validated);
-    // }
 
     public function editAssignBed(Request $request)
     {
