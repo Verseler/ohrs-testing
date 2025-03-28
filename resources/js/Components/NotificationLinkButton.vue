@@ -3,7 +3,7 @@ import LinkButton from "@/Components/LinkButton.vue";
 import { PageProps } from "@/types";
 import { usePage } from "@inertiajs/vue3";
 import { Bell } from "lucide-vue-next";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 
 const page = usePage<PageProps>();
 
@@ -13,6 +13,7 @@ const unreadCount = computed(() => page.props.unreadNotificationCount);
 <template>
     <LinkButton
         :href="route('notification.list')"
+        prefetch
         variant="link"
         size="icon"
         class="relative transition-colors rounded-full bg-neutral-50 text-neutral-500 hover:text-neutral-700"

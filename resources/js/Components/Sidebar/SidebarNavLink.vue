@@ -15,6 +15,7 @@ defineProps<SidebarNavLinkProps>();
 <template>
     <Link
         :href="href"
+        prefetch
         :class="
             cn(
                 'flex items-center px-4 py-2 transition-colors duration-150 rounded cursor-pointer p-ripple gap-x-2',
