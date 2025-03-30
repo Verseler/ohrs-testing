@@ -35,8 +35,8 @@ class OfficeController extends Controller
 
         return Inertia::render("Admin/Office/OfficeManagement", [
             'offices' => $offices,
-            'regions'=> $regions,
-            'filters'=> $request->only(['search', 'has_hostel', 'sort_by', 'sort_order', 'region_id'])
+            'regions' => $regions,
+            'filters' => $request->only(['search', 'has_hostel', 'sort_by', 'sort_order', 'region_id'])
         ]);
     }
 
@@ -78,6 +78,16 @@ class OfficeController extends Controller
     public function delete($id)
     {
         $office = Office::findOrFail($id);
+
+        // Check if there are users connected to the office
+        if ($office->users()->exists()) {
+            return redirect()->back()->with(['error' => 'Cannot delete office with connected users.']);
+        }
+        // Check if there are active reservations (not canceled or not checked out)
+        if ($office->reservations()->whereNotIn('status', ['canceled', 'checked_out'])->exists()) {
+            return redirect()->back()->with(['error' => 'Cannot delete office with active reservations.']);
+        }
+
         $office->delete();
         return redirect()->back();
     }

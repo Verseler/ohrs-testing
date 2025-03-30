@@ -33,7 +33,7 @@ import type {
 } from "@/Pages/Admin/Office/office.types";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import { debounce } from "@/lib/utils";
@@ -52,6 +52,7 @@ import SelectField from "@/Components/SelectField.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import { showError } from "@/Composables/useFlash";
 
 usePoll(5000);
 
@@ -101,6 +102,11 @@ watch(
     ],
     debounce(applyFilter, 300)
 );
+
+//display error
+onMounted(() => showError());
+
+
 
 //Delete Confirmation Dialog
 const deleteConfirmation = ref(false);
