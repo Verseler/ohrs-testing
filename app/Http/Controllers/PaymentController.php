@@ -155,9 +155,10 @@ class PaymentController extends Controller
                     ->get()
                     ->sum('amount');
 
-                $newDailyRate = $reservation->daily_rate - $bed->price;
+                // If value is below zero after re computing make the result as zero.
+                $newDailyRate = max(0, $reservation->daily_rate - $bed->price);
                 $newTotalBillings = $newDailyRate * $lengthOfStay;
-                $newRemainingBalance = $newTotalBillings - $totalPayed;
+                $newRemainingBalance = max(0, $newTotalBillings - $totalPayed);
 
                 $reservation->update([
                     'daily_rate' => $newDailyRate,
