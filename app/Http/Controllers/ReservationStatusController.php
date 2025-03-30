@@ -27,7 +27,7 @@ class ReservationStatusController extends Controller
     {
         $validated = $request->validate([
             'reservation_id' => ['required', 'exists:reservations,id'],
-            'status' => ['required', Rule::in(['confirmed', 'checked_in', 'checked_out', 'canceled'])]
+            'status' => ['required', Rule::in(['confirmed', 'checked_in', 'checked_out'])]
         ]);
 
         $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)

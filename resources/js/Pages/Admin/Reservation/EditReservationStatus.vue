@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, usePage } from "@inertiajs/vue3";
 import { XCircleIcon, Home, CalendarCheck } from "lucide-vue-next";
 import {
     Breadcrumb,
@@ -24,6 +24,8 @@ import ReservationStatusBadge from "@/Components/ReservationStatusBadge.vue";
 import StatusButton from "@/Pages/Admin/Reservation/ReservationDetails/Partials/StatusButton.vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { usePoll } from "@inertiajs/vue3";
+import { PageProps } from "@/types";
+import { Message } from "@/Components/ui/message";
 
 usePoll(10000);
 
@@ -32,6 +34,8 @@ type EditReservationStatusProps = {
 };
 
 const { reservation } = defineProps<EditReservationStatusProps>();
+
+const page = usePage<PageProps>();
 
 const cancelable = computed(
     () =>
@@ -70,8 +74,8 @@ function showCancelConfirmation() {
 
 function changeStatus(newStatus: ReservationStatus) {
     router.put(
-        route("reservation.cancel", {
-            id: reservation.id,
+        route("reservation.editStatus", {
+            reservation_id: reservation.id,
             status: newStatus,
         })
     );
@@ -134,6 +138,13 @@ function cancelStatus() {
                     <ReservationStatusBadge :status="reservation.status" />
                 </CardContent>
             </Card>
+
+            <Message v-if="page.props.errors.status" severity="danger">
+                {{ page.props.errors.status }}
+            </Message>
+            <Message v-if="page.props.errors.reverse_id" severity="danger">
+                {{ page.props.errors.reservation_id }}
+            </Message>
 
             <!-- Change Status Button -->
             <Card
