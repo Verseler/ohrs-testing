@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import {
     CalendarClockIcon,
-    CalendarIcon,
     ChartColumnIncreasing,
-    CreditCardIcon,
-    UsersIcon,
+    CalendarX2,
+    Wallet,
 } from "lucide-vue-next";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NotificationLinkButton from "@/Components/NotificationLinkButton.vue";
@@ -25,22 +24,21 @@ usePoll(5000);
 
 type DashboardProps = {
     pendingReservationsCount: number;
-    totalReservationsCount: number;
-    totalGuestsCount: number;
-    totalRevenue: number;
+    unpaidReservationsCount: number;
+    overdueCheckinCount: number;
+    overdueCheckoutCount: number;
     monthlyRevenues: MonthlyRevenue[];
 };
 
 const {
     pendingReservationsCount,
-    totalGuestsCount,
-    totalReservationsCount,
-    totalRevenue,
+    unpaidReservationsCount,
+    overdueCheckinCount,
+    overdueCheckoutCount,
     monthlyRevenues,
 } = defineProps<DashboardProps>();
 
 const zeroReservation = computed(() => pendingReservationsCount <= 0);
-const zeroRevenue = computed(() => totalRevenue <= 0);
 
 const form = useForm({
     selected_date: new Date(),
@@ -95,24 +93,19 @@ function updateDashboardData() {
                 <template #icon><CalendarClockIcon /></template>
             </StatsCard>
             <StatsCard>
-                <template #title>Total Reservations</template>
-                <template #value>{{ totalReservationsCount }}</template>
-                <template #icon><CalendarIcon /></template>
-            </StatsCard>
-
-            <StatsCard>
-                <template #title>Total Guests</template>
-                <template #value>{{ totalGuestsCount }}</template>
-                <template #icon><UsersIcon /></template>
+                <template #title>Unpaid Reservations</template>
+                <template #value>{{ unpaidReservationsCount }}</template>
+                <template #icon><Wallet /></template>
             </StatsCard>
             <StatsCard>
-                <template #title>Revenue</template>
-                <template #value>
-                    <span :class="{ 'text-red-500': zeroRevenue }">
-                        ₱ {{ totalRevenue }}
-                    </span>
-                </template>
-                <template #icon><CreditCardIcon /></template>
+                <template #title>Overdue Check in</template>
+                <template #value>{{ overdueCheckinCount }}</template>
+                <template #icon><CalendarX2 /></template>
+            </StatsCard>
+            <StatsCard>
+                <template #title>Overdue Check out</template>
+                <template #value>{{ overdueCheckoutCount }}</template>
+                <template #icon><CalendarX2 /></template>
             </StatsCard>
         </section>
 

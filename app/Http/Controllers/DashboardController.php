@@ -14,56 +14,33 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'selected_date' => ['nullable', 'date'],
             'monthly_revenue_year' => ['nullable', 'date']
         ]);
-
-        $selectedDate = $request->selected_date ?
-            Carbon::parse($validated['selected_date'])->setTimezone('Asia/Manila') :
-            Carbon::now();
 
         $monthlyRevenueYear = $request->monthly_revenue_year ?
             Carbon::parse($validated['monthly_revenue_year'])->setTimezone('Asia/Manila') :
             Carbon::now();
 
-        //For the selected month and year (selectedDate)
         $pendingReservationsCount = Reservation::where([
             ['hostel_office_id', '=', Auth::user()->office_id],
             ['status', '=', 'pending']
-        ])
-            ->whereYear('check_in_date', $selectedDate->year)
-            ->whereMonth('check_in_date', $selectedDate->month)
-            ->count();
+        ])->count();
 
-        //total reservation
-        $totalReservationsCount = Reservation::where([
-            ['hostel_office_id', '=', Auth::user()->office_id]
-        ])
-            ->whereNotIn('status', ['pending', 'canceled'])
-            ->whereYear('check_in_date', $selectedDate->year)
-            ->whereMonth('check_in_date', $selectedDate->month)
-            ->count();
+        $unpaidReservationsCount = Reservation::where([
+            ['hostel_office_id', '=', Auth::user()->office_id],
+        ])->where('remaining_balance', '>', 0)->count();
 
-        //total guests
-        $totalGuestsCount = Reservation::where([
-            ['hostel_office_id', '=', Auth::user()->office_id]
-        ])
-            ->whereNotIn('status', ['pending', 'canceled'])
-            ->whereYear('check_in_date', $selectedDate->year)
-            ->whereMonth('check_in_date', $selectedDate->month)
-            ->withCount('guests')
-            ->get()
-            ->sum('guests_count');
+        $overdueCheckinCount = Reservation::where([
+            ['hostel_office_id', '=', Auth::user()->office_id],
+            ['status', '!=', 'checked_in']
+        ])->where('check_in_date', '<', Carbon::now())->count();
 
-        //total revenue (Already paid)
-        $totalRevenue = Payment::whereHas('reservation', function ($query) use ($selectedDate) {
-            $query->where([
-                ['hostel_office_id', '=', Auth::user()->office_id]
-            ])
-                ->whereYear('check_in_date', $selectedDate->year)
-                ->whereMonth('check_in_date', $selectedDate->month);
-        })
-            ->sum('amount');
+        $overdueCheckoutCount = Reservation::where([
+            ['hostel_office_id', '=', Auth::user()->office_id],
+            ['status', '!=', 'checked_out']
+        ])->where('check_out_date', '<', Carbon::now())->count();
+
+
 
         //For monthly revenue of selected year ($monthlyRevenueYear)
         $monthlyRevenues = [
@@ -83,6 +60,7 @@ class DashboardController extends Controller
 
         foreach ($monthlyRevenues as &$monthData) {
             $monthNumber = array_search($monthData['name'], ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']) + 1;
+
             $monthData['revenue'] = Payment::whereHas('reservation', function ($query) use ($monthlyRevenueYear, $monthNumber) {
                 $query->where([
                     ['hostel_office_id', '=', Auth::user()->office_id]
@@ -95,9 +73,9 @@ class DashboardController extends Controller
 
         return Inertia::render('Admin/Dashboard/Dashboard', [
             'pendingReservationsCount' => $pendingReservationsCount,
-            'totalReservationsCount' => $totalReservationsCount,
-            'totalGuestsCount' => $totalGuestsCount,
-            'totalRevenue' => $totalRevenue,
+            'unpaidReservationsCount' => $unpaidReservationsCount,
+            'overdueCheckinCount' => $overdueCheckinCount,
+            'overdueCheckoutCount' => $overdueCheckoutCount,
             'monthlyRevenues' => $monthlyRevenues
         ]);
     }
