@@ -59,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
     Route::post('/reservations/payment/exempt', [PaymentController::class, 'exemptPayment'])->name('reservation.exemptPayment');
     Route::get('/reservations/payment/{id}/exempt', [PaymentController::class, 'exemptPaymentForm'])->name('reservation.exemptPaymentForm');
 });
@@ -72,7 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 //* Admin Room Management
-Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/rooms', [RoomController::class, 'list'])->name('room.list');
     Route::inertia('/rooms/create', 'Admin/Room/CreateRoom')->name('room.createForm');
     Route::post('/rooms/create', [RoomController::class, 'create'])->name('room.create');
