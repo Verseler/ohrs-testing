@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -10,6 +12,8 @@ use Illuminate\Validation\Rule;
 
 class ReservationController extends Controller
 {
+    use AuthorizesRequests;
+
     //Reservation Management
     public function list(Request $request)
     {
@@ -83,6 +87,8 @@ class ReservationController extends Controller
             'reservedBeds.room.eligibleGenderSchedules',
             'reservedBedsWithGuests'
         ])->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
+
+        $this->authorize('view', $reservation);
 
         $isSuperAdmin = Auth::user()->role === 'super_admin';
         $hasRemainingBalance = $reservation->remaining_balance > 0;
