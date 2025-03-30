@@ -15,12 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            RegionSeeder::class,
-            OfficeSeeder::class,
-            RoomSeeder::class,
-            BedSeeder::class
-        ]);
+        // $this->call([
+        //     RoomSeeder::class,
+        //     BedSeeder::class
+        // ]);
 
         User::factory()->create([
             'name' => 'SuperAdmin Test',
