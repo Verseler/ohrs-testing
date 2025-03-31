@@ -10,7 +10,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 </script>
 
 <template>
-    <Card class="relative min-w-96">
+    <Card class="relative md:min-w-96">
         <CardHeader>
             <CardTitle class="flex items-center justify-between">
                 <span>Reservation Overview</span>

@@ -96,12 +96,12 @@ onMounted(() => showSuccess());
 
             <Separator class="my-4 md:hidden" />
 
-            <div>
+            <div class="max-w-md mx-auto">
                 <ReservationOverview :reservation="reservation" />
 
                 <Message
                     severity="info"
-                    class="flex items-center max-w-lg mt-6 mb-2 text-sm gap-x-2"
+                    class="flex items-center mt-6 mb-2 text-sm gap-x-2"
                 >
                     <Info class="size-6" />
                     If ever there is no available beds or beds are not enough

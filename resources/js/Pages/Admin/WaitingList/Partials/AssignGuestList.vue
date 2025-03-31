@@ -176,24 +176,15 @@ function submit() {
         <div
             v-for="(guest, index) in form.guests"
             :key="guest.id"
-            class="grid items-center grid-cols-10 gap-x-2"
+            class="grid items-center grid-cols-8 gap-x-2"
         >
-            <p class="col-span-3 capitalize">
-                <span class="text-lg font-bold text-primary-600">
-                    {{ index + 1 }}.
-                </span>
-                {{ guest.name }}
-            </p>
-            <div
-                class="grid h-full col-span-2 px-4 capitalize border rounded place-content-center"
-                :class="{
-                    'bg-blue-50 text-blue-500 border-blue-500':
-                        guest.gender === 'male',
-                    'bg-red-50 text-red-500 border-red-400':
-                        guest.gender === 'female',
-                }"
-            >
-                <p>{{ guest.gender }}</p>
+            <div class="flex justify-between col-span-5 gap-x-2">
+                <p
+                    class="flex items-center w-full px-2 capitalize border rounded-md"
+                >
+                    {{ guest.name }}
+                </p>
+                <GenderBadge class="h-12 text-sm" :gender="guest.gender" />
             </div>
 
             <Select
@@ -203,7 +194,7 @@ function submit() {
                 "
             >
                 <SelectTrigger
-                    class="h-12 col-span-5 rounded-sm shadow-none border-primary-700"
+                    class="h-12 col-span-3 rounded-sm shadow-none border-primary-700"
                     :invalid="(form.errors as any)[`guests.${index}.bed_id`]"
                 >
                     <SelectValue placeholder="Select bed">{{
