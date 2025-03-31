@@ -26,7 +26,7 @@ const { items } = defineProps<BreadcrumbsProps>();
     <Breadcrumb>
         <BreadcrumbList>
             <BreadcrumbItem>
-                <SidebarTrigger class='flex text-white md:hidden me-2 bg-primary-500' />
+                <SidebarTrigger class='me-2' />
             </BreadcrumbItem>
 
             <BreadcrumbItem>

@@ -18,8 +18,9 @@ import {
     downloadReport,
     printReport,
 } from "@/Pages/Admin/GenerateReport/report.helpers";
-import ReportHeading from "./Partials/ReportHeading.vue";
+import ReportHeading from "@/Pages/Admin/GenerateReport/Partials/ReportHeading.vue";
 import { formatCurrency } from "@/lib/utils";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type Report = {
     date: string;
@@ -56,15 +57,18 @@ watch(() => form.selected_date, changeDate);
 
     <AuthenticatedLayout>
         <div class="flex justify-end mb-20 gap-x-2">
+            <SidebarTrigger class="mr-auto size-9" />
             <MonthPicker v-model="form.selected_date" />
-            <Button @click="downloadReport" class="min-w-28">
-                <Download />Download
+            <Button @click="downloadReport" class="md:min-w-28">
+                <Download /><span class="hidden md:block">Download</span>
             </Button>
             <Button
                 @click="printReport"
-                class="text-white bg-neutral-800 min-w-28 hover:bg-neutral-700 hover:text-white"
+                class="text-white bg-neutral-800 md:min-w-28 hover:bg-neutral-700 hover:text-white"
             >
-                <Printer class="mr-1" />Print
+                <Printer class="mr-1" /><span class="hidden md:block"
+                    >Print</span
+                >
             </Button>
         </div>
 
