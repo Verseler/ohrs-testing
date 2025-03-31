@@ -82,7 +82,7 @@ function updateDashboardData() {
             {{ getMonthYear(new Date()) }}
         </Message>
 
-        <section id="stats" class="grid grid-cols-4 gap-3">
+        <section id="stats" class="grid grid-cols-2 gap-3 md:grid-cols-4">
             <StatsCard>
                 <template #title>Pending Reservations</template>
                 <template #value>
