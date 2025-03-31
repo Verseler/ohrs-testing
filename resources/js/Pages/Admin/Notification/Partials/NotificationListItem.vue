@@ -26,7 +26,7 @@ const handleMarkAsRead = (): void => {
             <!-- Notification icon -->
             <div class="mr-4">
                 <div
-                    class="flex items-center justify-center w-10 h-10 rounded-full"
+                    class="flex items-center justify-center rounded-full size-10"
                     :class="
                         notification.read_at
                             ? 'bg-neutral-100'
@@ -46,7 +46,7 @@ const handleMarkAsRead = (): void => {
 
             <!-- Notification content -->
             <div class="flex-1">
-                <div class="flex items-start justify-between">
+                <div class="flex flex-col items-start justify-between md:flex-row">
                     <div>
                         <h3
                             class="text-base font-medium capitalize"
@@ -60,7 +60,7 @@ const handleMarkAsRead = (): void => {
                         </h3>
 
                         <p
-                            class="mt-1 text-sm"
+                            class="mt-1 text-sm leading-none md:leading-normal"
                             :class="
                                 notification.read_at
                                     ? 'text-neutral-500'
@@ -85,7 +85,7 @@ const handleMarkAsRead = (): void => {
                         </p>
                     </div>
 
-                    <div class="flex-shrink-0 ml-4">
+                    <div class="flex-shrink-0 ml-auto md:ml-4">
                         <span class="text-xs text-gray-500">
                             {{ formatDateTimeString(notification.created_at) }}
                         </span>

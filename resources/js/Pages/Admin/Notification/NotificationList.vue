@@ -35,7 +35,7 @@ const markAllAsRead = (): void => {
     <Head title="Notifications" />
 
     <AuthenticatedLayout>
-        <div class="flex items-center justify-between my-2">
+        <div class="flex items-center justify-between md:my-2">
             <PageHeader class="!my-0">
                 <template #icon><Bell /></template>
                 <template #title>Notifications</template>
