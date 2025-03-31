@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import {
-    Bed as BedIcon,
-    Ellipsis,
-    Pencil,
-    Plus,
-    Trash,
-} from "lucide-vue-next";
+import { Bed as BedIcon, Ellipsis, Pencil, Plus, Trash } from "lucide-vue-next";
 import {
     Table,
     TableBody,
@@ -83,8 +77,8 @@ function getBedPrice(beds: Bed[]) {
 const selectedRoom = ref<Room | null>(null);
 
 const form = useForm({
-    check_in_date: filters.check_in_date ?? new Date(),
-    check_out_date: filters.check_in_date ?? tomorrowDate(),
+    check_in_date: filters.check_in_date,
+    check_out_date: filters.check_in_date ,
     eligible_gender: filters.eligible_gender,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
@@ -199,9 +193,8 @@ function handleDeleteRoom() {
                     </Label>
                     <DatePicker
                         id="check_in"
-                        class="text-sm rounded shadow-sm max-h-10 min-w-40 border-neutral-200"
-                        calendar-class="-right-10"
                         v-model="form.check_in_date"
+                        class="min-w-64"
                         :min-value="yesterdayDate()"
                         :max-value="form.check_out_date"
                     />
@@ -215,8 +208,7 @@ function handleDeleteRoom() {
                     </Label>
                     <DatePicker
                         id="check_out"
-                        class="text-sm rounded shadow-sm max-h-10 min-w-40 border-neutral-200"
-                        calendar-class="right-0"
+                        class="min-w-64"
                         v-model="form.check_out_date"
                         :min-value="form.check_in_date"
                     />

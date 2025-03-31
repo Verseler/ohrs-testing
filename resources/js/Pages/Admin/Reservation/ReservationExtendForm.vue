@@ -22,6 +22,7 @@ import {
 } from "@/Components/ui/card";
 import {
     formatCurrency,
+    formatDate,
     formatDateString,
     getDaysDifference,
 } from "@/lib/utils";
@@ -42,10 +43,14 @@ type ReservationExtendFormProps = {
 
 const { reservation } = defineProps<ReservationExtendFormProps>();
 
-const form = useForm({
+type ExtendForm = {
+    reservation_id: number;
+    new_check_out_date: string | Date;
+};
+
+const form = useForm<ExtendForm>({
     reservation_id: reservation.id,
-    new_check_out_date: new Date(reservation.check_out_date),
-    processing: false, // Ensure processing is initialized as a boolean
+    new_check_out_date: reservation.check_out_date,
 });
 
 const additionalDays = computed(() => {
@@ -74,9 +79,7 @@ function extendByDays(days: number) {
     const newDate = new Date(currentCheckout);
 
     newDate.setDate(newDate.getDate() + days);
-    const newCheckoutDate = new Date(newDate.toISOString().split("T")[0]);
-
-    form.new_check_out_date = newCheckoutDate;
+    form.new_check_out_date = formatDate(newDate) ?? newDate;
 }
 //Confirmation Dialog
 const confirmation = ref<boolean>(false);
