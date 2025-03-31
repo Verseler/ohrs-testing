@@ -34,6 +34,7 @@ import ReservationCode from "./Partials/ReservationCode.vue";
 import { onMounted } from "vue";
 import { usePoll } from "@inertiajs/vue3";
 import { showError, showSuccess } from "@/Composables/useFlash";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 usePoll(5000);
 
@@ -57,6 +58,10 @@ onMounted(() => {
         <div class="flex justify-between">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />
@@ -96,7 +101,7 @@ onMounted(() => {
                     </div>
 
                     <div
-                        class="flex mt-4 gap-x-2"
+                        class="flex flex-wrap gap-2 mt-4"
                         v-if="
                             reservation.status !== 'canceled' &&
                             reservation.status !== 'pending' &&

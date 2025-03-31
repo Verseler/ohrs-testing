@@ -19,6 +19,7 @@ import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import { Bed as BedIcon, Home } from "lucide-vue-next";
 import { Room } from "@/Pages/Admin/Room/room.types";
 import { Button } from "@/Components/ui/button";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type CreateRoomForm = Omit<
     Room,
@@ -58,6 +59,10 @@ function showSubmitConfirmation() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

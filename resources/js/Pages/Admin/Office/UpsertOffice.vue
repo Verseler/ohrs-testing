@@ -19,6 +19,7 @@ import {  Home, Hotel } from "lucide-vue-next";
 import { Button } from "@/Components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import type { Office, Region } from "@/Pages/Admin/Office/office.types";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type UpsertOfficeProps = {
     office: Office | null;
@@ -49,6 +50,10 @@ function showSubmitConfirmation() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

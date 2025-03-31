@@ -20,6 +20,7 @@ import { Head, useForm } from "@inertiajs/vue3";
 import { Home, ShieldUser } from "lucide-vue-next";
 import RoleBadge from "@/Pages/Admin/User/Partials/RoleBadge.vue";
 import { ref } from "vue";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type ChangePasswordUserProps = {
     user: User;
@@ -52,6 +53,10 @@ function submit() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

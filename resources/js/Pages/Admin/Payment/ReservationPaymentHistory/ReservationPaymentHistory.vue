@@ -38,6 +38,7 @@ import {
 } from "@/lib/utils";
 import AmountCard from "@/Pages/Admin/Payment/ReservationPaymentHistory/Partials/AmountCard.vue";
 import { usePoll } from "@inertiajs/vue3";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 usePoll(15000);
 
@@ -92,6 +93,10 @@ const closeReceiptDialog = () => {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

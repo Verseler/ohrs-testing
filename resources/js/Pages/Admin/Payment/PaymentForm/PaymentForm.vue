@@ -25,7 +25,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import type { PageProps } from "@/types";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -47,6 +46,7 @@ import type {
     Payment,
     PaymentOption,
 } from "@/Pages/Admin/Payment/payment.types";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type ReservationDetailsProps = {
     reservation: Reservation;
@@ -117,6 +117,10 @@ function submitPayLater() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

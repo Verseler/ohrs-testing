@@ -31,6 +31,7 @@ import InputLabel from "@/Components/ui/input/InputLabel.vue";
 import { InputError } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type EditBedAssignmentProps = {
     reservation: ReservationWithBeds & {
@@ -75,6 +76,10 @@ function submit() {
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
+                    <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />
                         </BreadcrumbLink>
@@ -109,7 +114,7 @@ function submit() {
         </PageHeader>
 
         <!-- Main content -->
-        <div class="grid max-w-6xl grid-cols-3 gap-6">
+        <div class="grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
             <form @submit.prevent="showConfirmation" class="col-span-2">
                 <Message severity="info" class="flex items-center mb-3 gap-x-2">
                     <Info class="size-4" />

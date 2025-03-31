@@ -29,6 +29,7 @@ import { Textarea } from "@/Components/ui/textarea";
 import { Guest, GuestBeds } from "@/Pages/Guest/guest.types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { InputError } from "@/Components/ui/input";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type ExemptPaymentFormProps = {
     reservation: Reservation;
@@ -71,6 +72,10 @@ function submit() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

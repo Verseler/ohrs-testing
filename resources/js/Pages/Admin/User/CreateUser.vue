@@ -28,6 +28,7 @@ import { Separator } from "@/Components/ui/separator";
 import InputPassword from "@/Components/ui/input/InputPassword.vue";
 import { Button } from "@/Components/ui/button";
 import Alert from '@/Components/ui/alert-dialog/Alert.vue';
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type CreateUserProps = {
     offices: Office[];
@@ -75,6 +76,10 @@ function submit() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                    <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

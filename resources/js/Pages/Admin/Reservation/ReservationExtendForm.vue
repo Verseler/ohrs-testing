@@ -34,6 +34,7 @@ import DatePicker from "@/Components/DatePicker.vue";
 import { InputError } from "@/Components/ui/input";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Badge } from "@/Components/ui/badge";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type ReservationExtendFormProps = {
     reservation: Reservation;
@@ -96,6 +97,10 @@ function submitExtendReservation() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

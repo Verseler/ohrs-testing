@@ -26,6 +26,7 @@ import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { usePoll } from "@inertiajs/vue3";
 import { PageProps } from "@/types";
 import { Message } from "@/Components/ui/message";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 usePoll(10000);
 
@@ -93,6 +94,10 @@ function cancelStatus() {
         <div class="flex justify-between">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />

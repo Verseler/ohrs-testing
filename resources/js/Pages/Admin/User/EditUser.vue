@@ -28,6 +28,7 @@ import { Separator } from "@/Components/ui/separator";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Button } from "@/Components/ui/button";
 import { User } from "@/types";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type EditUserProps = {
     user: User;
@@ -74,6 +75,10 @@ function submit() {
         <div class="flex justify-between min-h-12">
             <Breadcrumb>
                 <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
                     <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />
