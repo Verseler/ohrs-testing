@@ -33,7 +33,7 @@ const statusValue = computed(() => {
 </script>
 
 <template>
-    <Badge :severity="statusSeverity" class="capitalize">
+    <Badge :severity="statusSeverity" class="capitalize w-max">
         {{ statusValue }}
     </Badge>
 </template>

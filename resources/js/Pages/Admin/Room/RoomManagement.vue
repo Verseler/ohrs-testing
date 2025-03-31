@@ -4,7 +4,6 @@ import PageHeader from "@/Components/PageHeader.vue";
 import {
     Bed as BedIcon,
     Ellipsis,
-    FilterX,
     Pencil,
     Plus,
     Trash,
@@ -54,6 +53,7 @@ import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import AvailabilityBadge from "@/Components/AvailabilityBadge.vue";
 import GenderBadge from "@/Components/GenderBadge.vue";
+import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
 
 usePoll(20000);
 
@@ -150,7 +150,7 @@ function handleDeleteRoom() {
             <Breadcrumbs :items="data.breadcrumbs" />
 
             <Link :href="route('room.createForm')">
-                <Button><Plus />Add Room</Button>
+                <Button><Plus /><span>Add Room</span></Button>
             </Link>
         </div>
 
@@ -160,30 +160,34 @@ function handleDeleteRoom() {
         </PageHeader>
 
         <!-- Filter and Sort -->
-        <div class="flex mb-2 gap-x-2">
-            <SelectField
-                v-model="form.eligible_gender"
-                placeholder="Select a gender"
-                label="Gender"
-                :items="data.filterGender"
-            />
-            <SelectField
-                v-model="form.sort_by"
-                placeholder="Sort by"
-                label="Sort by"
-                :items="data.sortBy"
-            />
+        <div
+            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+        >
+            <div class="flex flex-col gap-2 md:flex-row">
+                <SelectField
+                    v-model="form.eligible_gender"
+                    placeholder="Select a gender"
+                    label="Gender"
+                    :items="data.filterGender"
+                />
+                <SelectField
+                    v-model="form.sort_by"
+                    placeholder="Sort by"
+                    label="Sort by"
+                    :items="data.sortBy"
+                />
 
-            <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
-
-            <Button
-                v-if="formHasValue"
-                @click="clearFilter"
-                variant="destructive"
-                size="icon"
-            >
-                <FilterX />
-            </Button>
+                <div class="ml-auto space-x-2">
+                    <TableOrderToggle
+                        v-if="form.sort_by"
+                        v-model="form.sort_order"
+                    />
+                    <ClearFilterButton
+                        v-if="formHasValue"
+                        @click="clearFilter"
+                    />
+                </div>
+            </div>
 
             <div class="flex items-center ml-auto gap-x-2 h-9">
                 <div class="relative">

@@ -34,7 +34,7 @@ import type { Gender, Guest, GuestsFilters } from "@/Pages/Guest/guest.types";
 import type { Region } from "@/Pages/Admin/Office/office.types";
 import type { LaravelPagination } from "@/types";
 import { Head, useForm } from "@inertiajs/vue3";
-import { FilterX, Users } from "lucide-vue-next";
+import { Users } from "lucide-vue-next";
 import { computed, watch } from "vue";
 import { usePoll } from "@inertiajs/vue3";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
@@ -42,6 +42,7 @@ import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import SelectField from "@/Components/SelectField.vue";
 import { data } from "@/Pages/Admin/Guest/data";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
 
 usePoll(8000);
 
@@ -104,46 +105,52 @@ watch(
         </PageHeader>
 
         <!-- Search, Filter and Sort -->
-        <div class="flex mb-2 gap-x-2">
-            <Select v-model="form.region_id">
-                <SelectTrigger class="w-40">
-                    <SelectValue placeholder="Select a region" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Region</SelectLabel>
-                        <SelectItem
-                            v-for="region in regions"
-                            :key="region.id"
-                            :value="region.id"
-                        >
-                            {{ region.name }}
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-            <SelectField
-                v-model="form.gender"
-                :items="data.filterGender"
-                placeholder="Select a gender"
-                label="Gender"
-            />
-            <SelectField
-                v-model="form.sort_by"
-                :items="data.sortBy"
-                placeholder="Sort by"
-                label="Sort by"
-            />
-            <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
+        <div
+            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+        >
+            <div class="flex flex-col gap-2 md:flex-row">
+                <Select v-model="form.region_id">
+                    <SelectTrigger class="md:w-40">
+                        <SelectValue placeholder="Select a region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Region</SelectLabel>
+                            <SelectItem
+                                v-for="region in regions"
+                                :key="region.id"
+                                :value="region.id"
+                            >
+                                {{ region.name }}
+                            </SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+                <SelectField
+                    v-model="form.gender"
+                    :items="data.filterGender"
+                    placeholder="Select a gender"
+                    label="Gender"
+                />
+                <SelectField
+                    v-model="form.sort_by"
+                    :items="data.sortBy"
+                    placeholder="Sort by"
+                    label="Sort by"
+                />
 
-            <Button
-                v-if="formHasValue"
-                @click="clearFilters"
-                variant="destructive"
-                size="icon"
-            >
-                <FilterX />
-            </Button>
+                <div class="ml-auto space-x-2">
+                    <TableOrderToggle
+                        v-if="form.sort_by"
+                        v-model="form.sort_order"
+                    />
+                    <ClearFilterButton
+                        v-if="formHasValue"
+                        @click="clearFilters"
+                    />
+                </div>
+            </div>
+
             <Searchbox class="ml-auto" v-model="form.search" />
         </div>
 

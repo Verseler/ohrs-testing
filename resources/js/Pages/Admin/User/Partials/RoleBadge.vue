@@ -20,7 +20,7 @@ const severityValue = computed(() => {
 <template>
     <Badge
         variant="outline"
-        class="h-6 px-2 font-normal gap-x-1 place-content-center min-w-16 border-neutral-200"
+        class="h-6 px-2 font-normal gap-x-1 place-content-center min-w-16 w-max border-neutral-200"
         :severity="severityValue"
     >
         <BadgeCheck class="size-3.5" />

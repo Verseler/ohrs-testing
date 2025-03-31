@@ -6,7 +6,7 @@ const model = defineModel<string>();
 </script>
 
 <template>
-    <div class="relative items-center w-full max-w-52">
+    <div class="relative items-center w-full md:max-w-52">
         <Input
             v-model="model"
             id="search"

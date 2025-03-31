@@ -2,7 +2,7 @@
 import { Head, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import { CalendarCheck, Ellipsis, FilterX, Maximize } from "lucide-vue-next";
+import { CalendarCheck, Ellipsis, Maximize } from "lucide-vue-next";
 import {
     Table,
     TableBody,
@@ -42,6 +42,7 @@ import { data } from "@/Pages/Admin/Reservation/data";
 import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
+import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
 
 usePoll(10000);
 
@@ -112,38 +113,42 @@ watch(
         </PageHeader>
 
         <!-- Search, Filter and Sort -->
-        <div class="flex mb-2 gap-x-2">
-            <SelectField
-                v-model="(form.status as string)"
-                placeholder="Reservation Status"
-                label="Status"
-                :items="data.filterStatus"
-            />
-            <SelectField
-                v-model="form.balance"
-                placeholder="Balance Status"
-                label="Balance"
-                :items="data.filterBalance"
-            />
-            <SelectField
-                v-model="form.sort_by"
-                placeholder="Sort by"
-                label="Sort by"
-                :items="data.sortBy"
-            />
+        <div
+            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+        >
+            <div class="flex flex-col gap-2 md:flex-row">
+                <SelectField
+                    v-model="(form.status as string)"
+                    placeholder="Reservation Status"
+                    label="Status"
+                    :items="data.filterStatus"
+                />
+                <SelectField
+                    v-model="form.balance"
+                    placeholder="Balance Status"
+                    label="Balance"
+                    :items="data.filterBalance"
+                />
+                <SelectField
+                    v-model="form.sort_by"
+                    placeholder="Sort by"
+                    label="Sort by"
+                    :items="data.sortBy"
+                />
 
-            <TableOrderToggle v-if="form.sort_by" v-model="form.sort_order" />
+                <div class="ml-auto space-x-2">
+                    <TableOrderToggle
+                        v-if="form.sort_by"
+                        v-model="form.sort_order"
+                    />
+                    <ClearFilterButton
+                        v-if="formHasValue"
+                        @click="clearFilter"
+                    />
+                </div>
+            </div>
 
-            <Button
-                v-if="formHasValue"
-                @click="clearFilter"
-                variant="destructive"
-                size="icon"
-            >
-                <FilterX />
-            </Button>
-
-            <Searchbox class="ml-auto" v-model="form.search" />
+            <Searchbox v-model="form.search" />
         </div>
 
         <TableContainer>
