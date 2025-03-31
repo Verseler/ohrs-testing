@@ -22,6 +22,8 @@ import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { usePoll } from "@inertiajs/vue3";
 import { showSuccess } from "@/Composables/useFlash";
+import { Separator } from "@/Components/ui/separator";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 usePoll(15000);
 
@@ -53,6 +55,10 @@ onMounted(() => showSuccess());
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
+                    <BreadcrumbItem>
                         <BreadcrumbLink :href="route('dashboard')">
                             <Home class="size-4" />
                         </BreadcrumbLink>
@@ -81,12 +87,15 @@ onMounted(() => showSuccess());
         </PageHeader>
 
         <!-- Main content -->
-        <div class="flex max-w-6xl gap-6">
+        <div class="flex flex-col max-w-6xl gap-6 md:flex-row">
             <AssignGuestList
                 :reservation="reservation"
                 :availableBeds="availableBeds"
                 class="flex-1"
             />
+
+            <Separator class="my-4 md:hidden" />
+
             <div>
                 <ReservationOverview :reservation="reservation" />
 
