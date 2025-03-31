@@ -131,14 +131,12 @@ function showSubmitConfirmation() {
                 >
                     <div class="flex w-full gap-4">
                         <RadioButtonCard
-                            id="yes"
                             value="yes"
                             label="Yes"
                             :active="form.has_hostel"
                             class="flex-1"
                         />
                         <RadioButtonCard
-                            id="no"
                             value="no"
                             label="No"
                             :active="form.has_hostel === false"

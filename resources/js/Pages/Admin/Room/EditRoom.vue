@@ -2,21 +2,13 @@
 import BackLink from "@/Components/BackLink.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import RadioButtonCard from "@/Components/RadioButtonCard.vue";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb";
 import { Input, InputError } from "@/Components/ui/input";
 import Label from "@/Components/ui/label/Label.vue";
 import { RadioGroup } from "@/Components/ui/radio-group";
 import ValueAdjuster from "@/Components/ValueAdjuster.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
-import { Bed as BedIcon, Home, Trash } from "lucide-vue-next";
+import { Bed as BedIcon, Trash } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { Bed, Room, RoomWithBed } from "@/Pages/Admin/Room/room.types";
 import Separator from "@/Components/ui/separator/Separator.vue";
@@ -124,7 +116,6 @@ function showSubmitConfirmation() {
                     <div class="flex w-full gap-4">
                         <RadioButtonCard
                             v-for="item in editRoomData.eligibleGenderRadioButtons"
-                            :id="item"
                             :value="item"
                             :label="item"
                             :active="form.eligible_gender === item"
@@ -152,7 +143,6 @@ function showSubmitConfirmation() {
                 <Separator class="my-2" />
                 <!-- List of bed fields -->
                 <div
-                    id="name"
                     v-for="(bed, index) in form.beds"
                     class="flex flex-1 gap-x-2"
                 >
@@ -173,7 +163,6 @@ function showSubmitConfirmation() {
                         <Input
                             class="flex-1"
                             v-model.number="bed.price"
-                            id="bed-rice"
                             type="number"
                             step=".01"
                             :invalid="!!(form.errors as any)[`beds.${index}.price`]"

@@ -27,7 +27,7 @@ import { computed, ref, watch } from "vue";
 import { Separator } from "@/Components/ui/separator";
 import InputPassword from "@/Components/ui/input/InputPassword.vue";
 import { Button } from "@/Components/ui/button";
-import Alert from '@/Components/ui/alert-dialog/Alert.vue';
+import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type CreateUserProps = {
@@ -77,7 +77,7 @@ function submit() {
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
-                    <SidebarTrigger class="me-2" />
+                        <SidebarTrigger class="me-2" />
                     </BreadcrumbItem>
 
                     <BreadcrumbItem>

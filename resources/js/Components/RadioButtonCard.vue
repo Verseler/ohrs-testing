@@ -2,10 +2,6 @@
 import { RadioGroupItem } from "@/Components/ui/radio-group";
 
 defineProps({
-    id: {
-        type: String,
-        require: true,
-    },
     name: {
         type: String,
         require: true,
@@ -28,7 +24,7 @@ const model = defineModel();
     <div class="relative">
         <RadioGroupItem
             v-model="model"
-            :id="id"
+            :id="value"
             :value="value"
             class="absolute transform -translate-y-1/2 left-2 top-1/2"
             :class="{
@@ -37,7 +33,7 @@ const model = defineModel();
             }"
         />
         <label
-            :for="id"
+            :for="value"
             :class="{
                 'border-primary-500 text-primary-500': active,
                 'border-neutral-300 text-neutral-600': !active,

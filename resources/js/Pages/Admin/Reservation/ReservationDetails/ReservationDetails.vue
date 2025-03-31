@@ -100,18 +100,11 @@ onMounted(() => {
                         <StatusBadge :status="reservation.status" />
                     </div>
 
-                    <div
-                        class="flex flex-wrap gap-2 mt-4"
-                        v-if="
-                            reservation.status !== 'canceled' &&
-                            reservation.status !== 'pending' &&
-                            reservation.status !== 'checked_out'
-                        "
-                    >
+                    <div class="flex flex-wrap justify-end gap-2 mt-4">
                         <!-- Input or record a payment -->
                         <LinkButton
                             v-if="reservation.remaining_balance > 0"
-                            class="flex-1"
+                            class="flex-1 max-w-sm"
                             :href="
                                 route('reservation.paymentForm', reservation.id)
                             "
@@ -122,7 +115,7 @@ onMounted(() => {
 
                         <!-- View Payment History -->
                         <LinkButton
-                            class="flex-1 bg-yellow-500 hover:bg-yellow-600"
+                            class="flex-1 max-w-sm bg-yellow-500 hover:bg-yellow-600"
                             :href="
                                 route(
                                     'reservation.paymentHistory',
@@ -136,8 +129,12 @@ onMounted(() => {
 
                         <!-- Payment Exemption -->
                         <LinkButton
-                            v-if="canExempt"
-                            class="flex-1 bg-violet-500 hover:bg-violet-600"
+                            v-if="
+                                canExempt &&
+                                reservation.status != 'canceled' &&
+                                reservation.status != 'checked_out'
+                            "
+                            class="flex-1 max-w-sm bg-violet-500 hover:bg-violet-600"
                             :href="
                                 route(
                                     'reservation.exemptPaymentForm',
@@ -151,6 +148,10 @@ onMounted(() => {
 
                         <!-- Extend a reservation -->
                         <LinkButton
+                            v-if="
+                                reservation.status == 'confirmed' ||
+                                reservation.status == 'checked_in'
+                            "
                             class="flex-1 bg-red-500 hover:bg-red-600"
                             :href="
                                 route('reservation.extendForm', reservation.id)
@@ -162,6 +163,10 @@ onMounted(() => {
 
                         <!-- Edit a bed assignment -->
                         <LinkButton
+                            v-if="
+                                reservation.status == 'confirmed' ||
+                                reservation.status == 'checked_in'
+                            "
                             class="flex-1 bg-blue-500 hover:bg-blue-600"
                             :href="
                                 route(
@@ -176,6 +181,10 @@ onMounted(() => {
 
                         <!-- Change reservation status -->
                         <LinkButton
+                            v-if="
+                                reservation.status == 'confirmed' ||
+                                reservation.status == 'checked_in'
+                            "
                             class="flex-1 bg-pink-500 hover:bg-pink-600"
                             :href="
                                 route(

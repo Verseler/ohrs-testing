@@ -3,12 +3,13 @@ import { Label } from "@/Components/ui/label";
 
 type InputLabelProps = {
     optional?: boolean;
+    class?: string;
 };
 
-const { optional = false } = defineProps<InputLabelProps>();
+const { optional = false, class: className } = defineProps<InputLabelProps>();
 </script>
 
 <template>
-    <Label><slot /></Label>
+    <Label :class="className"><slot /></Label>
     <span v-if="optional === false" class="text-red-500">*</span>
 </template>

@@ -18,7 +18,7 @@ createInertiaApp({
         ),
     setup({ el, App, props, plugin }) {
         createApp({
-            render: () => h(TooltipProvider, { delayDuration: 300 }, [
+            render: () => h(TooltipProvider, { delayDuration: 300 }, () => [
                 h(App, props)
             ])
         })

@@ -117,21 +117,18 @@ function showSubmitConfirmation() {
                 >
                     <div class="flex w-full gap-4">
                         <RadioButtonCard
-                            id="any"
                             value="any"
                             label="Any"
                             :active="form.eligible_gender === 'any'"
                             class="flex-1"
                         />
                         <RadioButtonCard
-                            id="male"
                             value="male"
                             label="Male"
                             :active="form.eligible_gender === 'male'"
                             class="flex-1"
                         />
                         <RadioButtonCard
-                            id="female"
                             value="female"
                             label="Female"
                             :active="form.eligible_gender === 'female'"
