@@ -21,7 +21,7 @@ const { canLogin, user } = defineProps<HeaderProps>();
         <Link href="/">
             <div class="flex items-center gap-x-2">
                 <ApplicationLogo />
-                <p class="text-xl font-bold text-primary-500">
+                <p class="hidden text-xl font-bold md:block text-primary-500">
                     <span class="text-yellow-300">H</span>ostel
                     <span class="text-yellow-300">R</span>eservation
                     <span class="text-yellow-300">S</span>ystem
@@ -32,7 +32,10 @@ const { canLogin, user } = defineProps<HeaderProps>();
         <div class="inline-flex items-center gap-2">
             <nav class="flex items-center gap-x-2">
                 <Link :href="route('reservation.checkStatusForm')">
-                    <Button class="px-3"><ScanSearch /> Reservation Status</Button>
+                    <Button class="px-3">
+                        <ScanSearch />
+                        <span class="hidden md:block">Reservation</span>Status
+                    </Button>
                 </Link>
 
                 <template v-if="canLogin">

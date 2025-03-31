@@ -9,6 +9,7 @@ import type { PageProps } from "@/types";
 import { usePoll } from "@inertiajs/vue3";
 import { Head, usePage } from "@inertiajs/vue3";
 import { CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
+import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { computed } from "vue";
 
 type ReservationStatusResult = {
@@ -83,16 +84,19 @@ const statusConfig = computed(() => {
 <template>
     <Head title="Reservation Result" />
 
-    <div class="w-full min-h-screen">
+    <d class="w-full min-h-screen">
         <Header :can-login="canLogin" :user="page.props.auth.user" />
 
         <!-- Reservation Status Result -->
-        <div
+        <Card
             v-if="reservation"
-            class="max-w-xl mx-auto mt-20 mb-2 overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm"
+            class="max-w-xl mx-auto mt-20 mb-2 overflow-hidden border-none rounded-none shadow-none md:rounded-xl md:border md:shadow"
         >
             <!-- Status Header -->
-            <div class="flex flex-col p-6 gap-y-2" :class="statusConfig?.color">
+            <CardHeader
+                class="flex flex-col p-6 gap-y-2"
+                :class="statusConfig?.color"
+            >
                 <div class="flex items-center">
                     <component :is="statusConfig?.icon" class="w-6 h-6 mr-2" />
                     <h2 class="text-lg font-semibold">
@@ -102,10 +106,10 @@ const statusConfig = computed(() => {
 
                 <!-- Status Description -->
                 <p class="pl-8">{{ statusConfig?.description }}</p>
-            </div>
+            </CardHeader>
 
             <!-- Limited Reservation Details -->
-            <div class="p-6 space-y-4">
+            <CardContent class="p-6 space-y-4">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <h3 class="text-sm font-medium text-gray-500">
@@ -174,8 +178,7 @@ const statusConfig = computed(() => {
                     <div
                         v-if="
                             reservation.status !== 'pending' &&
-                            reservation.status !== 'canceled' &&
-                            reservation.remaining_balance
+                            reservation.status !== 'canceled'
                         "
                     >
                         <h3 class="text-sm font-medium text-gray-500">
@@ -186,7 +189,7 @@ const statusConfig = computed(() => {
                         </p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </CardContent>
+        </Card>
+    </d>
 </template>
