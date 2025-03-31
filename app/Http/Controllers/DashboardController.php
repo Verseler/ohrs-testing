@@ -32,15 +32,13 @@ class DashboardController extends Controller
 
         $overdueCheckinCount = Reservation::where([
             ['hostel_office_id', '=', Auth::user()->office_id],
-            ['status', '!=', 'checked_in']
+            ['status', '=', 'confirmed']
         ])->where('check_in_date', '<', Carbon::now())->count();
 
         $overdueCheckoutCount = Reservation::where([
             ['hostel_office_id', '=', Auth::user()->office_id],
-            ['status', '!=', 'checked_out']
+            ['status', '=', 'checked_in']
         ])->where('check_out_date', '<', Carbon::now())->count();
-
-
 
         //For monthly revenue of selected year ($monthlyRevenueYear)
         $monthlyRevenues = [
