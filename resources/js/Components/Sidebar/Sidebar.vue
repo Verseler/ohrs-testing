@@ -3,7 +3,6 @@ import { computed, ref } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import { Avatar, AvatarFallback } from "@/Components/ui/avatar";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
-import SidebarHeading from "@/Components/Sidebar/SidebarHeading.vue";
 import SidebarNavLink from "@/Components/Sidebar/SidebarNavLink.vue";
 import Button from "@/Components/ui/button/Button.vue";
 import {
@@ -17,10 +16,21 @@ import {
     FileDown,
     ShieldUser,
 } from "lucide-vue-next";
-import type { NavItem } from "./sidebar.type";
+import type { NavItem } from "@/Components/Sidebar/sidebar.type";
 import type { PageProps } from "@/types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
-import NotificationLinkButton from "../NotificationLinkButton.vue";
+import NotificationLinkButton from "@/Components/NotificationLinkButton.vue";
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuItem,
+} from "@/Components/ui/sidebar";
 
 const page = usePage<PageProps>();
 
@@ -109,57 +119,53 @@ function handleLogout() {
 </script>
 
 <template>
-    <div
-        class="fixed z-10 flex flex-col min-h-screen border-r w-72 border-r-primary-600 bg-primary-500"
-    >
-        <div
-            class="flex flex-col items-center px-6 pt-4 text-white gap-x-2 shrink-0"
-        >
-            <ApplicationLogo class="size-28" />
-            <p class="text-[1.2rem] font-bold">
+    <Sidebar>
+        <SidebarHeader>
+            <ApplicationLogo class="mx-auto size-28" />
+            <p class="text-[1.1rem] font-bold text-center">
                 <span class="text-yellow-200">H</span>ostel
                 <span class="text-yellow-200">R</span>eservation
                 <span class="text-yellow-200">S</span>ystem
             </p>
-        </div>
+        </SidebarHeader>
 
-        <div class="mt-12 overflow-y-auto">
-            <ul class="px-4 space-y-8 list-none">
-                <li v-for="navSection of nav" :key="navSection.heading">
-                    <SidebarHeading>{{ navSection.heading }}</SidebarHeading>
-                    <ul class="overflow-hidden space-y-1.5 list-none">
-                        <li
-                            v-for="navItem of navSection.items"
-                            :key="navItem.path"
+        <SidebarContent class="pt-6">
+            <SidebarGroup v-for="navSection of nav" :key="navSection.heading">
+                <SidebarGroupLabel class="text-neutral-200">
+                    {{ navSection.heading }}
+                </SidebarGroupLabel>
+                <SidebarGroupContent>
+                    <SidebarMenu>
+                        <SidebarMenuItem
+                            v-for="item in navSection.items"
+                            :key="item.label"
                         >
                             <SidebarNavLink
-                                v-if="navItem.accessible"
-                                :href="route(navItem.route)"
-                                :icon="navItem.icon"
-                                :active="$page.url.includes(navItem.path)"
+                                v-if="item.accessible"
+                                :href="route(item.route)"
+                                :icon="item.icon"
+                                :active="$page.url.includes(item.path)"
                             >
-                                {{ navItem.label }}
+                                {{ item.label }}
                             </SidebarNavLink>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarGroupContent>
+            </SidebarGroup>
+        </SidebarContent>
 
-        <div
-            class="flex items-center justify-between p-2 mt-auto gap-x-2 bg-primary-600"
-        >
+        <SidebarFooter class="flex flex-row justify-between">
             <div class="flex items-center justify-between gap-x-2">
                 <Avatar>
                     <AvatarFallback>V</AvatarFallback>
                 </Avatar>
                 <div class="flex flex-col leading-none text-white">
-                    <span aria-label="user-name" class="text-sm">
+                    <span aria-label="user-name" class="text-xs">
                         {{ page.props.auth.user.name }}
                     </span>
                     <span
                         aria-label="user-role"
-                        class="text-[0.65rem] text-neutral-200 capitalize"
+                        class="text-[0.60rem] text-neutral-200 capitalize"
                     >
                         {{
                             page.props?.auth?.user?.role === "super_admin"
@@ -170,7 +176,7 @@ function handleLogout() {
                 </div>
             </div>
 
-            <div class="space-x-1">
+            <div class="flex space-x-1">
                 <NotificationLinkButton
                     class="text-white bg-transparent hover:text-neutral-300"
                 />
@@ -182,7 +188,7 @@ function handleLogout() {
                     <LogOut />
                 </Button>
             </div>
-        </div>
+        </SidebarFooter>
 
         <Alert
             :open="logoutConfirmation"
@@ -192,5 +198,5 @@ function handleLogout() {
             severity="danger"
             confirm-label="Logout"
         />
-    </div>
+    </Sidebar>
 </template>

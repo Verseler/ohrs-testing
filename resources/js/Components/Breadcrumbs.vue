@@ -8,6 +8,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
+import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 type Item = {
     label: string;
@@ -24,6 +25,10 @@ const { items } = defineProps<BreadcrumbsProps>();
 <template>
     <Breadcrumb>
         <BreadcrumbList>
+            <BreadcrumbItem>
+                <SidebarTrigger class='flex text-white md:hidden me-2 bg-primary-500' />
+            </BreadcrumbItem>
+
             <BreadcrumbItem>
                 <BreadcrumbLink :href="route('dashboard')">
                     <Home class="size-4" />
