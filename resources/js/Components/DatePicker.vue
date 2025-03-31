@@ -179,7 +179,7 @@ onUnmounted(() => {
                 :min="min"
             />
             <CalendarIcon
-                class="absolute font-normal top-4 right-3 size-4"
+                class="absolute inset-y-0 my-auto font-normal right-3 size-4"
                 :class="{
                     'text-red-500': invalid,
                     'text-primary-700': !invalid,
