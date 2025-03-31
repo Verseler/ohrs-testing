@@ -36,7 +36,7 @@ import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
-import { debounce, tomorrowDate, yesterdayDate } from "@/lib/utils";
+import { debounce, formatDate, tomorrowDate, yesterdayDate } from "@/lib/utils";
 import { Label } from "@/Components/ui/label";
 import DatePicker from "@/Components/DatePicker.vue";
 import { usePoll } from "@inertiajs/vue3";
@@ -77,8 +77,8 @@ function getBedPrice(beds: Bed[]) {
 const selectedRoom = ref<Room | null>(null);
 
 const form = useForm({
-    check_in_date: filters.check_in_date,
-    check_out_date: filters.check_in_date ,
+    check_in_date: filters.check_in_date ?? formatDate(new Date()),
+    check_out_date: filters.check_in_date ?? formatDate(tomorrowDate()),
     eligible_gender: filters.eligible_gender,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
@@ -194,7 +194,7 @@ function handleDeleteRoom() {
                     <DatePicker
                         id="check_in"
                         v-model="form.check_in_date"
-                        class="min-w-64"
+                        class="!h-10 min-w-64"
                         :min-value="yesterdayDate()"
                         :max-value="form.check_out_date"
                     />
@@ -208,7 +208,7 @@ function handleDeleteRoom() {
                     </Label>
                     <DatePicker
                         id="check_out"
-                        class="min-w-64"
+                        class="!h-10 min-w-64"
                         v-model="form.check_out_date"
                         :min-value="form.check_in_date"
                     />

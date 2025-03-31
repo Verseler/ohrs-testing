@@ -24,9 +24,7 @@ export function debounce<T extends (...args: any[]) => void>(func: T, delay: num
 }
 
 
-export function formatDate(date: Date | string | undefined) {
-    if (!date) return null;
-
+export function formatDate(date: Date | string) {
     const jsDate = new Date(date);
     const year = jsDate.getFullYear();
     const month = String(jsDate.getMonth() + 1).padStart(2, '0');
