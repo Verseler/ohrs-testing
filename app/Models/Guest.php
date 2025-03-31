@@ -11,11 +11,12 @@ class Guest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'display_name',
+        'first_name',
+        'last_name',
+        'phone',
         'gender',
         'office_id',
-        'reservation_id',
-        'bed_id'
+        'reservation_id'
     ];
 
     public function office()
@@ -28,8 +29,13 @@ class Guest extends Model
         return $this->belongsTo(Reservation::class);
     }
 
-    public function bed()
+    public function guestBeds()
     {
-        return $this->belongsTo(Bed::class);
+        return $this->hasMany(GuestBeds::class);
+    }
+
+    public function paymentExemption()
+    {
+        return $this->hasOne(PaymentExemption::class);
     }
 }

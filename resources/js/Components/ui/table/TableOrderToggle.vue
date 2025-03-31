@@ -19,9 +19,10 @@ function toggle() {
         @click="toggle"
         size="icon"
         variant="outline"
-        class="text-neutral-500"
+        class="w-28 text-neutral-500 md:w-max"
     >
         <ArrowDownNarrowWide v-if="model === 'asc'" />
         <ArrowUpWideNarrow v-else />
+        <span class='block md:hidden'>Order by</span>
     </Button>
 </template>

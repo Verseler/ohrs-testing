@@ -11,23 +11,62 @@ class Reservation extends Model
     use HasFactory;
 
     protected $fillable = [
+        'reservation_code',
         'check_in_date',
         'check_out_date',
-        'total_amount',
-        'current_balance',
+        'daily_rate',
+        'total_billings',
+        'remaining_balance',
         'status',
+        'payment_type',
         'first_name',
         'middle_initial',
         'last_name',
         'phone',
         'email',
         'guest_office_id',
-        'employee_identification',
+        'hostel_office_id',
+        'employee_id',
         'purpose_of_stay',
     ];
 
     public function guests()
     {
-        $this->hasMany(Guest::class);
+        return $this->hasMany(Guest::class);
+    }
+
+    public function guestOffice()
+    {
+        return $this->belongsTo(Office::class, 'guest_office_id');
+    }
+
+    public function hostelOffice()
+    {
+        return $this->belongsTo(Office::class, 'hostel_office_id');
+    }
+
+    public function guestBeds()
+    {
+        return $this->hasMany(GuestBeds::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function PaymentExemptions()
+    {
+        return $this->hasMany(PaymentExemption::class);
+    }
+
+    public function reservedBeds()
+    {
+        return $this->hasManyThrough(Bed::class, GuestBeds::class, 'reservation_id', 'id', 'id', 'bed_id');
+    }
+
+    public function reservedBedsWithGuests()
+    {
+        return $this->guestBeds()->with(['bed.room.eligibleGenderSchedules', 'guest']);
     }
 }

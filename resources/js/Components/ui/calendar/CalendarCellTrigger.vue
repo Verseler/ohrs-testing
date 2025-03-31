@@ -22,7 +22,7 @@ const forwardedProps = useForwardProps(delegatedProps)
       'h-8 w-8 p-0 font-normal',
       '[&[data-today]:not([data-selected])]:bg-neutral-100 [&[data-today]:not([data-selected])]:text-neutral-900 dark:[&[data-today]:not([data-selected])]:bg-neutral-800 dark:[&[data-today]:not([data-selected])]:text-neutral-50',
       // Selected
-      'data-[selected]:bg-neutral-900 data-[selected]:text-neutral-50 data-[selected]:opacity-100 data-[selected]:hover:bg-neutral-900 data-[selected]:hover:text-neutral-50 data-[selected]:focus:bg-neutral-900 data-[selected]:focus:text-neutral-50 dark:data-[selected]:bg-neutral-50 dark:data-[selected]:text-neutral-900 dark:data-[selected]:hover:bg-neutral-50 dark:data-[selected]:hover:text-neutral-900 dark:data-[selected]:focus:bg-neutral-50 dark:data-[selected]:focus:text-neutral-900',
+      'data-[selected]:bg-primary-500 data-[selected]:text-neutral-50 data-[selected]:opacity-100 data-[selected]:hover:bg-primary-500 data-[selected]:hover:text-neutral-50 data-[selected]:focus:bg-primary-500 data-[selected]:focus:text-neutral-50 dark:data-[selected]:bg-neutral-50 dark:data-[selected]:text-primary-500 dark:data-[selected]:hover:bg-neutral-50 dark:data-[selected]:hover:text-primary-500 dark:data-[selected]:focus:bg-neutral-50 dark:data-[selected]:focus:text-primary-500',
       // Disabled
       'data-[disabled]:text-neutral-500 data-[disabled]:opacity-50 dark:data-[disabled]:text-neutral-400',
       // Unavailable

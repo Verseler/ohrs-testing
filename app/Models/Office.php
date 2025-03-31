@@ -11,8 +11,15 @@ class Office extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'region_id',
+        'name',
+        'has_hostel',
     ];
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class);
+    }
 
     public function users()
     {
@@ -27,5 +34,10 @@ class Office extends Model
     public function guests()
     {
         return $this->hasMany(Guest::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'hostel_office_id', 'id');
     }
 }

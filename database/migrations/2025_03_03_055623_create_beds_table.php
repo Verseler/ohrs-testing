@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->double('price');
-            $table->enum('status', ['available', 'reserved', 'occupied', 'maintenance']);
             $table->foreignId('room_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

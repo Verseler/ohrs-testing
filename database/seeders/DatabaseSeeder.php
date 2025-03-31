@@ -15,17 +15,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-       $this->call([
-        OfficeSeeder::class,
-        RoomSeeder::class,
-        BedSeeder::class
-    ]);
+        // $this->call([
+        //     RoomSeeder::class,
+        //     BedSeeder::class
+        // ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@gmail.com',
+            'name' => 'SuperAdmin Test',
+            'email' => 'superAdmin@gmail.com',
+            'role' => 'super_admin',
+            'office_id' => 175,
+            'password' => bcrypt('1010101010'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'User Test',
+            'email' => 'admin@gmail.com',
             'role' => 'admin',
-            'office_id' => 1,
+            'office_id' => 175,
             'password' => bcrypt('1010101010'),
         ]);
     }

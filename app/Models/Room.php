@@ -13,7 +13,6 @@ class Room extends Model
     protected $fillable = [
         'name',
         'eligible_gender',
-        'status',
         'office_id'
     ];
 
@@ -25,5 +24,10 @@ class Room extends Model
     public function office()
     {
         return $this->belongsTo(Office::class);
+    }
+
+    public function eligibleGenderSchedules()
+    {
+        return $this->hasMany(EligibleGenderSchedule::class);
     }
 }

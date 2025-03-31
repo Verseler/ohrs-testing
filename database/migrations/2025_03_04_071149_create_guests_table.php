@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('guests', function (Blueprint $table) {
             $table->id();
-            $table->string('display_name');
-            $table->enum('gender', ['any', 'male', 'female'])->default('any');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('phone')->nullable();
+            $table->enum('gender', ['male', 'female']);
             $table->foreignId('office_id')->constrained()->cascadeOnDelete();
             $table->foreignId('reservation_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('bed_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
     });
     }

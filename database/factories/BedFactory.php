@@ -17,10 +17,10 @@ class BedFactory extends Factory
      */
     public function definition(): array
     {
+        static $order = 1;
         return [
-            'name' => $this->faker->name(),
-            'price' => $this->faker->randomFloat(2, 50, 5000),
-            'status' => 'available',
+            'name' => 'Bed #' . $order++,
+            'price' => 200,
             'room_id' => Room::inRandomOrder()->first()->id
         ];
     }

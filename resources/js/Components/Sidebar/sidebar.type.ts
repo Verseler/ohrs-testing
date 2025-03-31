@@ -4,12 +4,13 @@ export type LucidIconType = typeof User;
 
 export type NavItem = {
     heading?: string,
-    items: [
-        {
-            label: string,
-            route: string,
-            path: string,
-            icon: LucidIconType,
-        },
-    ],
+    items: Item[],
+};
+
+type  Item = {
+    label: string,
+    route: string,
+    path: string,
+    icon: LucidIconType,
+    accessible: boolean
 };

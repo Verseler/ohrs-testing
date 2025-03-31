@@ -1,7 +1,15 @@
+import { Office } from '@/Pages/Admin/Office/office.types';
+import type { UserIcon } from 'lucide-vue-next';
+
+export type UserRole = 'admin' | 'super_admin';
+
 export interface User {
     id: number;
     name: string;
     email: string;
+    role: UserRole;
+    office_id: number;
+    office: Office;
     email_verified_at?: string;
 }
 
@@ -16,16 +24,9 @@ export type PageProps<
     auth: {
         user: User;
     };
-    flash: Flash
+    flash: Flash,
+    unreadNotificationCount: number
 };
-
-
-export interface SharedData extends PageProps {
-    name: string;
-    quote: { message: string; author: string };
-    auth: Auth;
-    flash: Flash
-}
 
 export type LaravelPagination<T> = {
     current_page: number;
@@ -50,9 +51,4 @@ export type LaravelPagination<T> = {
 
   export type Severity = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'secondary'
 
-  export type Office = {
-        id: number;
-        name: string;
-        created_at: Date | string;
-        updated_at: Date | string;
-  }
+  export type LucideIcon = typeof UserIcon;

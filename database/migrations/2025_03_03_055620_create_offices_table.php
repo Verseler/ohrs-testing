@@ -1,7 +1,9 @@
 <?php
 
+use Database\Seeders\OfficeSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -13,8 +15,15 @@ return new class extends Migration {
         Schema::create('offices', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('has_hostel')->default(false);
+            $table->foreignId('region_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
+
+        // run seeder to add required data in the database
+        Artisan::call('db:seed', [
+            '--class' => OfficeSeeder::class
+        ]);
     }
 
     /**
