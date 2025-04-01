@@ -104,6 +104,21 @@ export function getDaysDifference(startDate: string | Date, endDate: string | Da
 }
 
 
+export function getLengthOfStay(checkInDate: string, checkOutDate: string) {
+    const difference = getDaysDifference(
+        checkInDate,
+        checkOutDate
+    );
+
+    //If the check in and out is on the same day then the length of stay is counted as one
+    if (difference === 0) return 1;
+
+    return difference;
+}
+
+
+
+
 export function formatCurrency(amount: number): string {
     return amount.toLocaleString('en-PH', {
       minimumFractionDigits: 2,

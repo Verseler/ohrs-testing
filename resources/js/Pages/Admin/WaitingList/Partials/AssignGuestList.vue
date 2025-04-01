@@ -18,136 +18,161 @@ import LinkButton from "@/Components/LinkButton.vue";
 import { Check, RefreshCw } from "lucide-vue-next";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { InputError } from "@/Components/ui/input";
-import { getDaysDifference } from "@/lib/utils";
+import { getLengthOfStay } from "@/lib/utils";
 import { roomScheduledEligibleGender } from "@/Pages/Admin/WaitingList/helpers";
 
 type AssignGuestListProps = {
     reservation: ReservationWithBeds;
-    availableBeds: Bed[]; //beds that are available within check in and out reservation
+    availableBeds: Bed[];
 };
 
-// Initialize component data
-const { reservation, availableBeds: beds } =
+const { reservation, availableBeds: defaultAvailableBeds } =
     defineProps<AssignGuestListProps>();
 
-// Prepare guest data for the form
-const prepareGuests = () => {
-    return reservation.guests.map((guest) => ({
-        id: guest.id,
-        name: `${guest.first_name} ${guest.last_name}`,
-        gender: guest.gender as Gender,
-        bed_id: null as number | null,
-    }));
-};
+/**
+ * Default guest list derived from the reservation's guests.
+ * Each guest is initialized with their ID, name, gender, and no assigned bed.
+ */
+const DEFAULT_GUESTS = reservation.guests.map((guest) => ({
+    id: guest.id,
+    name: `${guest.first_name} ${guest.last_name}`,
+    gender: guest.gender as Gender,
+    bed_id: null as number | null,
+}));
+
+/**
+ * Default mapping of room IDs to their eligible genders.
+ * If no specific schedule exists, the default eligible gender is used.
+ */
+const DEFAULT_ROOM_ELIGIBLE_GENDERS = new Map(
+    defaultAvailableBeds.map((bed) => [
+        bed.room.id,
+        bed.room.eligible_gender_schedules?.[0]?.eligible_gender ||
+            bed.room.eligible_gender,
+    ])
+);
 
 const form = useForm({
     reservation_id: reservation.id,
-    guests: prepareGuests(),
+    guests: DEFAULT_GUESTS,
 });
-
-const availableBeds = computed(() => {
-    //if bed room has scheduled eligible gender, use it or else use the default
-    const updatedGenderAvailableBeds = beds.map((bed) => {
-        const scheduledEligibleGender =
-            bed.room?.eligible_gender_schedules?.[0]?.eligible_gender;
-
-        if (scheduledEligibleGender) {
-            bed.room.eligible_gender = scheduledEligibleGender;
-            return bed;
-        }
-
-        return bed;
-    });
-
-    return updatedGenderAvailableBeds;
-});
-
-const lengthOfStay = computed(() => {
-    const difference = getDaysDifference(
-        reservation.check_in_date,
-        reservation.check_out_date
-    );
-
-    //If the check in and out is on the same day then the length of stay is counted as one
-    if (difference === 0) return 1;
-
-    return difference;
-});
-
-const totalPrice = computed(() =>
-    form.guests.reduce((price, currentGuest) => {
-        return (
-            price + (currentGuest.bed_id ? getBedPrice(currentGuest.bed_id) : 0)
-        );
-    }, 0)
-);
-
-function getBedPrice(id: number): number {
-    const bed = availableBeds.value.find((bed) => bed.id === id);
-
-    if (!bed) return 0;
-
-    return bed.price * lengthOfStay.value;
-}
 
 const assignedBedIds = ref<number[]>([]);
+const roomEligibleGenders = ref(DEFAULT_ROOM_ELIGIBLE_GENDERS);
 
-// Update assigned beds when form changes
+/**
+ * Computed property to dynamically update available beds.
+ * Ensures that room eligible genders are updated based on current state.
+ */
+const availableBeds = computed(() =>
+    defaultAvailableBeds.map((bed) => ({
+        ...bed,
+        room: {
+            ...bed.room,
+            eligible_gender:
+                roomEligibleGenders.value.get(bed.room.id) ||
+                bed.room.eligible_gender,
+        },
+    }))
+);
+
+/**
+ * Updates the list of assigned bed IDs based on the current form state.
+ */
 const updateAssignedBeds = () => {
     assignedBedIds.value = form.guests
         .filter((guest) => guest.bed_id)
         .map((guest) => guest.bed_id!);
 };
 
-// Watch for changes in guest bed assignments
-watch(form.guests, updateAssignedBeds, { deep: true });
-
-const getAvailableBeds = () => {
-    // Get available beds excluding newly assigned ones
-    const unassignedAvailableBeds = availableBeds.value.filter(
-        (bed) => !assignedBedIds.value.includes(Number(bed.id))
+/**
+ * Resets the eligible genders for rooms that do not have assigned beds.
+ */
+const resetRoomGenders = () => {
+    const assignedRooms = new Set(
+        assignedBedIds.value.map(
+            (bedId) =>
+                availableBeds.value.find((bed) => bed.id === bedId)?.room.id
+        )
     );
 
-    return unassignedAvailableBeds;
+    roomEligibleGenders.value.forEach((defaultGender, roomId) => {
+        if (!assignedRooms.has(roomId)) {
+            roomEligibleGenders.value.set(
+                roomId,
+                defaultAvailableBeds.find((bed) => bed.room.id === roomId)?.room
+                    .eligible_gender || "any"
+            );
+        }
+    });
 };
 
-// Filter beds by eligible_gender
-const filterBedsByGender = (beds: Bed[], gender: Gender) => {
-    return beds
-        .filter((bed) => {
-            const eligibleGender = bed.room.eligible_gender;
-            return eligibleGender === "any" || eligibleGender === gender;
-        })
-        .sort((a, b) => b.id - a.id); //desc order
-};
+/**
+ * Watches changes to the form's guests and updates assigned beds and room genders.
+ */
+watch(
+    form.guests,
+    () => {
+        updateAssignedBeds();
+        resetRoomGenders();
+    },
+    { deep: true }
+);
 
-// Update room gender when first bed is assigned
-const updateRoomGender = (bedId: number, gender: Gender) => {
-    const bed = availableBeds.value.find((b) => b.id === bedId);
-
-    if (bed?.room.eligible_gender === "any") {
-        availableBeds.value
-            .filter((b) => b.room.id === bed.room.id)
-            .forEach((b) => (b.room.eligible_gender = gender));
+/**
+ * Handles bed selection for a guest.
+ * Updates the guest's assigned bed and adjusts the room's eligible gender if necessary.
+ */
+const onBedSelect = (guestId: number, bedId: number) => {
+    const guest = form.guests.find((g) => g.id === guestId);
+    if (guest) {
+        guest.bed_id = bedId;
+        const bed = availableBeds.value.find((b) => b.id === bedId);
+        if (bed && bed.room.eligible_gender === "any") {
+            roomEligibleGenders.value.set(bed.room.id, guest.gender);
+        }
     }
 };
 
-// Get formatted bed name for display
+const getAvailableBeds = () =>
+    availableBeds.value.filter((bed) => !assignedBedIds.value.includes(bed.id));
+
+const filterBedsByGender = (beds: Bed[], gender: Gender) =>
+    beds
+        .filter(
+            (bed) =>
+                bed.room.eligible_gender === "any" ||
+                bed.room.eligible_gender === gender
+        )
+        .sort((a, b) => b.id - a.id);
+
 const getBedName = (bedId: number) => {
     const bed = availableBeds.value.find((b) => b.id === bedId);
     return bed ? `${bed.room.name} - ${bed.name}` : "";
 };
 
-// Handle bed selection
-const onBedSelect = (guestId: number, bedId: number) => {
-    const guest = form.guests.find((g) => g.id === guestId);
-    if (guest) {
-        guest.bed_id = bedId;
-        updateRoomGender(bedId, guest.gender);
-    }
-};
+const lengthOfStay = computed(() =>
+    getLengthOfStay(reservation.check_in_date, reservation.check_out_date)
+);
 
-//* SUBMIT
+const totalPrice = computed(() => {
+    const totalBedPrice = form.guests.reduce((price, currentGuest) => {
+        return (
+            price + (currentGuest.bed_id ? getBedPrice(currentGuest.bed_id) : 0)
+        );
+    }, 0);
+
+    return totalBedPrice * lengthOfStay.value;
+});
+
+function getBedPrice(id: number): number {
+    const bed = availableBeds.value.find((bed) => bed.id === id);
+
+    if (!bed) return 0;
+
+    return bed.price;
+}
+
 const submitConfirmation = ref(false);
 
 function showSubmitConfirmation() {
@@ -184,7 +209,10 @@ function submit() {
                 >
                     {{ guest.name }}
                 </p>
-                <GenderBadge class="h-12 text-sm min-w-20" :gender="guest.gender" />
+                <GenderBadge
+                    class="h-12 text-sm min-w-20"
+                    :gender="guest.gender"
+                />
             </div>
 
             <Select
