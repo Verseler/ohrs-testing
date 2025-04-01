@@ -13,7 +13,6 @@ const unreadCount = computed(() => page.props.unreadNotificationCount);
 <template>
     <LinkButton
         :href="route('notification.list')"
-        prefetch
         variant="link"
         size="icon"
         class="relative transition-colors rounded-full bg-neutral-50 text-neutral-500 hover:text-neutral-700"
