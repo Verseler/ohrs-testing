@@ -179,12 +179,15 @@ function submit() {
                             <TableRow class="grid border-none md:grid-cols-2">
                                 <TableCell class="space-y-2">
                                     <InputLabel>Phone #</InputLabel>
-                                    <Input
-                                        type="number"
-                                        v-model.number="form.phone"
-                                        class="h-12 rounded-sm shadow-none border-primary-700"
-                                        :invalid="!!form.errors.phone"
-                                    />
+                                    <div class="relative">
+                                        <span class="absolute top-[15.3px] text-neutral-700 left-2">(+63)</span>
+                                        <Input
+                                            type="number"
+                                            v-model.number="form.phone"
+                                            class="h-12 rounded-sm shadow-none pl-11 border-primary-700"
+                                            :invalid="!!form.errors.phone"
+                                        />
+                                    </div>
                                     <InputError v-if="form.errors.phone">
                                         {{ form.errors.phone }}
                                     </InputError>
