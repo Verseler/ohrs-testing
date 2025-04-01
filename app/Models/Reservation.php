@@ -55,9 +55,14 @@ class Reservation extends Model
         return $this->hasMany(Payment::class);
     }
 
-    public function PaymentExemptions()
+    public function paymentExemptions()
     {
         return $this->hasMany(PaymentExemption::class);
+    }
+
+    public function extendedReservations()
+    {
+        return $this->hasMany(ExtendedReservation::class);
     }
 
     public function reservedBeds()

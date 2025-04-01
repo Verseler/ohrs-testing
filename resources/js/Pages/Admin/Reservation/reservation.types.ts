@@ -24,6 +24,7 @@ export type Reservation = {
     employee_id: string;
     purpose_of_stay: string | null;
     guests: Guest[];
+    extended_reservations: ExtendedReservation[]
     guest_office_id: number;
     hostel_office_id: number;
     reserved_beds: Bed[];
@@ -52,3 +53,15 @@ export type ReservationWithBeds = Omit<
     reserved_beds_with_guests: BedWithGuest[]
 
 };
+
+
+export type ExtendedReservation = {
+    id: number;
+    check_in_date: string;
+    old_check_out_date: string;
+    new_check_out_date: string;
+    days_extended: number;
+    reservation_id: number;
+    created_at: string;
+    updated_at: string;
+}

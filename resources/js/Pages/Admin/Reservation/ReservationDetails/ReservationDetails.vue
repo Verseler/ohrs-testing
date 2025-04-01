@@ -132,7 +132,8 @@ onMounted(() => {
                             v-if="
                                 canExempt &&
                                 reservation.status != 'canceled' &&
-                                reservation.status != 'checked_out'
+                                reservation.status != 'checked_out' &&
+                                reservation.extended_reservations?.length <= 0
                             "
                             class="flex-1 max-w-sm bg-violet-500 hover:bg-violet-600"
                             :href="

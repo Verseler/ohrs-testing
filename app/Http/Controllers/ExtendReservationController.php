@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ExtendedReservation;
 use App\Models\GuestBeds;
 use App\Models\Reservation;
 use Carbon\Carbon;
@@ -64,6 +65,14 @@ class ExtendReservationController extends Controller
 
                 //get additional days
                 $additionalDays = $oldCheckOutDate->diffInDays($newCheckOutDate, false);
+
+                ExtendedReservation::create([
+                    'check_in_date' => $reservation->check_in_date,
+                    'old_check_out_date' => $reservation->check_out_date,
+                    'new_check_out_date' => $newCheckOutDate,
+                    'days_extended' => $additionalDays,
+                    'reservation_id' => $reservation->id
+                ]);
 
                 //calculate additional charges
                 $dailyRate = $reservation->daily_rate;
