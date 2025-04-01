@@ -20,7 +20,7 @@ export const data = {
         "Total Beds",
         "Available Beds",
         "Status",
-        "Eligible Gender",
+        "Default Eligible Gender",
         "Bed Price",
         ""
     ],

@@ -243,18 +243,13 @@ function handleDeleteRoom() {
                             </TableCell>
                             <TableCell>
                                 <AvailabilityBadge
-                                    :available="room.available_beds <= 0"
+                                    :available="
+                                        !!room?.available_beds &&
+                                        room.available_beds <= 0
+                                    "
                                 />
                             </TableCell>
                             <TableCell>
-                                <!-- Use scheduled eligible gender if it has one -->
-                                <!-- <GenderBadge
-                                    :gender="
-                                        room.eligible_gender_schedules[0]
-                                            ?.eligible_gender ||
-                                        room.eligible_gender
-                                    "
-                                /> -->
                                 <GenderBadge :gender="room.eligible_gender" />
                             </TableCell>
                             <TableCell>
