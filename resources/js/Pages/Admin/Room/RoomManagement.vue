@@ -243,7 +243,6 @@ function handleDeleteRoom() {
                             </TableCell>
                             <TableCell>
                                 <AvailabilityBadge
-                                    v-if="room.available_beds"
                                     :available="room.available_beds <= 0"
                                 />
                             </TableCell>
