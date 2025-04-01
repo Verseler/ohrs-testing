@@ -36,7 +36,7 @@ import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
-import { debounce, formatDate, tomorrowDate, yesterdayDate } from "@/lib/utils";
+import { debounce, formatDate, tomorrowDate } from "@/lib/utils";
 import { Label } from "@/Components/ui/label";
 import DatePicker from "@/Components/DatePicker.vue";
 import { usePoll } from "@inertiajs/vue3";
@@ -48,6 +48,7 @@ import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import AvailabilityBadge from "@/Components/AvailabilityBadge.vue";
 import GenderBadge from "@/Components/GenderBadge.vue";
 import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
+import LinkButton from "@/Components/LinkButton.vue";
 
 usePoll(20000);
 
@@ -143,9 +144,9 @@ function handleDeleteRoom() {
         <div class="flex justify-between min-h-12">
             <Breadcrumbs :items="data.breadcrumbs" />
 
-            <Link :href="route('room.createForm')">
-                <Button><Plus /><span>Add Room</span></Button>
-            </Link>
+            <LinkButton :href="route('room.createForm')">
+                <Plus /><span>Add Room</span>
+            </LinkButton>
         </div>
 
         <PageHeader>
@@ -183,7 +184,9 @@ function handleDeleteRoom() {
                 </div>
             </div>
 
-            <div class="items-center space-y-2 md:space-y-0 gap-x-2 md:ml-auto md:flex md:h-9">
+            <div
+                class="items-center space-y-2 md:space-y-0 gap-x-2 md:ml-auto md:flex md:h-9"
+            >
                 <div class="relative">
                     <Label
                         for="check_in"
@@ -195,7 +198,7 @@ function handleDeleteRoom() {
                         id="check_in"
                         v-model="form.check_in_date"
                         class="!h-10 min-w-64"
-                        :min-value="yesterdayDate()"
+                        :min-value="new Date()"
                         :max-value="form.check_out_date"
                     />
                 </div>
@@ -245,6 +248,14 @@ function handleDeleteRoom() {
                                 />
                             </TableCell>
                             <TableCell>
+                                <!-- Use scheduled eligible gender if it has one -->
+                                <!-- <GenderBadge
+                                    :gender="
+                                        room.eligible_gender_schedules[0]
+                                            ?.eligible_gender ||
+                                        room.eligible_gender
+                                    "
+                                /> -->
                                 <GenderBadge :gender="room.eligible_gender" />
                             </TableCell>
                             <TableCell>
