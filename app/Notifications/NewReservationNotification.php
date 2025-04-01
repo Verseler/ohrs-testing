@@ -36,7 +36,6 @@ class NewReservationNotification extends Notification
 
         return [
             'message' => "A new reservation [$reservationCode] has been submitted by $bookBy.",
-            'link' => route('reservation.show', ["id" => $this->reservation->id]),
         ];
     }
 }

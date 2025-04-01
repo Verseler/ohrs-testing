@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Notification } from "@/Pages/Admin/Notification/notification.types";
 import { Bell, CheckIcon } from "lucide-vue-next";
-import LinkButton from "@/Components/LinkButton.vue";
 import { formatDateTimeString } from "@/lib/utils";
 
 interface NotificationListProps {
@@ -46,7 +45,9 @@ const handleMarkAsRead = (): void => {
 
             <!-- Notification content -->
             <div class="flex-1">
-                <div class="flex flex-col items-start justify-between md:flex-row">
+                <div
+                    class="flex flex-col items-start justify-between md:flex-row"
+                >
                     <div>
                         <h3
                             class="text-base font-medium capitalize"
@@ -68,20 +69,6 @@ const handleMarkAsRead = (): void => {
                             "
                         >
                             {{ notification.data.message }}
-
-                            <LinkButton
-                                v-if="notification.data.link"
-                                :href="notification.data.link"
-                                class="p-0 text-sm italic font-thin underline"
-                                :class="
-                                    notification.read_at
-                                        ? 'text-neutral-400'
-                                        : 'text-primary-500'
-                                "
-                                variant="link"
-                            >
-                                open
-                            </LinkButton>
                         </p>
                     </div>
 
