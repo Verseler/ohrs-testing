@@ -32,6 +32,8 @@ import { InputError } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import GenderBadge from "@/Components/GenderBadge.vue";
+import { roomScheduledEligibleGender } from "../../WaitingList/helpers";
 
 type EditBedAssignmentProps = {
     reservation: ReservationWithBeds & {
@@ -171,7 +173,24 @@ function submit() {
                                     :value="bed.id"
                                     :key="bed.id"
                                 >
-                                    {{ bed.room.name }} {{ bed.name }}
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            {{ bed.room.name }}
+                                            {{ bed.name }}
+                                        </div>
+                                        <GenderBadge
+                                            v-if="
+                                                roomScheduledEligibleGender(bed)
+                                            "
+                                            :gender="
+                                                roomScheduledEligibleGender(bed)
+                                            "
+                                        />
+                                        <GenderBadge
+                                            v-else
+                                            :gender="bed.room.eligible_gender"
+                                        />
+                                    </div>
                                 </SelectItem>
                             </SelectGroup>
                         </SelectContent>
