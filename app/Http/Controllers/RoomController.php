@@ -226,39 +226,4 @@ class RoomController extends Controller
 
         return to_route('room.list')->with('success', 'Room updated successfully.');
     }
-
-
-
-    public function getAvailableRooms(Request $request)
-    {
-        $validated = $request->validate([
-            'selected_date' => ['required', 'date'],
-        ]);
-
-        $date = Carbon::parse($validated['selected_date']);
-
-        // Get all beds with active reservations for the target date
-        $reservedBedIds = GuestBeds::reservedOnDate($date)->pluck('bed_id');
-
-        // Get all rooms with their beds
-        $rooms = Room::with('beds', 'eligibleGenderSchedules')->get()->map(function (Room $room) use ($reservedBedIds, $date) {
-            $eligibleGenderSchedule = EligibleGenderSchedule::where('room_id', $room->id)->where('start_date', '<=', $date)->where('end_date', '>=', $date)->first();
-            $roomEligibleGender = $eligibleGenderSchedule->eligible_gender ?? $room->eligible_gender;
-
-            //get all available beds of the current room
-            $bedCount = $room->beds
-                ->whereNotIn('id', $reservedBedIds)
-                ->count();
-
-            //structure the data so that we get the room with its available beds
-            return [
-                'id' => $room->id,
-                'name' => $room->name,
-                'eligible_gender' => $roomEligibleGender,
-                'beds_count' => $bedCount
-            ];
-        });
-
-        return response()->json($rooms);
-    }
 }
