@@ -29,122 +29,64 @@ type AssignGuestListProps = {
 const { reservation, availableBeds: defaultAvailableBeds } =
     defineProps<AssignGuestListProps>();
 
-/**
- * Default guest list derived from the reservation's guests.
- * Each guest is initialized with their ID, name, gender, and no assigned bed.
- */
-const DEFAULT_GUESTS = reservation.guests.map((guest) => ({
-    id: guest.id,
-    name: `${guest.first_name} ${guest.last_name}`,
-    gender: guest.gender as Gender,
-    bed_id: null as number | null,
-}));
+// Prepare guest data for the form
+const prepareGuests = () => {
+    return reservation.guests.map((guest) => ({
+        id: guest.id,
+        name: `${guest.first_name} ${guest.last_name}`,
+        gender: guest.gender as Gender,
+        bed_id: null as number | null,
+    }));
+};
 
-/**
- * Default mapping of room IDs to their eligible genders.
- * If no specific schedule exists, the default eligible gender is used.
- */
-const DEFAULT_ROOM_ELIGIBLE_GENDERS = new Map(
-    defaultAvailableBeds.map((bed) => [
-        bed.room.id,
-        bed.room.eligible_gender_schedules?.[0]?.eligible_gender ||
-            bed.room.eligible_gender,
-    ])
-);
 
 const form = useForm({
     reservation_id: reservation.id,
-    guests: DEFAULT_GUESTS,
+    guests: prepareGuests(),
 });
 
+const availableBeds = computed(() => {
+    //if bed room has scheduled eligible gender, use it or else use the default
+    const updatedGenderAvailableBeds = defaultAvailableBeds.map((bed) => {
+        const scheduledEligibleGender =
+            bed.room?.eligible_gender_schedules?.[0]?.eligible_gender;
+
+        if (scheduledEligibleGender) {
+            bed.room.eligible_gender = scheduledEligibleGender;
+            return bed;
+        }
+
+        return bed;
+    });
+
+    return updatedGenderAvailableBeds;
+});
+
+
 const assignedBedIds = ref<number[]>([]);
-const roomEligibleGenders = ref(DEFAULT_ROOM_ELIGIBLE_GENDERS);
 
-/**
- * Computed property to dynamically update available beds.
- * Ensures that room eligible genders are updated based on current state.
- */
-const availableBeds = computed(() =>
-    defaultAvailableBeds.map((bed) => ({
-        ...bed,
-        room: {
-            ...bed.room,
-            eligible_gender:
-                roomEligibleGenders.value.get(bed.room.id) ||
-                bed.room.eligible_gender,
-        },
-    }))
-);
-
-/**
- * Updates the list of assigned bed IDs based on the current form state.
- */
+// Update assigned beds when form changes
 const updateAssignedBeds = () => {
     assignedBedIds.value = form.guests
         .filter((guest) => guest.bed_id)
         .map((guest) => guest.bed_id!);
 };
 
-/**
- * Resets the eligible genders for rooms that do not have assigned beds.
- */
-const resetRoomGenders = () => {
-    const assignedRooms = new Set(
-        assignedBedIds.value.map(
-            (bedId) =>
-                availableBeds.value.find((bed) => bed.id === bedId)?.room.id
-        )
-    );
-
-    roomEligibleGenders.value.forEach((defaultGender, roomId) => {
-        if (!assignedRooms.has(roomId)) {
-            roomEligibleGenders.value.set(
-                roomId,
-                defaultAvailableBeds.find((bed) => bed.room.id === roomId)?.room
-                    .eligible_gender || "any"
-            );
-        }
-    });
-};
-
-/**
- * Watches changes to the form's guests and updates assigned beds and room genders.
- */
-watch(
-    form.guests,
-    () => {
-        updateAssignedBeds();
-        resetRoomGenders();
-    },
-    { deep: true }
-);
-
-/**
- * Handles bed selection for a guest.
- * Updates the guest's assigned bed and adjusts the room's eligible gender if necessary.
- */
-const onBedSelect = (guestId: number, bedId: number) => {
-    const guest = form.guests.find((g) => g.id === guestId);
-    if (guest) {
-        guest.bed_id = bedId;
-        const bed = availableBeds.value.find((b) => b.id === bedId);
-        if (bed && bed.room.eligible_gender === "any") {
-            roomEligibleGenders.value.set(bed.room.id, guest.gender);
-        }
-    }
-};
+// Watch for changes in guest bed assignments
+watch(form.guests, updateAssignedBeds, { deep: true });
 
 const getAvailableBeds = () =>
     availableBeds.value.filter((bed) => !assignedBedIds.value.includes(bed.id));
 
-const filterBedsByGender = (beds: Bed[], gender: Gender) =>
-    beds
+
+const filterBedsByGender = (beds: Bed[], gender: Gender) => {
+    return  beds
         .filter(
             (bed) =>
                 bed.room.eligible_gender === "any" ||
                 bed.room.eligible_gender === gender
         )
-        // Sort by eligible gender 'Male' > 'Female' > 'Any'
+        // Sort by eligible gender from 'Male' -> 'Female' -> 'Any'
         .sort((a, b) => {
             if (a.room.eligible_gender === b.room.eligible_gender) {
                 return b.id - a.id;
@@ -152,10 +94,34 @@ const filterBedsByGender = (beds: Bed[], gender: Gender) =>
             return b.room.eligible_gender.localeCompare(a.room.eligible_gender);
         });
 
+}
+
+// Update room gender when first bed is assigned
+const updateRoomGender = (bedId: number, gender: Gender) => {
+    const bed = availableBeds.value.find((b) => b.id === bedId);
+
+    if (bed?.room.eligible_gender === "any") {
+        availableBeds.value
+            .filter((b) => b.room.id === bed.room.id)
+            .forEach((b) => (b.room.eligible_gender = gender));
+    }
+};
+
+// Get formatted bed name for display
 const getBedName = (bedId: number) => {
     const bed = availableBeds.value.find((b) => b.id === bedId);
     return bed ? `${bed.room.name} - ${bed.name}` : "";
 };
+
+// Handle bed selection
+const onBedSelect = (guestId: number, bedId: number) => {
+    const guest = form.guests.find((g) => g.id === guestId);
+    if (guest) {
+        guest.bed_id = bedId;
+        updateRoomGender(bedId, guest.gender);
+    }
+};
+
 
 const lengthOfStay = computed(() =>
     getLengthOfStay(reservation.check_in_date, reservation.check_out_date)
