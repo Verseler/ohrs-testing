@@ -18,7 +18,7 @@ export const data = {
         { value: "first_name", label: "Book by" },
         { value: "check_in_date", label: "Checked in" },
         { value: "check_out_date", label: "Checked out" },
-        { value: "total_billings", label: "Total billing" },
+        { value: "total_billings", label: "Total billings" },
         { value: "status", label: "Status" },
     ],
     tableHeads: [

@@ -21,7 +21,7 @@ class ReservationController extends Controller
             'search' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', Rule::in(['pending', 'confirmed', 'checked_in', 'checked_out', 'canceled'])],
             'balance' => ['nullable', Rule::in(['paid', 'has_balance'])],
-            'sort_by' => ['nullable', Rule::in(['reservation_code', 'first_name', 'check_in_date', 'check_out_date', 'total_billing', 'remaining_balance', 'status'])],
+            'sort_by' => ['nullable', Rule::in(['reservation_code', 'first_name', 'check_in_date', 'check_out_date', 'total_billings', 'remaining_balance', 'status'])],
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
