@@ -16,7 +16,8 @@ class Guest extends Model
         'phone',
         'gender',
         'office_id',
-        'reservation_id'
+        'reservation_id',
+        'is_exempted'
     ];
 
     public function office()

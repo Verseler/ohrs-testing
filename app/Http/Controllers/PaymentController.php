@@ -85,8 +85,13 @@ class PaymentController extends Controller
             ])
             ->first();
 
+        $exemptedPayments = PaymentExemption::with(['reservation', 'guest', 'user.office'])
+            ->where('reservation_id', $id)
+            ->get();
+
         return Inertia::render('Admin/Payment/ReservationPaymentHistory/ReservationPaymentHistory', [
-            'reservationPaymentHistory' => $reservationPaymentHistory
+            'reservationPaymentHistory' => $reservationPaymentHistory,
+            'exemptedPayments' => $exemptedPayments
         ]);
     }
 
@@ -106,7 +111,12 @@ class PaymentController extends Controller
     {
         $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
             ->whereNotIn('status', ['checked_out', 'canceled'])
-            ->with(['guests.guestBeds.bed.room'])
+            ->with([
+                'guests' => function ($query) {
+                    $query->where('is_exempted', false)
+                        ->with(['guestBeds.bed.room']);
+                }
+            ])
             ->findOrFail($id);
 
         return Inertia::render('Admin/Payment/ExemptPayment/ExemptPaymentForm', [
@@ -145,6 +155,9 @@ class PaymentController extends Controller
                     'user_id' => Auth::user()->id,
                     'reason' => $validated['reason'],
                 ]);
+
+                $guest->is_exempted = true;
+                $guest->save();
 
                 //update the total amount, daily_rate, and remaining balance
                 $checkInDate = Carbon::parse($reservation->check_in_date);

@@ -42,7 +42,7 @@ class ReservationProcessController extends Controller
                 'middle_initial' => ['nullable', 'string', 'max:1'],
                 'last_name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email', 'max:255'],
-                'phone' => ['required', 'regex:/(9)[0-9]{9}/'],
+                'phone' => ['required', 'size:10', 'regex:/(9)[0-9]{9}/'],
                 'guest_office_id' => ['required', 'numeric'],
                 'hostel_office_id' => ['required', 'numeric'],
                 'employee_id' => ['required', 'string'],
@@ -101,7 +101,8 @@ class ReservationProcessController extends Controller
                         'phone' => $guest['phone'],
                         'gender' => $guest['gender'],
                         'office_id' => $guestOffice->id,
-                        'reservation_id' => $reservation->id
+                        'reservation_id' => $reservation->id,
+                        'is_exempted' => false
                     ]);
                 }
 
