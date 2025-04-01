@@ -188,7 +188,8 @@ class ReservationAssignBedsController extends Controller
         try {
             DB::transaction(function () use ($validated) {
                 $reservation = Reservation::findOrFail($validated['reservation_id']);
-                $bed = Bed::findOrFail($validated['selected_bed_id']);
+                $bed = Bed::with('room')->findOrFail($validated['selected_bed_id']);
+                $guest = Guest::findOrFail($validated['selected_guest_id']);
 
                 if (!$bed->isAvailable($reservation)) {
                     throw ValidationException::withMessages([
@@ -212,6 +213,16 @@ class ReservationAssignBedsController extends Controller
                     'guest_id' => $validated['selected_guest_id'],
                     'reservation_id' => $validated['reservation_id']
                 ]);
+
+                // If the room's eligible gender is "any", create an EligibleGenderSchedule
+                if ($bed->room->eligible_gender === 'any') {
+                    EligibleGenderSchedule::create([
+                        "start_date" => $reservation->check_in_date,
+                        "end_date" => $reservation->check_out_date,
+                        "eligible_gender" => $guest->gender,
+                        "room_id" => $bed->room->id
+                    ]);
+                }
             });
         } catch (\Exception $e) {
             return redirect()->back()->with(['error' => $e->getMessage()]);
