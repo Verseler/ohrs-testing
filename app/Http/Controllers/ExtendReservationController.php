@@ -46,16 +46,18 @@ class ExtendReservationController extends Controller
 
                 $oldCheckOutDate = Carbon::parse($reservation->check_out_date)->startOfDay();
                 $newCheckOutDate = Carbon::parse($validated['new_check_out_date'], 'Asia/Manila')->setTimezone($oldCheckOutDate->timezone)->startOfDay();
+                $extensionStart = $oldCheckOutDate->copy()->addDay(); //old checkOut date plus one
 
-                //check if newCheckOutDate is valid which means there is no overlapping of reservation
+                // Check if the new check-out date is valid by ensuring no overlapping reservations
                 $guestBed = new GuestBeds();
-                $reservedBedIds = $guestBed->reservedBeds($oldCheckOutDate, $newCheckOutDate)
+                $reservedBedIds = $guestBed->reservedBeds($extensionStart, $newCheckOutDate)
+                    ->where('reservation_id', '!=', $reservation->id)
                     ->pluck('bed_id')->toArray();
 
                 $currentReservedBedIds = $reservation->reservedBeds->pluck('id')->toArray();
 
-                // Check if any of the currently reserved beds are already reserved by others
-                $overlappingBeds = array_diff($reservedBedIds, $currentReservedBedIds);
+                // Identify overlapping beds that are reserved by others
+                $overlappingBeds = array_intersect($reservedBedIds, $currentReservedBedIds);
 
                 if (!empty($overlappingBeds)) {
                     throw ValidationException::withMessages([
