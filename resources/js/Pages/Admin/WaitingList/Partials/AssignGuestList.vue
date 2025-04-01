@@ -111,14 +111,14 @@ const getAvailableBeds = () => {
     return unassignedAvailableBeds;
 };
 
-// Filter beds by gender compatibility
+// Filter beds by eligible_gender
 const filterBedsByGender = (beds: Bed[], gender: Gender) => {
     return beds
         .filter((bed) => {
             const eligibleGender = bed.room.eligible_gender;
             return eligibleGender === "any" || eligibleGender === gender;
         })
-        .sort((a, b) => a.id - b.id); //desc order
+        .sort((a, b) => b.id - a.id); //desc order
 };
 
 // Update room gender when first bed is assigned
@@ -180,11 +180,11 @@ function submit() {
         >
             <div class="flex justify-between col-span-5 gap-x-2">
                 <p
-                    class="flex items-center w-full px-2 capitalize border rounded-md"
+                    class="flex items-center flex-1 w-full px-2 capitalize border rounded-md"
                 >
                     {{ guest.name }}
                 </p>
-                <GenderBadge class="h-12 text-sm" :gender="guest.gender" />
+                <GenderBadge class="h-12 text-sm min-w-20" :gender="guest.gender" />
             </div>
 
             <Select

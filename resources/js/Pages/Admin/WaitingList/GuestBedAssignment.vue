@@ -20,12 +20,9 @@ import { Bed } from "@/Pages/Admin/Room/room.types";
 import { Message } from "@/Components/ui/message";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
-import { usePoll } from "@inertiajs/vue3";
 import { showSuccess } from "@/Composables/useFlash";
 import { Separator } from "@/Components/ui/separator";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
-
-usePoll(15000);
 
 type GuestBedAssignmentProps = {
     reservation: ReservationWithBeds;
