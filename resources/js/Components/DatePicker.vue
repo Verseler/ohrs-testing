@@ -179,6 +179,7 @@ onUnmounted(() => {
                 :min="min"
             />
             <CalendarIcon
+                @click="handleToggleCalendar"
                 class="absolute inset-y-0 my-auto font-normal right-3 size-4"
                 :class="{
                     'text-red-500': invalid,
