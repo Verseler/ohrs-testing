@@ -183,7 +183,7 @@ function handleDeleteRoom() {
                 </div>
             </div>
 
-            <div class="flex items-center ml-auto gap-x-2 h-9">
+            <div class="items-center space-y-2 md:space-y-0 gap-x-2 md:ml-auto md:flex md:h-9">
                 <div class="relative">
                     <Label
                         for="check_in"
