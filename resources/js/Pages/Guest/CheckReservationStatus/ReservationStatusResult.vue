@@ -42,7 +42,7 @@ const statusConfig = computed(() => {
             borderColor: "border-yellow-200",
             title: "Pending",
             description:
-                "Your reservation is currently being processed. Please check back for updates.",
+                "Your reservation is waiting for approval. Please check back for updates.",
         },
         confirmed: {
             icon: CheckCircleIcon,
