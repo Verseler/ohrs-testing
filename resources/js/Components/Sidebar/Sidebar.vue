@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { router, usePage } from "@inertiajs/vue3";
+import { router, usePage, Link } from "@inertiajs/vue3";
 import { Avatar, AvatarFallback } from "@/Components/ui/avatar";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import SidebarNavLink from "@/Components/Sidebar/SidebarNavLink.vue";
@@ -121,12 +121,14 @@ function handleLogout() {
 <template>
     <Sidebar>
         <SidebarHeader>
-            <ApplicationLogo class="mx-auto size-28" />
-            <p class="text-[1.1rem] font-bold text-center">
-                <span class="text-yellow-200">H</span>ostel
-                <span class="text-yellow-200">R</span>eservation
-                <span class="text-yellow-200">S</span>ystem
-            </p>
+            <Link href="/">
+                <ApplicationLogo class="mx-auto size-28" />
+                <p class="text-[1.1rem] font-bold text-center">
+                    <span class="text-yellow-200">H</span>ostel
+                    <span class="text-yellow-200">R</span>eservation
+                    <span class="text-yellow-200">S</span>ystem
+                </p>
+            </Link>
         </SidebarHeader>
 
         <SidebarContent class="pt-6">
