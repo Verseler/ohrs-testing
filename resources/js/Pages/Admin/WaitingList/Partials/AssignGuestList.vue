@@ -144,7 +144,13 @@ const filterBedsByGender = (beds: Bed[], gender: Gender) =>
                 bed.room.eligible_gender === "any" ||
                 bed.room.eligible_gender === gender
         )
-        .sort((a, b) => b.id - a.id);
+        // Sort by eligible gender 'Male' > 'Female' > 'Any'
+        .sort((a, b) => {
+            if (a.room.eligible_gender === b.room.eligible_gender) {
+                return b.id - a.id;
+            }
+            return b.room.eligible_gender.localeCompare(a.room.eligible_gender);
+        });
 
 const getBedName = (bedId: number) => {
     const bed = availableBeds.value.find((b) => b.id === bedId);
@@ -198,6 +204,8 @@ function submit() {
                 <RefreshCw />Reset
             </LinkButton>
         </div>
+
+        <!-- List Items -->
         <div
             v-for="(guest, index) in form.guests"
             :key="guest.id"
@@ -260,9 +268,9 @@ function submit() {
 
             <InputError
                 class="col-start-6 col-end-10 mt-1"
-                v-if="(form.errors as any)[`guests.${index}.bed_id`]"
+                v-if="(form.errors as Record<string, string>)[`guests.${index}.bed_id`]"
             >
-                {{ (form.errors as any)[`guests.${index}.bed_id`] }}
+                {{ (form.errors as Record<string, string>)[`guests.${index}.bed_id`] }}
             </InputError>
         </div>
 
