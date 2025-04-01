@@ -49,7 +49,6 @@ const form = useForm({
     guests: [DEFAULT_FIRST_GUEST],
 
     //contact info
-    //contact info
     first_name: "",
     middle_initial: undefined,
     last_name: "",
@@ -107,7 +106,7 @@ function submit() {
                                     <DatePicker
                                         v-model="form.check_in_date"
                                         :invalid="!!form.errors.check_in_date"
-                                        :min-value="yesterdayDate()"
+                                        :min-value="new Date()"
                                         :max-value="form.check_out_date"
                                     />
                                     <InputError
