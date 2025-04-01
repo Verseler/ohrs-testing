@@ -126,10 +126,16 @@ const statusConfig = computed(() => {
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-medium text-gray-500">
+                        <h3
+                            v-if="reservation?.status !== 'canceled'"
+                            class="text-sm font-medium text-gray-500"
+                        >
                             Number of Guests
                         </h3>
-                        <p class="mt-1">
+                        <p
+                            v-if="reservation?.status !== 'canceled'"
+                            class="mt-1"
+                        >
                             {{ reservation?.guests?.length }}
                         </p>
                     </div>
