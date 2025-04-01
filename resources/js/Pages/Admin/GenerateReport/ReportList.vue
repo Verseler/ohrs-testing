@@ -81,7 +81,7 @@ watch(() => form.selected_date, changeDate);
                         <TableRow>
                             <TableHead> Date </TableHead>
                             <TableHead> OR Number </TableHead>
-                            <TableHead> Particulars </TableHead>
+                            <TableHead> Guest Representative </TableHead>
                             <TableHead> Number of Guests </TableHead>
                             <TableHead> Amount </TableHead>
                         </TableRow>
