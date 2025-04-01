@@ -8,6 +8,7 @@ use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -150,6 +151,7 @@ class RoomController extends Controller
             'name' => ['required', 'string', 'min:2', 'max:16'],
             'eligible_gender' => ['required', Rule::in(['any', 'male', 'female'])],
             'beds' => ['required', 'array', 'min:1'],
+            'beds.*.id' => ['required'],
             'beds.*.name' => ['required', 'string', 'max:8'],
             'beds.*.price' => ['required', 'min:1', 'numeric'],
         ], [
@@ -160,51 +162,70 @@ class RoomController extends Controller
             'beds.*.price.min' => 'Price must be at least 1 peso.',
         ]);
 
+        try {
+            DB::transaction(function () use ($validated, $room) {
+                // Check if room name already exists (excluding this room)
+                $roomNameAlreadyExisted = Room::where([
+                    ['id', '!=', $room->id],
+                    ['name', $validated['name']],
+                ])->first();
+                if ($roomNameAlreadyExisted) {
+                    throw new \Exception('Room name already exists.');
+                }
 
-        $roomNameAlreadyExisted = Room::where([
-            ['id', '!=', $request->id],
-            [
-                'name',
-                $validated['name'],
-            ]
-        ])->first();
-        if ($roomNameAlreadyExisted) {
-            return redirect()->back()->with('error', 'Room name already existed.');
+                // **Update Room Info** (Always allowed)
+                $room->update([
+                    'name' => $validated['name'],
+                    'eligible_gender' => $validated['eligible_gender'],
+                ]);
+
+                // Get existing bed IDs for comparison
+                $existingBedIds = $room->beds->pluck('id')->toArray();
+                $submittedBedIds = [];
+
+                foreach ($validated['beds'] as $bedData) {
+                    // If bed already exists, update it
+                    if (!empty($bedData['id']) && in_array($bedData['id'], $existingBedIds)) {
+                        $room->beds()
+                            ->where('id', $bedData['id'])
+                            ->update(['name' => $bedData['name'], 'price' => $bedData['price']]);
+                        $submittedBedIds[] = $bedData['id']; // Keep track of updated beds
+                    }
+                    // Otherwise, create a new bed
+                    else {
+                        $newBed = $room->beds()->create(['name' => $bedData['name'], 'price' => $bedData['price']]);
+                        $submittedBedIds[] = $newBed->id; // Track new bed IDs
+                    }
+                }
+
+                // **Prevent Deleting Beds That Have Reservations**
+                $bedsToDelete = array_diff($existingBedIds, $submittedBedIds);
+
+                // Check if any of the beds to delete have reservations
+                $reservedBeds = $room->beds()
+                    ->whereIn('id', $bedsToDelete)
+                    ->whereHas('guestBeds.guest.reservation', function ($query) {
+                        $query->where('check_out_date', '>=', Carbon::today());
+                    })
+                    ->pluck('id')
+                    ->toArray();
+
+                // If any reserved beds are in the delete list, throw an error
+                if (!empty($reservedBeds)) {
+                    throw new \Exception("Cannot delete beds that have current or future reservations.");
+                }
+
+                // **Delete Beds That Are Not Reserved**
+                if (!empty($bedsToDelete)) {
+                    $room->beds()->whereIn('id', $bedsToDelete)->delete();
+                }
+            });
+        } catch (\Exception $e) {
+            return redirect()->back()->with("error", $e->getMessage());
         }
-
-        // Update the room
-        $room->update([
-            'name' => $validated['name'],
-            'eligible_gender' => $validated['eligible_gender'],
-        ]);
-
-        $existingBedIds = $room->beds->pluck('id')->toArray();
-        $submittedBedIds = [];
-
-        foreach ($validated['beds'] as $bedData) {
-            // If bed already existed perform update
-            if (isset($bedData['id']) && in_array($bedData['id'], $existingBedIds)) {
-                $room->beds()
-                    ->where('id', $bedData['id'])
-                    ->update(['name' => $bedData['name'], 'price' => $bedData['price']]);
-                $submittedBedIds[] = $bedData['id'];
-            }
-            // else create
-            else {
-                $newBed = $room->beds()->create(['name' => $bedData['name'], 'price' => $bedData['price']]);
-                $submittedBedIds[] = $newBed->id;
-            }
-        }
-
-        // Delete beds not present in the submitted data
-        $room->beds()
-            ->whereNotIn('id', $submittedBedIds)
-            ->delete();
-
 
         return to_route('room.list')->with('success', 'Room updated successfully.');
     }
-
 
 
 
