@@ -33,14 +33,6 @@ class ReservationStatusController extends Controller
         $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
             ->findOrFail($validated['reservation_id']);
 
-        //update check_out_date with the time when the status is change ti checked_out
-        if ($validated['status'] === 'checked_out') {
-            $currentDate = now()->toDateString();
-            if ($reservation->check_out_date !== $currentDate) {
-                $reservation->check_out_date = $currentDate;
-            }
-        }
-
         $reservation->status = $validated['status'];
         $reservation->save();
 
