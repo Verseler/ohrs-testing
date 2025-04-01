@@ -228,8 +228,7 @@ const closeReceiptDialog = () => {
                                 {{
                                     ` [${exemptedPayment.user.office.name} - ${exemptedPayment.user.role}]`
                                 }}
-                                from ₱{{ exemptedPayment.price }} payment of
-                                reservation
+                                payment of reservation
                                 {{
                                     exemptedPayment.reservation.reservation_code
                                 }}
