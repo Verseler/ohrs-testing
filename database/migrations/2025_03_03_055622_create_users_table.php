@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -36,6 +37,16 @@ return new class extends Migration {
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        //Add a default super admin
+        DB::table('users')->insert([
+            'name' => 'main10-superadmin',
+            'email' => 'main10-superadmin@gmail.com',
+            'role' => 'super_admin',
+            'office_id' => 175,
+            'password' => bcrypt('denrregionx'),
+        ]);
+
     }
 
     /**
