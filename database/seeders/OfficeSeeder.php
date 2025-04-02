@@ -972,7 +972,7 @@ class OfficeSeeder extends Seeder
             [
                 'region_id' => '13',
                 'name' => 'PENRO Camiguin',
-                'has_hostel' => true,
+                'has_hostel' => false,
             ],
             [
                 'region_id' => '13',
