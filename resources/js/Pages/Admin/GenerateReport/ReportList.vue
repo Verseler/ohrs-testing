@@ -45,7 +45,6 @@ function changeDate() {
     form.get(route("reports", { date: form.selected_date }), {
         preserveScroll: true,
         preserveState: true,
-        only: ["reports"],
     });
 }
 
@@ -71,7 +70,6 @@ watch(() => form.selected_date, changeDate);
                 >
             </Button>
         </div>
-
         <div class="max-w-[300mm] mx-auto">
             <div id="reports" class="font-[sans-serif]">
                 <ReportHeading />
@@ -120,17 +118,16 @@ watch(() => form.selected_date, changeDate);
                                 </TableCell>
                             </TableRow>
                         </template>
-                    </TableBody>
-                    <TableFooter class="table-footer-group bg-white">
+
                         <TableRow>
                             <TableCell colspan="4" class="text-right">
                                 Total Amount:
                             </TableCell>
-                            <TableCell class="font-semibold">
+                            <TableCell class="font-bold">
                                 {{ formatCurrency(totalAmount) }}
                             </TableCell>
                         </TableRow>
-                    </TableFooter>
+                    </TableBody>
                 </Table>
             </div>
         </div>
