@@ -100,7 +100,6 @@ function showSubmitConfirmation() {
                     id="name"
                     v-model="form.name"
                     :invalid="!!form.errors.name"
-                    autofocus
                 />
 
                 <InputError v-if="form.errors.name">
