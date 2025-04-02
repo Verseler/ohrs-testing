@@ -42,13 +42,51 @@ type EditBedAssignmentProps = {
     availableBeds: Bed[];
 };
 
-const { reservation } = defineProps<EditBedAssignmentProps>();
+const { reservation, availableBeds: defaultAvailableBeds } =
+    defineProps<EditBedAssignmentProps>();
 
 const form = useForm({
     reservation_id: reservation.id,
     selected_guest_id: null,
     selected_bed_id: null,
 });
+
+const availableBeds = computed(() => {
+    //if bed room has scheduled eligible gender, use it or else use the default
+    const updatedGenderAvailableBeds = defaultAvailableBeds.map((bed) => {
+        const scheduledEligibleGender =
+            bed.room?.eligible_gender_schedules?.[0]?.eligible_gender;
+
+        if (scheduledEligibleGender) {
+            bed.room.eligible_gender = scheduledEligibleGender;
+            return bed;
+        }
+
+        return bed;
+    });
+
+    return updatedGenderAvailableBeds;
+});
+
+const filterBedsByGender = (beds: Bed[], gender: Gender) => {
+    return (
+        beds
+            .filter(
+                (bed) =>
+                    bed.room.eligible_gender === "any" ||
+                    bed.room.eligible_gender === gender
+            )
+            // Sort by eligible gender from 'Male' -> 'Female' -> 'Any'
+            .sort((a, b) => {
+                if (a.room.eligible_gender === b.room.eligible_gender) {
+                    return b.id - a.id;
+                }
+                return b.room.eligible_gender.localeCompare(
+                    a.room.eligible_gender
+                );
+            })
+    );
+};
 
 const selectedGuest = computed<GuestBeds | null>(() => {
     const guest = reservation.guest_beds.find(
@@ -169,11 +207,16 @@ function submit() {
                             <SelectGroup>
                                 <SelectLabel>Beds</SelectLabel>
                                 <SelectItem
-                                    v-for="bed in availableBeds"
+                                    v-for="bed in filterBedsByGender(
+                                        availableBeds,
+                                        selectedGuest?.guest?.gender as Gender
+                                    )"
                                     :value="bed.id"
                                     :key="bed.id"
                                 >
-                                    <div class="flex items-center justify-between">
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
                                         <div>
                                             {{ bed.room.name }}
                                             {{ bed.name }}
