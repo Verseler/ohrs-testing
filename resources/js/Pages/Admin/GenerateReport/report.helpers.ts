@@ -21,7 +21,6 @@ export function printReport() {
             <head>
                 <title>Print Report</title>
                 <style>
-                    @page { margin-top: 0}
                     body { font-family: Arial, sans-serif; margin: 0; padding: 10px; }
                     table { width: 100%; border-collapse: collapse; }
                     th, td { border: 1px solid black; padding: 8px; text-align: left; }
@@ -47,9 +46,6 @@ export function printReport() {
     }, 10)
 }
 
-
-
-
 export function downloadReport() {
     const doc = new jsPDF({
         orientation: 'portrait',
@@ -63,7 +59,6 @@ export function downloadReport() {
         return;
     }
 
-    // Generate HTML with print-specific styles
     const htmlContent = `
         <!DOCTYPE html>
         <html>
@@ -77,6 +72,7 @@ export function downloadReport() {
                     table {
                         width: 100%;
                         border-collapse: collapse;
+                        page-break-inside: auto !important;
                     }
                     th, td {
                         border: 1px solid black;
@@ -85,7 +81,19 @@ export function downloadReport() {
                         font-size: 10px; /* Adjust font size to fit content */
                     }
                     tr {
-                        page-break-inside: avoid !important;
+                        page-break-inside: auto !important;
+                        page-break-after: auto !important;
+                    }
+
+                    @media print {
+                        tr {
+                            page-break-inside: avoid !important;
+                            page-break-after: auto !important;
+                        }
+                        td, th {
+                            padding: 4px !important;
+                            font-size: 8px !important;
+                        }
                     }
                 </style>
             </head>
@@ -96,13 +104,19 @@ export function downloadReport() {
     `;
 
     doc.html(htmlContent, {
-        callback: (doc) => {
-            doc.save(`hrs-report-${formatDate(new Date)}.pdf`);
+        callback: (file) => {
+            file.save(`hrs-report-${formatDate(new Date)}.pdf`);
         },
-        margin: [5, 10, 5, 10],
+        margin: [10, 10, 10, 10],
         autoPaging: 'text',
-        width: 190, // A4 width in mm
-        windowWidth: 1024, // Simulate larger viewport for better scaling
+        width: 210,
+        windowWidth: 800,
+        html2canvas: {
+            allowTaint: true,
+            letterRendering: true,
+            logging: false,
+            scale: 0.237, // Adjust the scale to fit content
+        },
     });
 }
 
