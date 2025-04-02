@@ -187,7 +187,6 @@ const closeReceiptDialog = () => {
                     </AmountCard>
                 </div>
 
-                <!-- List of exempted payments -->
                 <div
                     v-if="
                         reservationPaymentHistory.payments.length > 0 ||
@@ -195,50 +194,6 @@ const closeReceiptDialog = () => {
                     "
                     class="space-y-3"
                 >
-                    <div
-                        v-for="exemptedPayment in exemptedPayments"
-                        :key="exemptedPayment.id"
-                        class="flex flex-col p-3 border rounded-md bg-primary-50"
-                    >
-                        <div class="flex items-start">
-                            <div>
-                                <div class="font-medium">Exempted Payment</div>
-                                <div class="text-xs text-muted-foreground">
-                                    {{
-                                        formatDateTimeString(
-                                            exemptedPayment.created_at
-                                        )
-                                    }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="flex items-center pt-2 mt-2 border-t border-dashed"
-                        >
-                            <p class="text-sm text-muted-foreground">
-                                Guest
-                                <span class="text-primary-500">{{
-                                    `${exemptedPayment.guest.first_name} ${exemptedPayment.guest.last_name}`
-                                }}</span>
-                                is exempted by
-                                <span class="text-primary-500">
-                                    {{ exemptedPayment.user.name }}
-                                </span>
-                                {{
-                                    ` [${exemptedPayment.user.office.name} - ${exemptedPayment.user.role}]`
-                                }}
-                                payment of reservation
-                                {{
-                                    exemptedPayment.reservation.reservation_code
-                                }}
-                                .
-                                <span class="text-xs font-bold">Reason:</span>
-                                {{ exemptedPayment.reason }}
-                            </p>
-                        </div>
-                    </div>
-
                     <!-- List of Payments -->
                     <div
                         v-for="payment in reservationPaymentHistory.payments"
@@ -275,6 +230,51 @@ const closeReceiptDialog = () => {
                                     View
                                 </Button>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- List of exempted payments -->
+                    <div
+                        v-for="exemptedPayment in exemptedPayments"
+                        :key="exemptedPayment.id"
+                        class="flex flex-col p-3 border rounded-md bg-primary-50"
+                    >
+                        <div class="flex items-start">
+                            <div>
+                                <div class="font-medium">Exempted Payment</div>
+                                <div class="text-xs text-muted-foreground">
+                                    {{
+                                        formatDateTimeString(
+                                            exemptedPayment.created_at
+                                        )
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center pt-2 mt-2 border-t border-dashed"
+                        >
+                            <p class="text-sm text-muted-foreground">
+                                Guest
+                                <span class="text-primary-500">{{
+                                    `${exemptedPayment.guest.first_name} ${exemptedPayment.guest.last_name}`
+                                }}</span>
+                                is exempted from payment by
+                                <span class="text-primary-500">
+                                    {{ exemptedPayment.user.name }}
+                                </span>
+                                {{
+                                    ` [${exemptedPayment.user.office.name} - ${exemptedPayment.user.role}]`
+                                }}
+                                of reservation
+                                {{
+                                    exemptedPayment.reservation.reservation_code
+                                }}
+                                .
+                                <span class="text-xs font-bold">Reason:</span>
+                                {{ exemptedPayment.reason }}
+                            </p>
                         </div>
                     </div>
                 </div>
