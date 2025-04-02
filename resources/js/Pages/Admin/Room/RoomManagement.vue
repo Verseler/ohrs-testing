@@ -244,7 +244,8 @@ function handleDeleteRoom() {
                             <TableCell>
                                 <AvailabilityBadge
                                     :available="
-                                        !!room?.available_beds &&
+                                        room.available_beds !== undefined &&
+                                        room.available_beds !== null &&
                                         room.available_beds <= 0
                                     "
                                 />
