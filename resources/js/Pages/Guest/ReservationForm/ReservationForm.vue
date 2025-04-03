@@ -20,6 +20,8 @@ import DatePicker from "@/Components/DatePicker.vue";
 import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
+import type { Gender } from "@/Pages/Guest/guest.types";
+import { ArrowDown } from "lucide-vue-next";
 
 type ReservationFormProps = {
     regions: Region[];
@@ -30,10 +32,10 @@ type ReservationFormProps = {
 const { offices, regions, hostelOffice } = defineProps<ReservationFormProps>();
 
 const DEFAULT_FIRST_GUEST = {
-    first_name: undefined,
-    last_name: undefined,
-    gender: undefined,
-    office: undefined,
+    first_name: undefined as string | undefined,
+    last_name: undefined as string | undefined,
+    gender: undefined as Gender | undefined,
+    office: undefined as string | undefined,
 };
 
 const form = useForm({
@@ -64,6 +66,19 @@ const officesInARegion = computed(() =>
 watch(selectedRegionId, () => {
     form.guest_office_id = undefined;
 });
+
+const firstGuestHasFilled = computed<Boolean>(() => {
+    return Boolean(form.guests[0].first_name || form.guests[0].last_name);
+});
+
+function addEmployeeAsFirstGuest() {
+    form.guests[0] = {
+        first_name: form.first_name,
+        last_name: form.last_name,
+        gender: undefined,
+        office: undefined,
+    };
+}
 
 //confirmation dialog
 const confirmation = ref(false);
@@ -301,27 +316,36 @@ function submit() {
                         </div>
 
                         <div class="md:col-span-7">
-                            <TableSectionHeading>
-                                <div
-                                    class="flex items-center justify-between gap-x-1"
+                            <div
+                                class="flex items-center justify-between h-8 px-2 gap-x-10"
+                            >
+                                <p class="text-lg font-medium text-neutral-800">
+                                    Guests Details
+                                </p>
+                                <Button
+                                    v-if="
+                                        form.first_name &&
+                                        form.last_name &&
+                                        firstGuestHasFilled === false
+                                    "
+                                    type="button"
+                                    @click="addEmployeeAsFirstGuest"
+                                    class="bg-blue-500 hover:bg-blue-600"
                                 >
-                                    <p>Guests Details</p>
-                                    <p
-                                        class="text-xs text-center pt-1.5 text-white rounded h-7 min-w-7 p-2 bg-primary-500"
-                                    >
-                                        {{ form.guests.length }}
-                                    </p>
-                                </div>
-                            </TableSectionHeading>
+                                    <ArrowDown />Add employee as first guest
+                                </Button>
+                            </div>
 
                             <GuestsDetailsInput :form="form" />
 
-                            <Button
-                                type="submit"
-                                class="w-full h-12 mt-6 text-base"
-                            >
-                                Submit Reservation
-                            </Button>
+                            <div class="px-2">
+                                <Button
+                                    type="submit"
+                                    class="w-full h-12 mt-6 text-base"
+                                >
+                                    Submit Reservation
+                                </Button>
+                            </div>
                         </div>
                     </TableBody>
                 </Table>
