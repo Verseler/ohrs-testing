@@ -64,7 +64,7 @@ const additionalCharge = computed(() => {
     return reservation.daily_rate * additionalDays.value;
 });
 
-const bookBy = computed(() => {
+const bookedBy = computed(() => {
     const firstName = reservation.first_name || "N/A";
     const middleInitial = reservation.middle_initial
         ? reservation.middle_initial + "."
@@ -149,9 +149,9 @@ function submitExtendReservation() {
 
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <p class="text-muted-foreground">Book By</p>
+                                <p class="text-muted-foreground">Booked By</p>
                                 <p class="font-medium">
-                                    {{ bookBy }}
+                                    {{ bookedBy }}
                                 </p>
                             </div>
                             <div>

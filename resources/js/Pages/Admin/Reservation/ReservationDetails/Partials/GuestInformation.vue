@@ -15,7 +15,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
         <CardContent class="grid gap-4">
             <div class="grid grid-cols-2">
                 <div>
-                    <Label class="text-neutral-700">Book By</Label>
+                    <Label class="text-neutral-700">Booked By</Label>
                     <p class="font-medium">
                         {{ reservation.first_name }}
                         {{

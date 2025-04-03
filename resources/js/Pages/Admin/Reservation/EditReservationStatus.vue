@@ -57,7 +57,7 @@ const nextStatus = computed(() => {
     return status[currentIndex + 1];
 });
 
-const bookBy = computed(
+const bookedBy = computed(
     () => `${reservation.first_name} ${reservation.last_name}`
 );
 
@@ -131,7 +131,7 @@ function cancelStatus() {
 
                 <CardContent class="text-center">
                     <p class="text-lg font-medium">
-                        {{ bookBy }}
+                        {{ bookedBy }}
                     </p>
                     <p class="text-gray-600">
                         {{ formatDateString(reservation.check_in_date) }} -

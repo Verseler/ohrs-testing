@@ -31,11 +31,11 @@ class NewReservationNotification extends Notification
 
     public function toArray(object $notifiable): array
     {
-        $bookBy = $this->reservation->first_name . ' ' . $this->reservation->last_name;
+        $bookedBy = $this->reservation->first_name . ' ' . $this->reservation->last_name;
         $reservationCode = $this->reservation->reservation_code;
 
         return [
-            'message' => "A new reservation [$reservationCode] has been submitted by $bookBy.",
+            'message' => "A new reservation [$reservationCode] has been submitted by $bookedBy.",
         ];
     }
 }

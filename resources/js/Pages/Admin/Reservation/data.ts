@@ -15,7 +15,7 @@ export const data = {
     ],
     sortBy: [
         { value: "reservation_code", label: "Reservation code" },
-        { value: "first_name", label: "Book by" },
+        { value: "first_name", label: "Booked by" },
         { value: "check_in_date", label: "Checked in" },
         { value: "check_out_date", label: "Checked out" },
         { value: "total_billings", label: "Total billings" },
@@ -23,7 +23,7 @@ export const data = {
     ],
     tableHeads: [
         "Reservation Code",
-        "Book by",
+        "Booked by",
         "Check in",
         "Check out",
         "Total Billings",
