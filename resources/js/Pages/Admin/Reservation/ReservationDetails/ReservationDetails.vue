@@ -101,6 +101,44 @@ onMounted(() => {
                     </div>
 
                     <div class="flex flex-wrap justify-end gap-2 mt-4">
+                        <!-- Change reservation status -->
+                        <LinkButton
+                            v-if="
+                                reservation.status == 'confirmed' ||
+                                reservation.status == 'checked_in'
+                            "
+                            class="flex-1 bg-pink-500 hover:bg-pink-600"
+                            :href="
+                                route(
+                                    'reservation.editStatusForm',
+                                    reservation.id
+                                )
+                            "
+                        >
+                            <Pencil class="mr-1" />
+                            Change Status
+                        </LinkButton>
+
+                        <!-- Payment Exemption -->
+                        <LinkButton
+                            v-if="
+                                canExempt &&
+                                reservation.status != 'canceled' &&
+                                reservation.status != 'checked_out' &&
+                                reservation.extended_reservations?.length <= 0
+                            "
+                            class="flex-1 max-w-sm bg-violet-500 hover:bg-violet-600"
+                            :href="
+                                route(
+                                    'reservation.exemptPaymentForm',
+                                    reservation.id
+                                )
+                            "
+                        >
+                            <CreditCard class="mr-1" />
+                            Payment Exemption
+                        </LinkButton>
+
                         <!-- Input or record a payment -->
                         <LinkButton
                             v-if="reservation.remaining_balance > 0"
@@ -125,26 +163,6 @@ onMounted(() => {
                         >
                             <History class="mr-1" />
                             Payment History
-                        </LinkButton>
-
-                        <!-- Payment Exemption -->
-                        <LinkButton
-                            v-if="
-                                canExempt &&
-                                reservation.status != 'canceled' &&
-                                reservation.status != 'checked_out' &&
-                                reservation.extended_reservations?.length <= 0
-                            "
-                            class="flex-1 max-w-sm bg-violet-500 hover:bg-violet-600"
-                            :href="
-                                route(
-                                    'reservation.exemptPaymentForm',
-                                    reservation.id
-                                )
-                            "
-                        >
-                            <CreditCard class="mr-1" />
-                            Payment Exemption
                         </LinkButton>
 
                         <!-- Extend a reservation -->
@@ -178,24 +196,6 @@ onMounted(() => {
                         >
                             <Pencil class="mr-1" />
                             Bed Assignment
-                        </LinkButton>
-
-                        <!-- Change reservation status -->
-                        <LinkButton
-                            v-if="
-                                reservation.status == 'confirmed' ||
-                                reservation.status == 'checked_in'
-                            "
-                            class="flex-1 bg-pink-500 hover:bg-pink-600"
-                            :href="
-                                route(
-                                    'reservation.editStatusForm',
-                                    reservation.id
-                                )
-                            "
-                        >
-                            <Pencil class="mr-1" />
-                            Change Status
                         </LinkButton>
                     </div>
 
