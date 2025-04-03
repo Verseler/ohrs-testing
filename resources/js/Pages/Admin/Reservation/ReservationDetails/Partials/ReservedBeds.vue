@@ -10,7 +10,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 <template>
     <Card>
         <CardHeader>
-            <CardTitle>Reserved Beds</CardTitle>
+            <CardTitle>Reserved Bed/s</CardTitle>
         </CardHeader>
         <CardContent>
             <div class="space-y-2">
@@ -45,7 +45,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                     v-else
                     class="py-2 text-sm italic text-neutral-500 text-muted-foreground"
                 >
-                    No reserved beds
+                    No reserved bed/s
                 </p>
             </div>
         </CardContent>

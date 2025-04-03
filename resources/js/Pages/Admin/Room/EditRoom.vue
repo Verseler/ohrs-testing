@@ -130,9 +130,9 @@ function showSubmitConfirmation() {
 
             <!-- Bed Field -->
             <div class="space-y-4">
-                <!-- Increment and decrement number of bed(s) -->
+                <!-- Increment and decrement number of beds -->
                 <div class="space-y-2">
-                    <Label>Number of Bed(s)</Label>
+                    <Label>Number of Beds</Label>
                     <ValueAdjuster
                         :value="bedsLength"
                         :on-decrease="removeLastBed"
