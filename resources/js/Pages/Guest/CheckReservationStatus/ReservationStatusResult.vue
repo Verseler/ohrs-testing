@@ -5,23 +5,19 @@ import type {
     Reservation,
     ReservationStatus,
 } from "@/Pages/Admin/Reservation/reservation.types";
-import type { PageProps } from "@/types";
 import { usePoll } from "@inertiajs/vue3";
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import { CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { computed } from "vue";
 
 type ReservationStatusResult = {
     reservation: Reservation;
-    canLogin: boolean;
 };
 
-const { reservation, canLogin } = defineProps<ReservationStatusResult>();
+const { reservation } = defineProps<ReservationStatusResult>();
 
 usePoll(15000);
-
-const page = usePage<PageProps>();
 
 const statusConfig = computed(() => {
     if (!reservation) return null;
@@ -85,7 +81,7 @@ const statusConfig = computed(() => {
     <Head title="Reservation Result" />
 
     <d class="w-full min-h-screen">
-        <Header :can-login="canLogin" :user="page.props.auth.user" />
+        <Header />
 
         <!-- Reservation Status Result -->
         <Card

@@ -25,7 +25,6 @@ class ReservationProcessController extends Controller
             ->findOrFail($request->hostel_office_id);
 
         return Inertia::render('Guest/ReservationForm/ReservationForm', [
-            'canLogin' => Route::has('login'),
             'regions' => $regions,
             'offices' => $offices,
             'hostelOffice' => $hostelOffice
@@ -51,7 +50,7 @@ class ReservationProcessController extends Controller
                 'guests.*.first_name' => ['required', 'string', 'max:20'],
                 'guests.*.last_name' => ['required', 'string', 'max:20'],
                 'guests.*.gender' => ['required', Rule::in(['male', 'female'])],
-                'guests.*.phone' => ['nullable', 'regex:/(9)[0-9]{9}/'],
+                'guests.*.office' => ['required', 'string'],
             ],
             [
                 'guests.*.first_name.required' => 'Required.',
@@ -61,7 +60,7 @@ class ReservationProcessController extends Controller
                 'guests.*last_name.string' => 'Last name must be a string.',
                 'guests.*.last_name.max' => 'Must be at most 20 characters.',
                 'guests.*.gender.required' => 'Required.',
-                'guests.*.phone.regex' => 'The format should be (09XXXXXXXX)'
+                'guests.*.office.required' => 'Required'
             ]
         );
 
@@ -98,9 +97,8 @@ class ReservationProcessController extends Controller
                     $guest = Guest::create([
                         'first_name' => $guest['first_name'],
                         'last_name' => $guest['last_name'],
-                        'phone' => $guest['phone'],
                         'gender' => $guest['gender'],
-                        'office_id' => $guestOffice->id,
+                        'office' => $guest['office'],
                         'reservation_id' => $reservation->id,
                         'is_exempted' => false
                     ]);
@@ -174,7 +172,6 @@ class ReservationProcessController extends Controller
         ];
 
         return Inertia::render('Guest/ReservationConfirmation', [
-            'canLogin' => Route::has('login'),
             'reservation' => $reservationConfirmationInfo
         ]);
     }

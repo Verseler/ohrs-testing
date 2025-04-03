@@ -9,8 +9,7 @@ import {
 } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { Separator } from "@/Components/ui/separator";
-import { Head, Link, usePage } from "@inertiajs/vue3";
-import type { PageProps } from "@/types";
+import { Head, Link } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import { Button } from "@/Components/ui/button";
 import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
@@ -23,7 +22,6 @@ import Code from "@/Pages/Guest/Partials/Code.vue";
 import PendingStatus from "@/Pages/Guest/Partials/PendingStatus.vue";
 
 type ReservationConfirmationProps = {
-    canLogin: boolean;
     reservation: Pick<
         Reservation,
         "check_in_date" | "check_out_date" | "status" | "reservation_code"
@@ -33,9 +31,7 @@ type ReservationConfirmationProps = {
     };
 };
 
-const { canLogin, reservation } = defineProps<ReservationConfirmationProps>();
-
-const page = usePage<PageProps>();
+const { reservation } = defineProps<ReservationConfirmationProps>();
 
 function downloadConfirmation() {
     htmlToImage
@@ -69,7 +65,7 @@ onMounted(() => {
     <Head title="Reservation Confirmation" />
 
     <div class="w-full min-h-screen">
-        <Header :can-login="canLogin" :user="page.props.auth.user" />
+        <Header />
 
         <div class="container max-w-xl px-4 py-8 mx-auto">
             <!-- Check Icon -->

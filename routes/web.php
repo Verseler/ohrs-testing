@@ -15,7 +15,6 @@ use App\Http\Controllers\ReservationStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
 use App\Models\Office;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,7 +24,6 @@ Route::get('/', function () {
     $hostels = Office::with('region')->where('has_hostel', true)->get();
 
     return Inertia::render('LandingPage', [
-        'canLogin' => Route::has('login'),
         'hostels' => $hostels
     ]);
 });

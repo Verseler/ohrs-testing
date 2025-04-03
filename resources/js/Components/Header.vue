@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import { Button } from "@/Components/ui/button";
-import { Link } from "@inertiajs/vue3";
-import { User } from "@/types";
+import { Link, usePage } from "@inertiajs/vue3";
+import type { PageProps } from "@/types";
 import Inplace from "@/Components/Inplace.vue";
 import { AlignJustify, X, ScanSearch, HouseIcon } from "lucide-vue-next";
 import LinkButton from "@/Components/LinkButton.vue";
 
-type HeaderProps = {
-    canLogin: boolean;
-    user: User | null;
-};
-
-const { canLogin, user } = defineProps<HeaderProps>();
+const page = usePage<PageProps>();
 </script>
 
 <template>
@@ -40,7 +35,6 @@ const { canLogin, user } = defineProps<HeaderProps>();
                 <LinkButton href="/">
                     <HouseIcon />
                 </LinkButton>
-
                 <Inplace>
                     <template #trigger>
                         <Button
@@ -51,15 +45,17 @@ const { canLogin, user } = defineProps<HeaderProps>();
                         </Button>
                     </template>
                     <template #content>
-                        <template v-if="canLogin">
-                            <Link v-if="user" :href="route('dashboard')">
-                                <Button class="px-6">Dashboard</Button>
-                            </Link>
-                        </template>
+                        <LinkButton
+                            v-if="!!page.props.auth.user"
+                            :href="route('dashboard')"
+                            class="px-6"
+                        >
+                            Dashboard
+                        </LinkButton>
 
-                        <Link v-else :href="route('login')">
-                            <Button class="px-6">Log in</Button>
-                        </Link>
+                        <LinkButton v-else :href="route('login')" class="px-6">
+                            Log in
+                        </LinkButton>
                     </template>
                     <template #close-trigger>
                         <Button

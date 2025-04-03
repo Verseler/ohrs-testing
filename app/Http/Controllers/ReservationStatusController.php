@@ -78,9 +78,7 @@ class ReservationStatusController extends Controller
     //Check Reservation Status for Guests
     public function checkStatusForm()
     {
-        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus', [
-            'canLogin' => Route::has('login'),
-        ]);
+        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus');
     }
 
     public function checkStatus(string $code)
@@ -92,8 +90,7 @@ class ReservationStatusController extends Controller
         }
 
         return Inertia::render('Guest/CheckReservationStatus/ReservationStatusResult', [
-            'reservation' => $reservation,
-            'canLogin' => Route::has('login'),
+            'reservation' => $reservation
         ]);
     }
 }
