@@ -25,9 +25,10 @@ import { SidebarTrigger } from "@/Components/ui/sidebar";
 type Report = {
     date: string;
     orNumber: string;
-    particulars: string;
-    amount: number;
+    bookedBy: string;
     numberOfGuests: number;
+    numberOfDays: number;
+    amount: number;
 };
 
 type GenerateReportProps = {
@@ -79,8 +80,9 @@ watch(() => form.selected_date, changeDate);
                         <TableRow>
                             <TableHead> Date </TableHead>
                             <TableHead> OR Number </TableHead>
-                            <TableHead> Guest Representative </TableHead>
+                            <TableHead> Booked By </TableHead>
                             <TableHead> Number of Guests </TableHead>
+                            <TableHead> Number of Days </TableHead>
                             <TableHead> Amount </TableHead>
                         </TableRow>
                     </TableHeader>
@@ -98,7 +100,10 @@ watch(() => form.selected_date, changeDate);
                                     {{ report.orNumber }}
                                 </TableCell>
                                 <TableCell style="height: 3rem">
-                                    {{ report.particulars }}
+                                    {{ report.bookedBy }}
+                                </TableCell>
+                                <TableCell style="height: 3rem">
+                                    {{ report.numberOfDays }}
                                 </TableCell>
                                 <TableCell style="height: 3rem">
                                     {{ report.numberOfGuests }}
@@ -111,7 +116,7 @@ watch(() => form.selected_date, changeDate);
                         <template v-else>
                             <TableRow>
                                 <TableCell
-                                    colspan="5"
+                                    colspan="6"
                                     class="py-10 italic text-center text-neutral-500"
                                 >
                                     No records found.
@@ -120,7 +125,7 @@ watch(() => form.selected_date, changeDate);
                         </template>
 
                         <TableRow>
-                            <TableCell colspan="4" class="text-right">
+                            <TableCell colspan="5" class="text-right">
                                 Total Amount:
                             </TableCell>
                             <TableCell class="font-bold">
