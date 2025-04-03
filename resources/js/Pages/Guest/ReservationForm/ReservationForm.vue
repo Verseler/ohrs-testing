@@ -131,7 +131,7 @@ function submit() {
                             </TableRow>
 
                             <TableSectionHeading>
-                                Contact Person Info
+                                Employee Making the Reservation
                             </TableSectionHeading>
                             <TableRow
                                 class="grid grid-cols-1 border-none md:grid-cols-5"
@@ -180,7 +180,10 @@ function submit() {
                                 <TableCell class="space-y-2">
                                     <InputLabel>Phone #</InputLabel>
                                     <div class="relative">
-                                        <span class="absolute top-[15.3px] text-neutral-700 left-2">(+63)</span>
+                                        <span
+                                            class="absolute top-[15.3px] text-neutral-700 left-2"
+                                            >(+63)</span
+                                        >
                                         <Input
                                             type="number"
                                             v-model.number="form.phone"
@@ -302,13 +305,6 @@ function submit() {
                                     />
                                 </TableCell>
                             </TableRow>
-
-                            <Button
-                                type="submit"
-                                class="w-full h-12 mt-4 text-base"
-                            >
-                                Submit
-                            </Button>
                         </div>
 
                         <div>
@@ -326,6 +322,13 @@ function submit() {
                             </TableSectionHeading>
 
                             <GuestsDetailsInput :form="form" />
+
+                            <Button
+                                type="submit"
+                                class="w-full h-12 mt-6 text-base"
+                            >
+                                Submit
+                            </Button>
                         </div>
                     </TableBody>
                 </Table>
