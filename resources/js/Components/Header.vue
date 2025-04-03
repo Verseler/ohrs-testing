@@ -22,9 +22,7 @@ const { canLogin, user } = defineProps<HeaderProps>();
             <div class="flex items-center gap-x-2">
                 <ApplicationLogo />
                 <p class="hidden text-xl font-bold md:block text-primary-500">
-                    <span class="text-yellow-300">H</span>ostel
-                    <span class="text-yellow-300">R</span>eservation
-                    <span class="text-yellow-300">S</span>ystem
+                    Online Hostel   Reservation System
                 </p>
             </div>
         </Link>

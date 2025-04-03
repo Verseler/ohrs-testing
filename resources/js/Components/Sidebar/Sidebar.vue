@@ -124,9 +124,7 @@ function handleLogout() {
             <Link href="/">
                 <ApplicationLogo class="mx-auto size-28" />
                 <p class="text-[1.1rem] font-bold text-center">
-                    <span class="text-yellow-200">H</span>ostel
-                    <span class="text-yellow-200">R</span>eservation
-                    <span class="text-yellow-200">S</span>ystem
+                    Online Hostel <span class="block">Reservation System</span>
                 </p>
             </Link>
         </SidebarHeader>

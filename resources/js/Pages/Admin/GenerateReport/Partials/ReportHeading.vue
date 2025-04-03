@@ -62,7 +62,7 @@ import { formatDateTimeString, getMonthYear } from "@/lib/utils";
         <!-- LowerSide side -->
         <div :style="{ display: 'flex', flexDirection: 'column', gap: '5px' }">
             <h1 :style="{ fontSize: '20px', margin: 0 }">
-                HOSTEL RESERVATION SYSTEM
+               ONLINE HOSTEL RESERVATION SYSTEM
             </h1>
             <div>Monthly Report for {{ getMonthYear(new Date()) }}</div>
             <div>Generated on: {{ formatDateTimeString(new Date()) }}</div>
