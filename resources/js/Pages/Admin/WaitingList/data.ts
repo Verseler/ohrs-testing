@@ -17,7 +17,7 @@ export const data = {
         "Book by",
         "Check in",
         "Check out",
-        "Total Guests",
+        "Number of Guests",
         "Guest Office",
         ""
     ],

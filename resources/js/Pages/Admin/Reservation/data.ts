@@ -28,7 +28,7 @@ export const data = {
         "Check out",
         "Total Billings",
         "Remaining Balance",
-        "Total Guests",
+        "Number of Guests",
         "Guest Office",
         "Status",
         ""

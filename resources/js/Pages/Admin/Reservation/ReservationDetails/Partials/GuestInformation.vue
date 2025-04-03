@@ -27,7 +27,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                     </p>
                 </div>
                 <div>
-                    <Label class="text-neutral-700">Total Guests</Label>
+                    <Label class="text-neutral-700">Total Number of Guests</Label>
                     <p class="font-medium">
                         {{ reservation?.guests?.length }}
                     </p>
