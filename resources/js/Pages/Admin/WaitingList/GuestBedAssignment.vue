@@ -96,20 +96,11 @@ onMounted(() => showSuccess());
             <div class="max-w-md mx-auto">
                 <ReservationOverview :reservation="reservation" />
 
-                <Message
-                    severity="info"
-                    class="flex items-center mt-6 mb-2 text-sm gap-x-2"
-                >
-                    <Info class="size-6" />
-                    If ever there is no available beds or beds are not enough
-                    for all guests, you can cancel the reservation if needed.
-                </Message>
-
                 <Button
                     @click="showCancelConfirmation"
                     type="button"
                     variant="outline"
-                    class="w-full text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
+                    class="w-full mt-4 text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
                 >
                     <XCircle />
                     Cancel Reservation

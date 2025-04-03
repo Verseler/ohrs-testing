@@ -37,16 +37,23 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
             </div>
 
             <div>
-                <Label class="text-neutral-700"> Code </Label>
+                <Label class="text-neutral-700"> Book By </Label>
                 <p class="font-medium">
-                    {{ reservation.reservation_code }}
+                    {{ `${reservation.first_name} ${reservation.last_name}` }}
                 </p>
             </div>
 
             <div>
-                <Label class="text-neutral-700"> Book By </Label>
+                <Label class="text-neutral-700"> Phone </Label>
                 <p class="font-medium">
-                    {{ `${reservation.first_name} ${reservation.last_name}` }}
+                    {{ reservation.phone }}
+                </p>
+            </div>
+
+            <div class="col-span-2">
+                <Label class="text-neutral-700"> Code </Label>
+                <p class="font-medium">
+                    {{ reservation.reservation_code }}
                 </p>
             </div>
 
