@@ -117,21 +117,30 @@ function updateDashboardData() {
                 <YearPicker v-model="form.monthly_revenue_year" />
             </div>
 
-            <BarChart
-                class="w-full"
-                :data="monthlyRevenues"
-                index="name"
-                :categories="['revenue']"
-                :y-formatter="
-                    (tick, i) => {
-                        return typeof tick === 'number'
-                            ? `₱ ${new Intl.NumberFormat('us')
-                                  .format(tick)
-                                  .toString()}`
-                            : '';
-                    }
-                "
-            />
+            <div class="relative">
+                <div
+                    style="writing-mode: vertical-rl; transform: rotate(180deg)"
+                    class="absolute inset-y-0 flex justify-center my-auto -left-3"
+                >
+                    <p class='font-medium text-neutral-600'>Peso</p>
+                </div>
+
+                <BarChart
+                    class="w-full pl-5"
+                    :data="monthlyRevenues"
+                    index="name"
+                    :categories="['revenue']"
+                    :y-formatter="
+                        (tick, i) => {
+                            return typeof tick === 'number'
+                                ? `${new Intl.NumberFormat('us')
+                                      .format(tick)
+                                      .toString()}`
+                                : '';
+                        }
+                    "
+                />
+            </div>
         </section>
     </AuthenticatedLayout>
 </template>
