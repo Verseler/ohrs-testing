@@ -43,6 +43,7 @@ class ReservationProcessController extends Controller
                 'phone' => ['required', 'size:10', 'regex:/(9)[0-9]{9}/'],
                 'guest_office_id' => ['required', 'numeric'],
                 'hostel_office_id' => ['required', 'numeric'],
+                'id_type' => ['required', 'string'],
                 'employee_id' => ['required', 'string'],
                 'purpose_of_stay' => ['required', 'string'],
                 'guests' => ['required', 'array', 'min:1'],
@@ -87,6 +88,7 @@ class ReservationProcessController extends Controller
                     'email' => $validated['email'] ?? null,
                     'guest_office_id' => $guestOffice->id,
                     'hostel_office_id' => $hostelOffice->id,
+                    'id_type' => $validated['id_type'],
                     'employee_id' => $validated['employee_id'],
                     'purpose_of_stay' => $validated['purpose_of_stay'] ?? null,
                 ]);

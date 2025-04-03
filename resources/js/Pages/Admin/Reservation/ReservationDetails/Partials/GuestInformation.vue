@@ -27,7 +27,9 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                     </p>
                 </div>
                 <div>
-                    <Label class="text-neutral-700">Total Number of Guests</Label>
+                    <Label class="text-neutral-700"
+                        >Total Number of Guests</Label
+                    >
                     <p class="font-medium">
                         {{ reservation?.guests?.length }}
                     </p>
@@ -49,6 +51,17 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                 </div>
             </div>
 
+            <div class='grid grid-cols-2'>
+                <div>
+                    <Label class="text-neutral-700"> ID Type </Label>
+                    <p class="font-medium">
+                        {{ reservation.id_type }}
+                    </p>
+                </div>
+
+                <EmployeeID :value="reservation.employee_id" />
+            </div>
+
             <div>
                 <Label class="text-neutral-700"> Guest Office </Label>
                 <p class="font-medium">
@@ -59,8 +72,6 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                     }}
                 </p>
             </div>
-
-            <EmployeeID :value="reservation.employee_id" />
         </CardContent>
     </Card>
 </template>

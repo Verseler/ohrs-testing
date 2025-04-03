@@ -21,6 +21,7 @@ export type Reservation = {
     last_name: string;
     phone: string;
     email: string | null;
+    id_type: string;
     employee_id: string;
     purpose_of_stay: string | null;
     guests: Guest[];

@@ -26,6 +26,7 @@ class Reservation extends Model
         'email',
         'guest_office_id',
         'hostel_office_id',
+        'id_type',
         'employee_id',
         'purpose_of_stay',
     ];

@@ -22,6 +22,7 @@ import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import type { Gender } from "@/Pages/Guest/guest.types";
 import { ArrowDown } from "lucide-vue-next";
+import { validIds } from "@/Pages/Guest/ReservationForm/data";
 
 type ReservationFormProps = {
     regions: Region[];
@@ -52,6 +53,7 @@ const form = useForm({
     email: "",
     phone: undefined,
     guest_office_id: undefined,
+    id_type: undefined,
     employee_id: "",
     purpose_of_stay: "",
 });
@@ -273,7 +275,7 @@ function submit() {
                                             <SelectGroup>
                                                 <SelectItem
                                                     v-for="office in officesInARegion"
-                                                    :Key="office.id"
+                                                    :key="office.id"
                                                     :value="office.id"
                                                 >
                                                     {{ office.name }}
@@ -288,9 +290,37 @@ function submit() {
                                     </InputError>
                                 </TableCell>
                             </TableRow>
-                            <TableRow class="grid border-none">
+                            <TableRow class="grid grid-cols-2 border-none">
                                 <TableCell class="space-y-2">
-                                    <InputLabel>Employee ID</InputLabel>
+                                    <InputLabel>ID Type</InputLabel>
+                                    <Select v-model="form.id_type">
+                                        <SelectTrigger
+                                            class="h-12 rounded-sm shadow-none border-primary-700"
+                                            :invalid="!!form.errors.id_type"
+                                        >
+                                            <SelectValue
+                                                placeholder="Select ID type"
+                                            />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectItem
+                                                    v-for="id in validIds"
+                                                    :key="id.id"
+                                                    :value="id.name"
+                                                >
+                                                    {{ id.name }}
+                                                </SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    <InputError v-if="form.errors.id_type">
+                                        {{ form.errors.id_type }}
+                                    </InputError>
+                                </TableCell>
+
+                                <TableCell class="space-y-2">
+                                    <InputLabel>ID Number</InputLabel>
                                     <Input
                                         v-model="form.employee_id"
                                         class="h-12 rounded-sm shadow-none border-primary-700"

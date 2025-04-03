@@ -27,6 +27,7 @@ return new class extends Migration {
             $table->string('email');
             $table->foreignId('guest_office_id')->constrained('offices')->cascadeOnDelete();
             $table->foreignId('hostel_office_id')->constrained('offices')->cascadeOnDelete();
+            $table->string('id_type');
             $table->string('employee_id');
             $table->text('purpose_of_stay');
             $table->timestamps();

@@ -57,7 +57,14 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                 </p>
             </div>
 
-            <EmployeeID class="col-span-2" :value="reservation.employee_id" />
+            <div>
+                <Label class="text-neutral-700"> ID Type </Label>
+                <p class="font-medium">
+                    {{ reservation.id_type }}
+                </p>
+            </div>
+
+            <EmployeeID class='col-span-2' :value="reservation.employee_id" />
 
             <div class="col-span-2">
                 <Label class="text-neutral-700"> Guests Office </Label>
