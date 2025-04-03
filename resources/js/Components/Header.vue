@@ -3,8 +3,9 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import { Button } from "@/Components/ui/button";
 import { Link } from "@inertiajs/vue3";
 import { User } from "@/types";
-import Inplace from "./Inplace.vue";
-import { AlignJustify, X, ScanSearch } from "lucide-vue-next";
+import Inplace from "@/Components/Inplace.vue";
+import { AlignJustify, X, ScanSearch, HouseIcon } from "lucide-vue-next";
+import LinkButton from "@/Components/LinkButton.vue";
 
 type HeaderProps = {
     canLogin: boolean;
@@ -22,7 +23,7 @@ const { canLogin, user } = defineProps<HeaderProps>();
             <div class="flex items-center gap-x-2">
                 <ApplicationLogo />
                 <p class="hidden text-xl font-bold md:block text-primary-500">
-                    Online Hostel   Reservation System
+                    Online Hostel Reservation System
                 </p>
             </div>
         </Link>
@@ -36,37 +37,39 @@ const { canLogin, user } = defineProps<HeaderProps>();
                     </Button>
                 </Link>
 
-                <template v-if="canLogin">
-                    <Link v-if="user" :href="route('dashboard')">
-                        <Button class="px-6">Dashboard</Button>
-                    </Link>
+                <LinkButton href="/">
+                    <HouseIcon />
+                </LinkButton>
 
-                    <template v-else>
-                        <Inplace>
-                            <template #trigger>
-                                <Button
-                                    variant="outline"
-                                    class="text-green-500 border-green-500 hover:bg-green-50 hover:text-green-600"
-                                >
-                                    <AlignJustify />
-                                </Button>
-                            </template>
-                            <template #content>
-                                <Link :href="route('login')">
-                                    <Button class="px-6">Log in</Button>
-                                </Link>
-                            </template>
-                            <template #close-trigger>
-                                <Button
-                                    variant="outline"
-                                    class="text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600"
-                                >
-                                    <X />
-                                </Button>
-                            </template>
-                        </Inplace>
+                <Inplace>
+                    <template #trigger>
+                        <Button
+                            variant="outline"
+                            class="text-green-500 border-green-500 hover:bg-green-50 hover:text-green-600"
+                        >
+                            <AlignJustify />
+                        </Button>
                     </template>
-                </template>
+                    <template #content>
+                        <template v-if="canLogin">
+                            <Link v-if="user" :href="route('dashboard')">
+                                <Button class="px-6">Dashboard</Button>
+                            </Link>
+                        </template>
+
+                        <Link v-else :href="route('login')">
+                            <Button class="px-6">Log in</Button>
+                        </Link>
+                    </template>
+                    <template #close-trigger>
+                        <Button
+                            variant="outline"
+                            class="text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600"
+                        >
+                            <X />
+                        </Button>
+                    </template>
+                </Inplace>
             </nav>
         </div>
     </header>
