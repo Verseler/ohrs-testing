@@ -17,7 +17,7 @@ class OfficeSeeder extends Seeder
             // NCR (National Capital Region)
             [
                 'region_id' => '1',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -44,7 +44,7 @@ class OfficeSeeder extends Seeder
             // CAR (Cordillera Administrative Region)
             [
                 'region_id' => '2',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -141,7 +141,7 @@ class OfficeSeeder extends Seeder
             // Region 1
             [
                 'region_id' => '3',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -203,7 +203,7 @@ class OfficeSeeder extends Seeder
             // Region 2
             [
                 'region_id' => '4',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -300,7 +300,7 @@ class OfficeSeeder extends Seeder
             // Region 3
             [
                 'region_id' => '5',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -402,7 +402,7 @@ class OfficeSeeder extends Seeder
             // 9
             [
                 'region_id' => '6',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -469,7 +469,7 @@ class OfficeSeeder extends Seeder
             // 10
             [
                 'region_id' => '7',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -541,7 +541,7 @@ class OfficeSeeder extends Seeder
             // Region 5
             [
                 'region_id' => '8',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -608,7 +608,7 @@ class OfficeSeeder extends Seeder
             // Region 6
             [
                 'region_id' => '9',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -695,7 +695,7 @@ class OfficeSeeder extends Seeder
             // Region 7
             [
                 'region_id' => '10',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -752,7 +752,7 @@ class OfficeSeeder extends Seeder
             // Region 8
             [
                 'region_id' => '11',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -844,7 +844,7 @@ class OfficeSeeder extends Seeder
             // Region 9
             [
                 'region_id' => '12',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -911,7 +911,7 @@ class OfficeSeeder extends Seeder
             // Region 10
             [
                 'region_id' => '13',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => true,
             ],
             [
@@ -993,7 +993,7 @@ class OfficeSeeder extends Seeder
             // Region 11
             [
                 'region_id' => '14',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -1080,7 +1080,7 @@ class OfficeSeeder extends Seeder
             // Region 12
             [
                 'region_id' => '15',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
@@ -1147,7 +1147,7 @@ class OfficeSeeder extends Seeder
             // Region 13 (Caraga)
             [
                 'region_id' => '16',
-                'name' => 'Regional Executive Office',
+                'name' => 'Regional Office',
                 'has_hostel' => false,
             ],
             [
