@@ -93,8 +93,8 @@ function submit() {
                         </TableCell>
                     </TableRow>
 
-                    <TableBody class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div>
+                    <TableBody class="grid grid-cols-1 gap-4 md:grid-cols-12">
+                        <div class="md:col-span-5">
                             <TableRow class="grid border-none md:grid-cols-2">
                                 <TableCell class="space-y-2">
                                     <InputLabel>Check In</InputLabel>
@@ -300,7 +300,7 @@ function submit() {
                             </TableRow>
                         </div>
 
-                        <div>
+                        <div class="md:col-span-7">
                             <TableSectionHeading>
                                 <div
                                     class="flex items-center justify-between gap-x-1"
