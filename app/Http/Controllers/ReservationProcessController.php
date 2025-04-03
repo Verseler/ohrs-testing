@@ -11,7 +11,6 @@ use App\Notifications\NewReservationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -45,7 +44,7 @@ class ReservationProcessController extends Controller
                 'guest_office_id' => ['required', 'numeric'],
                 'hostel_office_id' => ['required', 'numeric'],
                 'employee_id' => ['required', 'string'],
-                'purpose_of_stay' => ['nullable', 'string'],
+                'purpose_of_stay' => ['required', 'string'],
                 'guests' => ['required', 'array', 'min:1'],
                 'guests.*.first_name' => ['required', 'string', 'max:20'],
                 'guests.*.last_name' => ['required', 'string', 'max:20'],

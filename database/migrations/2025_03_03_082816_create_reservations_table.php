@@ -28,7 +28,7 @@ return new class extends Migration {
             $table->foreignId('guest_office_id')->constrained('offices')->cascadeOnDelete();
             $table->foreignId('hostel_office_id')->constrained('offices')->cascadeOnDelete();
             $table->string('employee_id');
-            $table->text('purpose_of_stay')->nullable();
+            $table->text('purpose_of_stay');
             $table->timestamps();
         });
     }
