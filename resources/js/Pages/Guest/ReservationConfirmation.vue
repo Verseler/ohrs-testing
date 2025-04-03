@@ -41,7 +41,7 @@ function downloadConfirmation() {
     htmlToImage
         .toJpeg(document.getElementById("confirmation") as HTMLElement, {
             quality: 1,
-            skipFonts: true
+            skipFonts: true,
         })
         .then(function (dataUrl) {
             var link = document.createElement("a");
@@ -84,7 +84,7 @@ onMounted(() => {
             </h1>
             <p class="mb-8 text-center text-muted-foreground text-neutral-500">
                 Your reservation has been successfully submitted. Please wait
-                for the admin to process your reservation. You can check your
+                while your reservation is being processed. You can check your
                 reservation status update in
                 <Link
                     :href="route('reservation.checkStatusForm')"
@@ -126,7 +126,7 @@ onMounted(() => {
                         />
                         <ListItem
                             :icon="Users"
-                            label="Total Guests"
+                            label="Total number of guests"
                             :value="`${reservation.total_guests} ${
                                 reservation.total_guests > 1
                                     ? 'guests'
