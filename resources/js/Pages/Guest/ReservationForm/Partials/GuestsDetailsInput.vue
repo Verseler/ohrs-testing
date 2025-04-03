@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@/Components/ui/button";
 import { Input, InputError } from "@/Components/ui/input";
-import { Info, Plus, Trash } from "lucide-vue-next";
+import { Plus, Trash } from "lucide-vue-next";
 import {
     Select,
     SelectContent,
@@ -12,7 +12,6 @@ import {
 } from "@/Components/ui/select";
 import { isObjectEmpty, removeItem } from "@/lib/utils";
 import { TableCell, TableRow } from "@/Components/ui/table";
-import { Alert, AlertDescription } from '@/Components/ui/alert';
 
 const { form } = defineProps({
     form: {
@@ -36,22 +35,13 @@ function addGuest() {
         first_name: undefined,
         last_name: undefined,
         gender: undefined,
-        phone: null
+        office: undefined,
     });
 }
 </script>
 
 <template>
     <TableRow class="grid border-none">
-        <TableCell class='py-0 mb-1'>
-            <Alert variant="default" class="text-blue-500 border-blue-500 bg-blue-50">
-                <Info class="!text-blue-500 size-4" />
-                <AlertDescription>
-                    <span class='font-bold'>We Highly Encourage:</span> Providing your phone number to allows us to reach you out in case of forgotten items, or other important matters.
-                </AlertDescription>
-            </Alert>
-        </TableCell>
-
         <div v-for="(guest, index) in form.guests">
             <TableCell class="grid grid-cols-4 gap-x-1.5">
                 <Input
@@ -67,12 +57,10 @@ function addGuest() {
                     placeholder="Last Name"
                 />
                 <Input
-                    v-model.number="guest.phone"
-                    type="number"
-                    inputmode="numeric"
+                    v-model.number="guest.office"
                     class="h-12 border border-green-800"
-                    :invalid="!!form.errors[`guests.${index}.phone`]"
-                    placeholder="Phone (optional)"
+                    :invalid="!!form.errors[`guests.${index}.office`]"
+                    placeholder="Office"
                 />
                 <div class="flex items-center gap-x-1.5">
                     <Select class="flex-1" v-model="guest.gender">
@@ -116,7 +104,7 @@ function addGuest() {
                 </InputError>
 
                 <InputError>
-                    {{ form.errors[`guests.${index}.phone`] }}
+                    {{ form.errors[`guests.${index}.office`] }}
                 </InputError>
 
                 <InputError>

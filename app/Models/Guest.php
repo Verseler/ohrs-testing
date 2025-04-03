@@ -13,17 +13,11 @@ class Guest extends Model
     protected $fillable = [
         'first_name',
         'last_name',
-        'phone',
         'gender',
-        'office_id',
+        'office',
         'reservation_id',
         'is_exempted'
     ];
-
-    public function office()
-    {
-        return $this->belongsTo(Office::class);
-    }
 
     public function reservation()
     {

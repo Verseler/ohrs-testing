@@ -14,10 +14,9 @@ return new class extends Migration {
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
-            $table->string('phone')->nullable();
+            $table->string('office');
             $table->enum('gender', ['male', 'female']);
             $table->boolean('is_exempted')->default(false);
-            $table->foreignId('office_id')->constrained()->cascadeOnDelete();
             $table->foreignId('reservation_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

@@ -31,11 +31,6 @@ class Office extends Model
         return $this->hasMany(Room::class);
     }
 
-    public function guests()
-    {
-        return $this->hasMany(Guest::class);
-    }
-
     public function reservations()
     {
         return $this->hasMany(Reservation::class, 'hostel_office_id', 'id');

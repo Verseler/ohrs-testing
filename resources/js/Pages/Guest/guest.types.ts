@@ -1,4 +1,3 @@
-import type { Office } from '@/Pages/Admin/Office/office.types';
 import type { Reservation } from '@/Pages/Admin/Reservation/reservation.types';
 import type { Bed } from '@/Pages/Admin/Room/room.types';
 
@@ -8,10 +7,9 @@ export type Guest = {
     id: number;
     first_name: string;
     last_name: string;
-    phone: number;
     gender: Omit<Gender, 'any'>;
     office_id: number;
-    office: Office;
+    office: string;
     reservation_id: number;
     reservation: Reservation;
     created_at: string;
@@ -19,7 +17,6 @@ export type Guest = {
 }
 
 export type GuestsFilters = {
-    region_id: number;
     gender: Gender | undefined;
     search: string | undefined;
     sort_by: string | undefined;

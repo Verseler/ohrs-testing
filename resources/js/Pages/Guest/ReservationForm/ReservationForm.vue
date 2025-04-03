@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, useForm, usePage } from "@inertiajs/vue3";
+import { Head, useForm } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import { Table, TableCell, TableRow, TableBody } from "@/Components/ui/table";
 import TableSectionHeading from "@/Pages/Guest/ReservationForm/Partials/TableSectionHeading.vue";
@@ -15,30 +15,25 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import type { Office, Region } from "@/Pages/Admin/Office/office.types";
-import type { PageProps } from "@/types";
 import { computed, ref, watch } from "vue";
 import DatePicker from "@/Components/DatePicker.vue";
-import { yesterdayDate } from "@/lib/utils";
 import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 
 type ReservationFormProps = {
-    canLogin: boolean;
     regions: Region[];
     offices: Office[];
     hostelOffice: Office;
 };
 
-const { canLogin, offices, hostelOffice } = defineProps<ReservationFormProps>();
-
-const page = usePage<PageProps>();
+const { offices, regions, hostelOffice } = defineProps<ReservationFormProps>();
 
 const DEFAULT_FIRST_GUEST = {
     first_name: undefined,
     last_name: undefined,
     gender: undefined,
-    phone: null,
+    office: undefined,
 };
 
 const form = useForm({
@@ -86,7 +81,7 @@ function submit() {
     <Head title="Reservation Form" />
 
     <div class="w-full min-h-screen">
-        <Header :can-login="canLogin" :user="page.props.auth.user" />
+        <Header />
 
         <div class="container px-2 py-4 mx-auto md:p-8">
             <form @submit.prevent="showConfirmation">
@@ -294,9 +289,7 @@ function submit() {
 
                             <TableRow class="grid border-none">
                                 <TableCell class="space-y-2">
-                                    <InputLabel optional>
-                                        Purpose of stay
-                                    </InputLabel>
+                                    <InputLabel>Purpose of stay</InputLabel>
                                     <Textarea
                                         v-model="form.purpose_of_stay"
                                         class="border border-primary-800"
@@ -327,7 +320,7 @@ function submit() {
                                 type="submit"
                                 class="w-full h-12 mt-6 text-base"
                             >
-                                Submit
+                                Submit Reservation
                             </Button>
                         </div>
                     </TableBody>
