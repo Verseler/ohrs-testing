@@ -76,9 +76,11 @@ class ReservationStatusController extends Controller
 
 
     //Check Reservation Status for Guests
-    public function checkStatusForm()
+    public function checkStatusForm(?string $code = null)
     {
-        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus');
+        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus', [
+            'code' => $code
+        ]);
     }
 
     public function checkStatus(string $code)

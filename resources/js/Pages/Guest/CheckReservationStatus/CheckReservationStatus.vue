@@ -6,14 +6,16 @@ import { Info } from "lucide-vue-next";
 import { Message } from "@/Components/ui/message";
 import SearchCodeForm from "@/Pages/Guest/CheckReservationStatus/Partials/SearchCodeForm.vue";
 
+const { code } = defineProps<{ code: string }>();
+
 const page = usePage<PageProps>();
 
 const form = useForm({
-    code: '',
+    code: code,
 });
 
 function checkReservation() {
-    form.get(route('reservation.checkStatus', { code: form.code }));
+    form.get(route("reservation.checkStatus", { code: form.code }));
 }
 </script>
 

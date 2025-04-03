@@ -6,10 +6,11 @@ import {
     Download,
     Hotel,
     ArrowLeft,
+    ScanSearch,
 } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { Separator } from "@/Components/ui/separator";
-import { Head, Link } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import { Button } from "@/Components/ui/button";
 import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
@@ -78,18 +79,23 @@ onMounted(() => {
             <h1 class="mb-2 text-3xl font-bold text-center">
                 Reservation Submitted!
             </h1>
-            <p class="mb-8 text-center text-muted-foreground text-neutral-500">
+            <p class="mb-2 text-center text-muted-foreground text-neutral-500">
                 Your reservation has been successfully submitted. Please wait
                 while your reservation is being processed. You can check your
-                reservation status update in
-                <Link
-                    :href="route('reservation.checkStatusForm')"
-                    class="text-blue-500 underline"
-                >
-                    here
-                </Link>
-                .
+                reservation status below.
             </p>
+
+            <LinkButton
+                :href="
+                    route('reservation.checkStatusForm', {
+                        code: reservation.reservation_code,
+                    })
+                "
+                size="lg"
+                class="w-full mb-4 bg-blue-500 hover:bg-blue-600 animate-bounce"
+            >
+                <ScanSearch /> Check Reservation Status
+            </LinkButton>
 
             <Card id="confirmation" class="rounded-sm shadow">
                 <CardHeader class="pb-4 text-center">
@@ -145,11 +151,11 @@ onMounted(() => {
                     class="text-primary-500 border-primary-500 hover:bg-primary-50 hover:text-primary-600"
                     size="lg"
                 >
-                    <ArrowLeft />Back
+                    <ArrowLeft />
                 </LinkButton>
 
                 <Button @click="downloadConfirmation" class="flex-1" size="lg">
-                    <Download />Download
+                    <Download />Download Reservation Code
                 </Button>
             </div>
         </div>
