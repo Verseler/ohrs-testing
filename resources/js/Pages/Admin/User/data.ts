@@ -15,7 +15,7 @@ export const data = {
     tableHeads: [
         "Name",
         "Email",
-        "Hostel Office",
+        "Hostel Location",
         "Role",
         ""
     ],

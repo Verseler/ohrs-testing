@@ -135,7 +135,7 @@ onMounted(() => {
                         />
                         <ListItem
                             :icon="Hotel"
-                            label="Hostel Office"
+                            label="Hostel Location"
                             :value="reservation.hostel_office_name"
                         />
                     </div>

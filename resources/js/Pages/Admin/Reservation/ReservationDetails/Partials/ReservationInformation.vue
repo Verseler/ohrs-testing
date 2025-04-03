@@ -68,7 +68,7 @@ const notPendingOrCanceled = computed(
             <Separator />
 
             <div>
-                <Label class="text-neutral-700"> Hostel Office </Label>
+                <Label class="text-neutral-700"> Hostel Location </Label>
                 <p class="font-medium">
                     {{
                         `Region
