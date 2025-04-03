@@ -34,8 +34,6 @@ class PaymentController extends Controller
             'reservation_id' => ['required', 'numeric'],
             'or_number' => ['required', 'string', 'unique:payments,or_number'],
             'or_date' => ['required', 'date'],
-            'payment_method' => ['required', Rule::in(['cash', 'online'])],
-            'transaction_id' => ['required', 'string', 'unique:payments,transaction_id'],
             'amount' => [
                 'required',
                 'numeric',
@@ -58,8 +56,6 @@ class PaymentController extends Controller
                     'amount' => $validated['amount'],
                     'or_number' => $validated['or_number'],
                     'or_date' => $validated['or_date'],
-                    'transaction_id' => $validated['transaction_id'],
-                    'payment_method' => $validated['payment_method'],
                     'reservation_id' => $validated['reservation_id'],
                 ]);
 

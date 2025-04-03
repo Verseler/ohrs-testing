@@ -59,8 +59,6 @@ const form = useForm<Partial<Payment>>({
     reservation_id: reservation.id,
     or_number: "",
     or_date: undefined,
-    payment_method: "cash",
-    transaction_id: "",
 });
 
 // Payment form state
@@ -106,7 +104,7 @@ function showPayLaterConfirmation() {
 }
 
 function submitPayLater() {
-    router.post(route('reservation.payLater', { id: reservation.id }));
+    router.post(route("reservation.payLater", { id: reservation.id }));
 }
 </script>
 
@@ -271,49 +269,6 @@ function submitPayLater() {
                             />
                             <InputError v-if="!!form.errors.or_date">
                                 {{ form.errors.or_date }}
-                            </InputError>
-                        </div>
-
-                        <div>
-                            <Label>Transaction ID</Label>
-                            <div class="relative">
-                                <Input
-                                    v-model="form.transaction_id"
-                                    :invalid="!!form.errors.transaction_id"
-                                    class="h-12 mt-1 text-base rounded ps-9 border-primary-700"
-                                />
-                                <ReceiptText
-                                    class="absolute text-lg size-4 top-4 left-2.5 text-primary-600"
-                                />
-                            </div>
-                            <InputError v-if="!!form.errors.transaction_id">
-                                {{ form.errors.transaction_id }}
-                            </InputError>
-                        </div>
-
-                        <!-- Payment method -->
-                        <div class="space-y-2">
-                            <Label for="payment-method">Payment Method</Label>
-                            <Select v-model="form.payment_method" required>
-                                <SelectTrigger
-                                    id="payment-method"
-                                    class="h-12 rounded border-primary-700"
-                                    :invalid="!!form.errors.payment_method"
-                                >
-                                    <SelectValue
-                                        placeholder="Select payment method"
-                                    />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="cash">Cash</SelectItem>
-                                    <SelectItem value="online">
-                                        Online
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            <InputError v-if="!!form.errors.payment_method">
-                                {{ form.errors.payment_method }}
                             </InputError>
                         </div>
                     </div>
