@@ -372,7 +372,7 @@ function submitPayLater() {
                         </Button>
 
                         <Button @click="showPaymentConfirmation" type="button">
-                            <CreditCard /> Make Payment
+                            <CreditCard /> Record Payment
                         </Button>
                     </div>
                 </CardFooter>
