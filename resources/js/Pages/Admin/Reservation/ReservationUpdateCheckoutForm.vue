@@ -45,13 +45,26 @@ const { reservation } = defineProps<ReservationExtendFormProps>();
 
 type ExtendForm = {
     reservation_id: number;
+    check_in_date: string | Date;
     new_check_out_date: string | Date;
 };
 
 const form = useForm<ExtendForm>({
     reservation_id: reservation.id,
+    check_in_date: reservation.check_in_date,
     new_check_out_date: reservation.check_out_date,
 });
+
+const checkInDatePlusOne = computed(() => {
+    const checkInDate = new Date(reservation.check_in_date);
+    checkInDate.setDate(checkInDate.getDate() + 1);
+
+    return checkInDate;
+});
+
+const lessThenOldCheckOut = computed(
+    () => reservation.check_out_date > form.new_check_out_date
+);
 
 const additionalDays = computed(() => {
     return getDaysDifference(
@@ -81,6 +94,17 @@ function extendByDays(days: number) {
     newDate.setDate(newDate.getDate() + days);
     form.new_check_out_date = formatDate(newDate) ?? newDate;
 }
+
+function reduceByDays(days: number) {
+    const currentCheckout = new Date(reservation.check_out_date);
+    const newDate = new Date(currentCheckout);
+    newDate.setDate(newDate.getDate() - days);
+
+    if (newDate <= new Date(reservation.check_in_date)) return;
+
+    form.new_check_out_date = formatDate(newDate) ?? newDate;
+}
+
 //Confirmation Dialog
 const confirmation = ref<boolean>(false);
 
@@ -89,12 +113,12 @@ function showConfirmation() {
 }
 
 function submitExtendReservation() {
-    form.post(route("reservation.extend", { id: reservation.id }));
+    form.post(route("reservation.updateCheckout", { id: reservation.id }));
 }
 </script>
 
 <template>
-    <Head title="Extend Reservation" />
+    <Head title="Update Reservation Checkout" />
 
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
@@ -117,7 +141,9 @@ function submitExtendReservation() {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Extend Reservation</BreadcrumbPage>
+                        <BreadcrumbPage
+                            >Update Reservation Checkout</BreadcrumbPage
+                        >
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
@@ -129,7 +155,7 @@ function submitExtendReservation() {
 
         <PageHeader>
             <template #icon><CalendarCheck /></template>
-            <template #title>Extend Reservation</template>
+            <template #title>Update Reservation Checkout</template>
         </PageHeader>
 
         <div class="max-w-2xl">
@@ -182,6 +208,14 @@ function submitExtendReservation() {
                                     }}
                                 </p>
                             </div>
+                            <div>
+                                <p>Reservation rate per day</p>
+                                <span class="font-medium">
+                                    ₱{{
+                                        formatCurrency(reservation.daily_rate)
+                                    }}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -194,40 +228,67 @@ function submitExtendReservation() {
                             <Label for="new-checkout-date">
                                 New Check-out Date
                             </Label>
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <DatePicker
-                                    v-model="form.new_check_out_date"
-                                    :min-value="
-                                        new Date(reservation.check_out_date)
-                                    "
-                                    calendar-class="left-5"
-                                />
-                                <div class="flex items-center gap-2">
-                                    <Button
-                                        @click="extendByDays(1)"
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                    >
-                                        +1 Day
-                                    </Button>
-                                    <Button
-                                        @click="extendByDays(2)"
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                    >
-                                        +2 Days
-                                    </Button>
-                                    <Button
-                                        @click="extendByDays(3)"
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                    >
-                                        +3 Days
-                                    </Button>
-                                </div>
+                            <DatePicker
+                                v-model="form.new_check_out_date"
+                                :min-value="checkInDatePlusOne"
+                                :invalid="!!form.errors.new_check_out_date"
+                                class="!max-w-full"
+                            />
+                            <div class="grid grid-cols-3 gap-2 md:grid-cols-6">
+                                <Button
+                                    @click="reduceByDays(3)"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    class="text-red-500"
+                                >
+                                    -3 Days
+                                </Button>
+                                <Button
+                                    @click="reduceByDays(2)"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    class="text-red-500"
+                                >
+                                    -2 Days
+                                </Button>
+                                <Button
+                                    @click="reduceByDays(1)"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    class="text-red-500"
+                                >
+                                    -1 Day
+                                </Button>
+                                <Button
+                                    @click="extendByDays(1)"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    class="text-green-600"
+                                >
+                                    +1 Day
+                                </Button>
+                                <Button
+                                    @click="extendByDays(2)"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    class="text-green-600"
+                                >
+                                    +2 Days
+                                </Button>
+                                <Button
+                                    @click="extendByDays(3)"
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    class="text-green-600"
+                                >
+                                    +3 Days
+                                </Button>
                             </div>
                             <InputError v-if="form.errors.new_check_out_date">
                                 {{ form.errors.new_check_out_date }}
@@ -268,11 +329,11 @@ function submitExtendReservation() {
                                 </div>
                                 <Separator />
                                 <div class="flex justify-between">
-                                    <span class="font-medium"
-                                        >Total Additional Charge</span
-                                    >
-                                    <span class="font-bold"
-                                        >₱{{ formatCurrency(additionalCharge) }}
+                                    <span class="font-medium">
+                                        Total Additional Charge
+                                    </span>
+                                    <span class="font-bold">
+                                        ₱{{ formatCurrency(additionalCharge) }}
                                     </span>
                                 </div>
                             </div>
@@ -280,7 +341,10 @@ function submitExtendReservation() {
 
                         <!-- New Balance -->
                         <div
-                            v-if="additionalDays > 0"
+                            v-if="
+                                reservation.check_out_date !==
+                                form.new_check_out_date
+                            "
                             class="p-4 space-y-3 rounded-lg bg-muted/50"
                         >
                             <h3 class="font-medium">New Billings</h3>
@@ -298,7 +362,11 @@ function submitExtendReservation() {
                                 </div>
 
                                 <div class="flex justify-between text-sm">
-                                    <span>Additional Charge</span>
+                                    <span v-if="lessThenOldCheckOut">
+                                        Reduction
+                                    </span>
+                                    <span v-else>Additional Charge</span>
+
                                     <span class="font-medium">
                                         ₱{{ formatCurrency(additionalCharge) }}
                                     </span>
@@ -320,7 +388,12 @@ function submitExtendReservation() {
                             </div>
                         </div>
 
-                        <div v-if="additionalDays > 0">
+                        <div
+                            v-if="
+                                reservation.check_out_date !==
+                                form.new_check_out_date
+                            "
+                        >
                             <Button
                                 type="submit"
                                 class="w-full text-base min-h-12"

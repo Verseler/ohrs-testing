@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ExtendedReservation;
 use App\Models\GuestBeds;
 use App\Models\Reservation;
 use Carbon\Carbon;
@@ -12,17 +11,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
-class ExtendReservationController extends Controller
+class UpdateReservationCheckoutController extends Controller
 {
-    public function extendForm(int $id)
+    public function updateCheckoutForm(int $id)
     {
         $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
-        return Inertia::render('Admin/Reservation/ReservationExtendForm', [
+        return Inertia::render('Admin/Reservation/ReservationUpdateCheckoutForm', [
             'reservation' => $reservation
         ]);
     }
 
-    public function extend(Request $request)
+    public function updateCheckout(Request $request)
     {
         $reservation = Reservation::findOrFail($request->reservation_id);
 
@@ -31,12 +30,8 @@ class ExtendReservationController extends Controller
             'new_check_out_date' => [
                 'required',
                 'date',
-                'after_or_equal:today',
-                function ($attribute, $value, $fail) use ($reservation) {
-                    if (Carbon::parse($value)->lte(Carbon::parse($reservation->check_out_date))) {
-                        $fail('The new check-out date must be after the current check-out date.');
-                    }
-                },
+                'after:check_in_date',
+                'after_or_equal:today'
             ],
         ]);
 
@@ -66,24 +61,36 @@ class ExtendReservationController extends Controller
                 }
 
                 //get additional days
+                $dailyRate = $reservation->daily_rate;
                 $additionalDays = $oldCheckOutDate->diffInDays($newCheckOutDate, false);
 
-                ExtendedReservation::create([
-                    'check_in_date' => $reservation->check_in_date,
-                    'old_check_out_date' => $reservation->check_out_date,
-                    'new_check_out_date' => $newCheckOutDate,
-                    'days_extended' => $additionalDays,
-                    'reservation_id' => $reservation->id
-                ]);
 
-                //calculate additional charges
-                $dailyRate = $reservation->daily_rate;
-                $additionalCharges = $dailyRate * $additionalDays;
+                //if reservation checkout date extension
+                if ($additionalDays > 0) {
+                    $additionalCharges = $dailyRate * $additionalDays;
 
-                $reservation->total_billings += $additionalCharges;
-                $reservation->remaining_balance += $additionalCharges;
-                $reservation->check_out_date = $newCheckOutDate;
-                $reservation->save();
+                    $reservation->total_billings += $additionalCharges;
+                    $reservation->remaining_balance += $additionalCharges;
+                    $reservation->check_out_date = $newCheckOutDate;
+                    $reservation->save();
+                }
+
+                //if reservation checkout date reduction
+                if ($additionalDays < 0) {
+                    $reductionAmount = $dailyRate * abs($additionalDays); //reduction days
+
+                    $reservation->total_billings -= $reductionAmount;
+                    $reservation->remaining_balance -= $reductionAmount;
+                    $reservation->check_out_date = $newCheckOutDate;
+
+                    if ($reservation->total_billings < 0 || $reservation->remaining_balance < 0) {
+                        throw ValidationException::withMessages([
+                            'new_check_out_date' => 'Unable to extend the reservation because the new remaining balance is less than zero.'
+                        ]);
+                    } else {
+                        $reservation->save();
+                    }
+                }
             });
         } catch (\Exception $e) {
             return redirect()->back()->with(['error' => $e->getMessage()]);

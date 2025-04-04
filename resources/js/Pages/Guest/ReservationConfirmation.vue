@@ -5,8 +5,8 @@ import {
     Users,
     Download,
     Hotel,
-    ArrowLeft,
     ScanSearch,
+    Info,
 } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { Separator } from "@/Components/ui/separator";
@@ -21,6 +21,7 @@ import LinkButton from "@/Components/LinkButton.vue";
 import ListItem from "@/Pages/Guest/Partials/ListItem.vue";
 import Code from "@/Pages/Guest/Partials/Code.vue";
 import PendingStatus from "@/Pages/Guest/Partials/PendingStatus.vue";
+import { Message } from "@/Components/ui/message";
 
 type ReservationConfirmationProps = {
     reservation: Pick<
@@ -92,11 +93,18 @@ onMounted(() => {
                     })
                 "
                 size="lg"
-                class="w-full mb-4 bg-blue-500 hover:bg-blue-600 animate-bounce"
+                class="w-full mb-1 bg-blue-500 hover:bg-blue-600 animate-bounce"
             >
                 <ScanSearch /> Check Reservation Status
             </LinkButton>
 
+            <Message
+                severity="info"
+                class="flex items-center justify-center mb-2 text-sm gap-x-2"
+            >
+                <Info class="size-3.5" /> You can check your reservation in your
+                email.
+            </Message>
             <Card id="confirmation" class="rounded-sm shadow">
                 <CardHeader class="pb-4 text-center">
                     <h2 class="mb-2 text-sm font-semibold text-neutral-500">
@@ -144,20 +152,14 @@ onMounted(() => {
                 </CardContent>
             </Card>
 
-            <div class="flex items-center mt-3 gap-x-2">
-                <LinkButton
-                    href="/"
-                    variant="outline"
-                    class="text-primary-500 border-primary-500 hover:bg-primary-50 hover:text-primary-600"
-                    size="lg"
-                >
-                    <ArrowLeft />
-                </LinkButton>
-
-                <Button @click="downloadConfirmation" class="flex-1" size="lg">
-                    <Download />Download Reservation Code
-                </Button>
-            </div>
+            <Button
+                @click="downloadConfirmation"
+                variant="outline"
+                class="w-full mt-2"
+                size="lg"
+            >
+                <Download />Download Reservation Code
+            </Button>
         </div>
     </div>
 </template>

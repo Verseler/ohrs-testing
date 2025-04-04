@@ -124,8 +124,7 @@ onMounted(() => {
                             v-if="
                                 canExempt &&
                                 reservation.status != 'canceled' &&
-                                reservation.status != 'checked_out' &&
-                                reservation.extended_reservations?.length <= 0
+                                reservation.status != 'checked_out'
                             "
                             class="flex-1 max-w-sm bg-violet-500 hover:bg-violet-600"
                             :href="
@@ -165,7 +164,7 @@ onMounted(() => {
                             Payment History
                         </LinkButton>
 
-                        <!-- Extend a reservation -->
+                        <!-- Update reservation checkout -->
                         <LinkButton
                             v-if="
                                 reservation.status == 'confirmed' ||
@@ -173,11 +172,14 @@ onMounted(() => {
                             "
                             class="flex-1 bg-red-500 hover:bg-red-600"
                             :href="
-                                route('reservation.extendForm', reservation.id)
+                                route(
+                                    'reservation.updateCheckoutForm',
+                                    reservation.id
+                                )
                             "
                         >
                             <CalendarPlus class="mr-1" />
-                            Extend Reservation
+                            Update Reservation
                         </LinkButton>
 
                         <!-- Edit a bed assignment -->

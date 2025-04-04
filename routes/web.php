@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExtendReservationController;
+use App\Http\Controllers\UpdateReservationCheckoutController;
 use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\NotificationController;
@@ -39,8 +39,8 @@ Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'c
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
     Route::put('/reservations/edit-status', [ReservationStatusController::class, 'editStatus'])->name('reservation.editStatus');
-    Route::post('/reservations/extend', [ExtendReservationController::class, 'extend'])->name('reservation.extend');
-    Route::get('/reservations/{id}/extend', [ExtendReservationController::class, 'extendForm'])->name('reservation.extendForm');
+    Route::post('/reservations/edit-checkout', [UpdateReservationCheckoutController::class, 'updateCheckout'])->name('reservation.updateCheckout');
+    Route::get('/reservations/{id}/edit-checkout', [UpdateReservationCheckoutController::class, 'updateCheckoutForm'])->name('reservation.updateCheckoutForm');
     Route::get('/reservations/{id}/edit-status', [ReservationStatusController::class, 'editStatusForm'])->name('reservation.editStatusForm');
     Route::put('/reservations/{id}/cancel', [ReservationStatusController::class, 'cancel'])->name('reservation.cancel');
     Route::get('/reservations/{id}/edit-bed-assignment', [ReservationAssignBedsController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');
