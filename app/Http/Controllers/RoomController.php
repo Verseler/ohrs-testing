@@ -173,7 +173,7 @@ class RoomController extends Controller
                     throw new \Exception('Room name already exists.');
                 }
 
-                // **Update Room Info** (Always allowed)
+                // Update Room Info (Always allowed)
                 $room->update([
                     'name' => $validated['name'],
                     'eligible_gender' => $validated['eligible_gender'],
@@ -183,22 +183,50 @@ class RoomController extends Controller
                 $existingBedIds = $room->beds->pluck('id')->toArray();
                 $submittedBedIds = [];
 
+                // First check all beds for reservations before making any changes
+                foreach ($validated['beds'] as $bedData) {
+                    if (!empty($bedData['id']) && in_array($bedData['id'], $existingBedIds)) {
+                        $bed = $room->beds()->find($bedData['id']);
+
+                        // Check if bed has current or future reservations
+                        $hasReservations = $bed->guestBeds()
+                            ->whereHas('guest.reservation', function ($query) {
+                                $query->where('check_out_date', '>=', Carbon::today());
+                            })
+                            ->exists();
+
+                        if ($hasReservations) {
+                            // Check if price is being changed
+                            if ($bed->price != $bedData['price']) {
+                                throw new \Exception("Cannot update price for bed '{$bed->name}' as it has current or future reservations.");
+                            }
+                        }
+                    }
+                }
+
+                // Now process updates since we've verified no restricted changes
                 foreach ($validated['beds'] as $bedData) {
                     // If bed already exists, update it
                     if (!empty($bedData['id']) && in_array($bedData['id'], $existingBedIds)) {
                         $room->beds()
                             ->where('id', $bedData['id'])
-                            ->update(['name' => $bedData['name'], 'price' => $bedData['price']]);
-                        $submittedBedIds[] = $bedData['id']; // Keep track of updated beds
+                            ->update([
+                                'name' => $bedData['name'],
+                                'price' => $bedData['price']
+                            ]);
+                        $submittedBedIds[] = $bedData['id'];
                     }
                     // Otherwise, create a new bed
                     else {
-                        $newBed = $room->beds()->create(['name' => $bedData['name'], 'price' => $bedData['price']]);
-                        $submittedBedIds[] = $newBed->id; // Track new bed IDs
+                        $newBed = $room->beds()->create([
+                            'name' => $bedData['name'],
+                            'price' => $bedData['price']
+                        ]);
+                        $submittedBedIds[] = $newBed->id;
                     }
                 }
 
-                // **Prevent Deleting Beds That Have Reservations**
+                // Prevent Deleting Beds That Have Reservations
                 $bedsToDelete = array_diff($existingBedIds, $submittedBedIds);
 
                 // Check if any of the beds to delete have reservations
@@ -212,13 +240,15 @@ class RoomController extends Controller
 
                 // If any reserved beds are in the delete list, throw an error
                 if (!empty($reservedBeds)) {
-                    throw new \Exception("Cannot delete beds that have current or future reservations.");
+                    throw new \Exception("Cannot delete beds that have current or future reservations");
                 }
 
-                // **Delete Beds That Are Not Reserved**
+                // Delete Beds That Are Not Reserved
                 if (!empty($bedsToDelete)) {
                     $room->beds()->whereIn('id', $bedsToDelete)->delete();
                 }
+
+                dd('sucscess');
             });
         } catch (\Exception $e) {
             return redirect()->back()->with("error", $e->getMessage());
