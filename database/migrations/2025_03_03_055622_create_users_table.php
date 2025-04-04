@@ -13,8 +13,7 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('password');
             $table->enum('role', ['admin', 'super_admin'])->default('admin');
             $table->foreignId('office_id')->constrained()->cascadeOnDelete();
@@ -40,8 +39,7 @@ return new class extends Migration {
 
         //Add a default super admin
         DB::table('users')->insert([
-            'name' => 'main10-superadmin',
-            'email' => 'main10-superadmin@gmail.com',
+            'name' => 'verselerf_handuman',
             'role' => 'super_admin',
             'office_id' => 175,
             'password' => bcrypt('denrregionx'),

@@ -22,7 +22,6 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'SuperAdmin Test',
-            'email' => 'superAdmin@gmail.com',
             'role' => 'super_admin',
             'office_id' => 175,
             'password' => bcrypt('1010101010'),
@@ -30,7 +29,6 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'User Test',
-            'email' => 'admin@gmail.com',
             'role' => 'admin',
             'office_id' => 175,
             'password' => bcrypt('1010101010'),

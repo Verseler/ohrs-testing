@@ -220,11 +220,8 @@ function deleteUser() {
                 <TableBody>
                     <template v-if="users && users.data.length > 0">
                         <TableRow v-for="user in users.data" :key="user.id">
-                            <TableCell>
-                                {{ user.name }}
-                            </TableCell>
                             <TableCell class="font-medium">
-                                {{ user.email }}
+                                {{ user.name }}
                             </TableCell>
                             <TableCell class="font-medium">
                                 Region {{ user.office?.region?.name }} -
