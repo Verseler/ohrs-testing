@@ -73,7 +73,7 @@ class ReservationProcessController extends Controller
 
                 //create an initial reservation
                 $reservation = Reservation::create([
-                    'reservation_code' => $this->generateReservationCode($guestOffice->id, $hostelOffice->id),
+                    'reservation_code' => $this->generateReservationCode($hostelOffice->name),
                     'check_in_date' => $validated['check_in_date'],
                     'check_out_date' => $validated['check_out_date'],
                     'daily_rate' => 0,
@@ -126,31 +126,37 @@ class ReservationProcessController extends Controller
         return redirect()->route('reservation.confirmation');
     }
 
-    private function generateReservationCode(int $guestOfficeId, int $hostelOfficeId): string
+    private function generateReservationCode(string $officeName): string
     {
-        $date = now()->format('Ymd');
-        $maxAttempts = 100;
-        $attempt = 0;
+        $date = now()->format('Ym'); // Year and month only
 
-        while ($attempt < $maxAttempts) {
-            $randomNumber = random_int(1000, 9999);
-            $code = "RES-{$date}-{$guestOfficeId}{$hostelOfficeId}{$randomNumber}";
+        // Office acronym codes
+        $officeCodes = [
+            'Regional Office' => 'RO',
+            'PENRO Camiguin' => 'PC',
+            'PENRO Misamis Oriental' => 'PMO',
+        ];
 
-            // Check if code already exists
-            if (!Reservation::where('reservation_code', $code)->exists()) {
-                return $code;
-            }
+        // Default code if office not found
+        $officeCode = $officeCodes[$officeName] ?? 'RES';
 
-            $attempt++;
-        }
-
-        // Fallback to sequential if random fails after max attempts
-        $latestReservation = Reservation::where('reservation_code', 'like', "RES-{$date}-%")
+        // Get the latest reservation for this office in current month
+        $latestReservation = Reservation::where('reservation_code', 'like', "{$officeCode}-{$date}-%")
             ->orderBy('reservation_code', 'desc')
             ->first();
 
-        $sequence = $latestReservation ? (int) explode('-', $latestReservation->reservation_code)[2] + 1 : 1;
-        return "RES-{$date}{$guestOfficeId}{$hostelOfficeId}-" . str_pad($sequence, 6, '0', STR_PAD_LEFT);
+        // Determine the next sequence number
+        if ($latestReservation) {
+            $parts = explode('-', $latestReservation->reservation_code);
+            $lastSequence = (int) end($parts);
+            $sequence = $lastSequence + 1;
+        } else {
+            $sequence = 1;
+        }
+
+        $sequenceNumber = str_pad($sequence, 4, '0', STR_PAD_LEFT);
+
+        return "{$officeCode}-{$date}-{$sequenceNumber}";
     }
 
     public function confirmation()
