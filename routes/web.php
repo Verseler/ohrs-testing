@@ -32,7 +32,7 @@ Route::get('/', function () {
 Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
 Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
-Route::get('/reservation/status/{code?}/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
+Route::get('/reservation/status/form/{code?}', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
 
 //* Admin Reservation
