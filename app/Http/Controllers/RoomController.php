@@ -247,8 +247,6 @@ class RoomController extends Controller
                 if (!empty($bedsToDelete)) {
                     $room->beds()->whereIn('id', $bedsToDelete)->delete();
                 }
-
-                dd('sucscess');
             });
         } catch (\Exception $e) {
             return redirect()->back()->with("error", $e->getMessage());
