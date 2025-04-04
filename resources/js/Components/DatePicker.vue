@@ -157,17 +157,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div
-        class="mx-auto w-full relative max-w-[510px]"
-        ref="datepickerContainerRef"
-    >
+    <div class="relative w-full mx-auto" ref="datepickerContainerRef">
         <div class="relative">
             <input
                 v-model="selectedDate"
                 id="datepicker"
                 type="text"
                 placeholder="Pick a date"
-                class="w-full h-12 pl-3.5 pr-4 bg-white border rounded outline-none appearance-none focus:ring-0 focus:outline-primary-500 border-stroke text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+                class="w-full h-12 pl-3.5 max-w-[510px] pr-4 bg-white border rounded outline-none appearance-none focus:ring-0 focus:outline-primary-500 border-stroke text-dark dark:border-dark-3 dark:bg-dark-2 dark:text-white"
                 :class="[
                     invalid ? 'border-red-500' : 'border-green-700',
                     className,
