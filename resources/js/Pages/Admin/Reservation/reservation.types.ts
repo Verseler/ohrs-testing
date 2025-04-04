@@ -28,6 +28,7 @@ export type Reservation = {
     extended_reservations: ExtendedReservation[]
     guest_office_id: number;
     hostel_office_id: number;
+    hostel_office: Office;
     reserved_beds: Bed[];
     created_at: string;
     updated_at: string;

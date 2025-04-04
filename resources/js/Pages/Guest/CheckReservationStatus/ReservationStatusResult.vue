@@ -190,6 +190,16 @@ const statusConfig = computed(() => {
                             ₱{{ formatCurrency(reservation.remaining_balance) }}
                         </p>
                     </div>
+
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Hostel Location
+                        </h3>
+                        <p class="mt-1">
+                            Region {{ reservation.hostel_office.region.name }} -
+                            {{ reservation.hostel_office.name }}
+                        </p>
+                    </div>
                 </div>
             </CardContent>
         </Card>

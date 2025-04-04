@@ -7,7 +7,7 @@ use App\Models\GuestBeds;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -76,16 +76,14 @@ class ReservationStatusController extends Controller
 
 
     //Check Reservation Status for Guests
-    public function checkStatusForm(?string $code = null)
+    public function checkStatusForm()
     {
-        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus', [
-            'code' => $code
-        ]);
+        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus');
     }
 
     public function checkStatus(string $code)
     {
-        $reservation = Reservation::with('guests')->where('reservation_code', $code)->first();
+        $reservation = Reservation::with(['guests', 'hostelOffice.region'])->where('reservation_code', $code)->first();
 
         if (!$reservation) {
             return redirect()->back()->with('error', 'Reservation doesn\'t exist.');
@@ -93,6 +91,45 @@ class ReservationStatusController extends Controller
 
         return Inertia::render('Guest/CheckReservationStatus/ReservationStatusResult', [
             'reservation' => $reservation
+        ]);
+    }
+
+
+    public function search($search)
+    {
+        if (empty($search)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Search term cannot be empty',
+                'data' => null
+            ], 400);
+        }
+
+        $reservations = Reservation::query()
+            ->select([
+                'id',
+                'reservation_code',
+                'first_name',
+                'middle_initial',
+                'last_name',
+                'check_in_date',
+                'check_out_date',
+            ])
+            ->where(function ($query) use ($search) {
+                $query->where('reservation_code', 'ILIKE', "%{$search}%")
+                    ->orWhere('first_name', 'ILIKE', "%{$search}%")
+                    ->orWhere('last_name', 'ILIKE', "%{$search}%");
+            })
+            ->get();
+
+        if ($reservations->isEmpty()) {
+            return Redirect::back()->with([
+                'error' => 'No reservations found.',
+            ]);
+        }
+
+        return Redirect::back()->with([
+            'response_data' => $reservations
         ]);
     }
 }

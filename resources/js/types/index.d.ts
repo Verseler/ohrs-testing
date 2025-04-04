@@ -24,7 +24,8 @@ export type PageProps<
         user: User;
     };
     flash: Flash,
-    unreadNotificationCount: number
+    unreadNotificationCount: number,
+    response_data: unknown
 };
 
 export type LaravelPagination<T> = {

@@ -39,23 +39,42 @@ const DEFAULT_FIRST_GUEST = {
     office: undefined as string | undefined,
 };
 
+// const form = useForm({
+//     //reservation details
+//     check_in_date: undefined,
+//     check_out_date: undefined,
+//     hostel_office_id: hostelOffice.id,
+//     guests: [DEFAULT_FIRST_GUEST],
+
+//     //contact info
+//     first_name: "",
+//     middle_initial: undefined,
+//     last_name: "",
+//     email: "",
+//     phone: undefined,
+//     guest_office_id: undefined,
+//     id_type: undefined,
+//     employee_id: "",
+//     purpose_of_stay: "",
+// });
+
 const form = useForm({
     //reservation details
-    check_in_date: undefined,
-    check_out_date: undefined,
+    check_in_date: "2025-04-05",
+    check_out_date: "2025-04-09",
     hostel_office_id: hostelOffice.id,
     guests: [DEFAULT_FIRST_GUEST],
 
     //contact info
-    first_name: "",
+    first_name: "Ver",
     middle_initial: undefined,
-    last_name: "",
-    email: "",
-    phone: undefined,
+    last_name: "Handuman",
+    email: "v@gmail.com",
+    phone: 9059609327,
     guest_office_id: undefined,
-    id_type: undefined,
-    employee_id: "",
-    purpose_of_stay: "",
+    id_type: "National ID",
+    employee_id: "2012321",
+    purpose_of_stay: "Yes",
 });
 
 const selectedRegionId = ref<Region["id"] | null>(null);
@@ -360,7 +379,7 @@ function submit() {
                                     "
                                     type="button"
                                     @click="addEmployeeAsFirstGuest"
-                                    class="bg-blue-500 hover:bg-blue-600"
+                                    class="bg-blue-500 hover:bg-blue-600 animate-bounce"
                                 >
                                     <ArrowDown />Add employee as first guest
                                 </Button>

@@ -12,6 +12,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationProcessController;
 use App\Http\Controllers\ReservationStatusController;
+use App\Http\Controllers\ReservationSearchController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
 use App\Models\Office;
@@ -32,8 +33,10 @@ Route::get('/', function () {
 Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
 Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
-Route::get('/reservation/status/form/{code?}', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
+Route::get('/reservation/status/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
+Route::get('reservation/search/{search}', [ReservationStatusController::class, 'search'])->name('reservation.search');
+
 
 //* Admin Reservation
 Route::middleware(['auth', 'verified'])->group(function () {

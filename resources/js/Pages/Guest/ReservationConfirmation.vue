@@ -88,7 +88,7 @@ onMounted(() => {
 
             <LinkButton
                 :href="
-                    route('reservation.checkStatusForm', {
+                    route('reservation.checkStatus', {
                         code: reservation.reservation_code,
                     })
                 "
