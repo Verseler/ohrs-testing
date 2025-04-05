@@ -178,7 +178,7 @@ class ReservationProcessController extends Controller
             'total_guests' => $totalGuests
         ];
 
-        return Inertia::render('Guest/ReservationConfirmation', [
+        return Inertia::render('Guest/ReservationConfirmation/ReservationConfirmation', [
             'reservation' => $reservationConfirmationInfo
         ]);
     }

@@ -18,9 +18,9 @@ import * as htmlToImage from "html-to-image";
 import { toast } from "vue-sonner";
 import { onMounted } from "vue";
 import LinkButton from "@/Components/LinkButton.vue";
-import ListItem from "@/Pages/Guest/Partials/ListItem.vue";
-import Code from "@/Pages/Guest/Partials/Code.vue";
-import PendingStatus from "@/Pages/Guest/Partials/PendingStatus.vue";
+import ListItem from "@/Pages/Guest/ReservationConfirmation/Partials/ListItem.vue";
+import Code from "@/Pages/Guest/ReservationConfirmation/Partials/Code.vue";
+import PendingStatus from "@/Pages/Guest/ReservationConfirmation/Partials/PendingStatus.vue";
 import { Message } from "@/Components/ui/message";
 
 type ReservationConfirmationProps = {
