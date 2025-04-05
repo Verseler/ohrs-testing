@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EligibleGenderSchedule;
+use App\Models\Bed;
 use App\Models\GuestBeds;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -253,5 +253,50 @@ class RoomController extends Controller
         }
 
         return to_route('room.list')->with('success', 'Room updated successfully.');
+    }
+
+
+
+    public function getAvailableRooms(Request $request)
+    {
+        $validated = $request->validate([
+            'check_in_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:check_out_date'],
+            'check_out_date' => ['required', 'date', 'after_or_equal:today', 'after_or_equal:check_in_date'],
+            'hostel_id' => ['required', 'exists:offices,id'],
+        ]);
+
+        $bed = new Bed();
+        $availableBeds = $bed->availableBeds(
+            $validated['check_in_date'],
+            $validated['check_out_date'],
+            $validated['hostel_id']
+        );
+
+        // Group beds by room and format results
+        $availableBedsInRooms = $availableBeds->groupBy('room_id')->map(function ($beds) use ($validated) {
+            $room = $beds->first()->room;
+
+            // Determine eligible gender considering if there is an scheduled eligible gender
+            $eligibleGender = $room->eligible_gender;
+            $applicableSchedule = $room->eligibleGenderSchedules
+                ->where('start_date', '<=', $validated['check_in_date'])
+                ->where('end_date', '>=', $validated['check_in_date'])
+                ->first();
+
+            if ($applicableSchedule) {
+                $eligibleGender = $applicableSchedule->eligible_gender;
+            }
+
+            return [
+                'id' => $room->id,
+                'name' => $room->name,
+                'eligible_gender' => $eligibleGender,
+                'beds_count' => $beds->count(),
+            ];
+        })->values();
+
+        return redirect()->back()->with([
+            'response_data' => $availableBedsInRooms
+        ]);
     }
 }

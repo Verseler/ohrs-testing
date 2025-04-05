@@ -39,11 +39,6 @@ const { hostels } = defineProps<LandingPageProps>();
                         :has-hostel="hostel.has_hostel"
                         :hostel-name="hostel.name"
                         :region-name="hostel.region.name"
-                        :class="
-                            hostel.has_hostel
-                                ? 'hover:shadow-md hover:border-primary/50'
-                                : 'opacity-75'
-                        "
                     />
                 </template>
                 <p v-else class="text-sm italic text-neutral-500">

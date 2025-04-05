@@ -11,7 +11,7 @@ import { Button } from "@/Components/ui/button";
 const page = usePage<PageProps>();
 
 const reservations = computed<Reservation[] | null>(() => {
-    const response = usePage().props.response_data as Reservation[];
+    const response = page.props.response_data as Reservation[];
     return response || null;
 });
 

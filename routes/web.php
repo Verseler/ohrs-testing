@@ -12,7 +12,6 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservationProcessController;
 use App\Http\Controllers\ReservationStatusController;
-use App\Http\Controllers\ReservationSearchController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
 use App\Models\Office;
@@ -20,7 +19,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-//* All
 Route::get('/', function () {
     $hostels = Office::with('region')->where('has_hostel', true)->get();
 
@@ -28,6 +26,7 @@ Route::get('/', function () {
         'hostels' => $hostels
     ]);
 });
+Route::get('/rooms/available-beds', [RoomController::class, 'getAvailableRooms'])->name('room.checkAvailableBeds');
 
 //* Guest Reservation Process
 Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
@@ -36,7 +35,6 @@ Route::get('/reservation/confirmation', [ReservationProcessController::class, 'c
 Route::get('/reservation/status/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
 Route::get('reservation/search/{search}', [ReservationStatusController::class, 'search'])->name('reservation.search');
-
 
 //* Admin Reservation
 Route::middleware(['auth', 'verified'])->group(function () {

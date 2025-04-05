@@ -2,6 +2,7 @@
 import { HotelIcon } from "lucide-vue-next";
 import LinkButton from "@/Components/LinkButton.vue";
 import Button from "@/Components/ui/button/Button.vue";
+import BedAvailabilityChecker from "@/Components/BedAvailability/BedAvailabilityChecker.vue";
 
 type HostelCardProps = {
     hostelName: string;
@@ -17,6 +18,9 @@ const { hasHostel, hostelId, hostelName, regionName } =
 <template>
     <div
         class="overflow-hidden transition-all duration-200 bg-white border border-gray-200 rounded-lg shadow-sm min-w-64"
+        :class="
+            hasHostel ? 'hover:shadow-md hover:border-primary/50' : 'opacity-75'
+        "
     >
         <div class="p-6">
             <div class="flex justify-center mb-3">
@@ -35,17 +39,19 @@ const { hasHostel, hostelId, hostelName, regionName } =
             </p>
 
             <div class="flex justify-center">
-                <LinkButton
-                    v-if="hasHostel"
-                    class="w-full"
-                    :href="
-                        route('reservation.form', {
-                            hostel_office_id: hostelId,
-                        })
-                    "
-                >
-                    Select Location
-                </LinkButton>
+                <div v-if="hasHostel" class="flex gap-x-2">
+                    <LinkButton
+                        :href="
+                            route('reservation.form', {
+                                hostel_office_id: hostelId,
+                            })
+                        "
+                    >
+                        Make Reservation
+                    </LinkButton>
+                    <BedAvailabilityChecker :hostelId="hostelId" />
+                </div>
+
                 <Button v-else disabled class="w-full opacity-70">
                     Currently Unavailable
                 </Button>
