@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ReservationCodeMail;
 use App\Models\Guest;
 use App\Models\Office;
 use App\Models\Region;
@@ -10,6 +11,7 @@ use App\Models\User;
 use App\Notifications\NewReservationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -117,6 +119,14 @@ class ReservationProcessController extends Controller
                     $admins,
                     new NewReservationNotification($reservation)
                 );
+
+                //Send reservation code to guest email
+                $details = [
+                    'title' => 'Reservation Code - OHRS',
+                    'content' => $reservation->reservation_code,
+                ];
+
+                Mail::to($reservation->email)->send(new ReservationCodeMail($details));
             });
         } catch (\Exception $e) {
             return redirect()->back()->with("error", $e->getMessage());
@@ -161,22 +171,37 @@ class ReservationProcessController extends Controller
 
     public function confirmation()
     {
-        // Retrieve reservation details from the session
-        $reservationId = session('reservation_id');
-        $totalGuests = session('total_guests');
-
-        $reservation = Reservation::findOrFail($reservationId);
-        $hostelOffice = Office::with('region')->findOrFail($reservation->hostel_office_id);
-        $regionName = $hostelOffice->region->name;
-
         $reservationConfirmationInfo = [
-            'check_in_date' => $reservation->check_in_date,
-            'check_out_date' => $reservation->check_out_date,
-            'status' => $reservation->status,
-            'reservation_code' => $reservation->reservation_code,
-            'hostel_office_name' => "Region $regionName - $hostelOffice->name",
-            'total_guests' => $totalGuests
+            'check_in_date' => null,
+            'check_out_date' => null,
+            'status' => null,
+            'reservation_code' => null,
+            'hostel_office_name' => null,
+            'total_guests' => null
         ];
+
+        try {
+            DB::transaction(function () use (&$reservationConfirmationInfo) {
+                // Retrieve reservation details from the session
+                $reservationId = session('reservation_id');
+                $totalGuests = session('total_guests');
+
+                $reservation = Reservation::findOrFail($reservationId);
+                $hostelOffice = Office::with('region')->findOrFail($reservation->hostel_office_id);
+                $regionName = $hostelOffice->region->name;
+
+                $reservationConfirmationInfo = [
+                    'check_in_date' => $reservation->check_in_date,
+                    'check_out_date' => $reservation->check_out_date,
+                    'status' => $reservation->status,
+                    'reservation_code' => $reservation->reservation_code,
+                    'hostel_office_name' => "Region $regionName - $hostelOffice->name",
+                    'total_guests' => $totalGuests
+                ];
+            });
+        } catch (\Exception $e) {
+            return redirect()->back()->with('errors', 'An error occurred while processing your reservation.');
+        }
 
         return Inertia::render('Guest/ReservationConfirmation/ReservationConfirmation', [
             'reservation' => $reservationConfirmationInfo
