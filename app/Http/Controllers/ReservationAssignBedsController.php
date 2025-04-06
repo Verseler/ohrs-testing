@@ -23,7 +23,6 @@ class ReservationAssignBedsController extends Controller
             'guests' => function ($query) {
                 $query->orderBy('gender');
             },
-            'guestOffice.region',
             'hostelOffice.region',
         ])->where([
                     ['hostel_office_id', Auth::user()->office_id],
@@ -152,7 +151,6 @@ class ReservationAssignBedsController extends Controller
             'guests',
             'guestBeds.guest',
             'guestBeds.bed.room',
-            'guestOffice.region',
             'hostelOffice.region',
         ])->where(
                 'hostel_office_id',

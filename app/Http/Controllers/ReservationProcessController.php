@@ -20,14 +20,10 @@ class ReservationProcessController extends Controller
 {
     public function form(Request $request)
     {
-        $regions = Region::all();
-        $offices = Office::all();
         $hostelOffice = Office::with('region')->where('has_hostel', true)
             ->findOrFail($request->hostel_office_id);
 
         return Inertia::render('Guest/ReservationForm/ReservationForm', [
-            'regions' => $regions,
-            'offices' => $offices,
             'hostelOffice' => $hostelOffice
         ]);
     }
@@ -43,7 +39,6 @@ class ReservationProcessController extends Controller
                 'last_name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email', 'max:255'],
                 'phone' => ['required', 'size:10', 'regex:/(9)[0-9]{9}/'],
-                'guest_office_id' => ['required', 'numeric'],
                 'hostel_office_id' => ['required', 'numeric'],
                 'id_type' => ['required', 'string'],
                 'employee_id' => ['required', 'string'],
@@ -68,10 +63,7 @@ class ReservationProcessController extends Controller
 
         try {
             DB::transaction(function () use ($validated) {
-                //validate if guest and hostel office exists
-                $guestOffice = Office::findOrFail($validated['guest_office_id']);
                 $hostelOffice = Office::where('has_hostel', true)->findOrFail($validated['hostel_office_id']);
-
 
                 //create an initial reservation
                 $reservation = Reservation::create([
@@ -88,7 +80,6 @@ class ReservationProcessController extends Controller
                     'last_name' => $validated['last_name'],
                     'phone' => $validated['phone'],
                     'email' => $validated['email'] ?? null,
-                    'guest_office_id' => $guestOffice->id,
                     'hostel_office_id' => $hostelOffice->id,
                     'id_type' => $validated['id_type'],
                     'employee_id' => $validated['employee_id'],
@@ -133,7 +124,7 @@ class ReservationProcessController extends Controller
         }
 
         //redirect to confirmation
-        return redirect()->route('reservation.confirmation');
+        return Inertia::location(route('reservation.confirmation'));
     }
 
     private function generateReservationCode(string $officeName): string

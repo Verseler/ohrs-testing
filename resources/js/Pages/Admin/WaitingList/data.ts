@@ -9,7 +9,6 @@ export const data = {
         { value: "first_name", label: "Booked by" },
         { value: "check_in_date", label: "Check in" },
         { value: "check_out_date", label: "Check out" },
-        { value: "guest_office_id", label: "Guest Office" },
     ],
     tableHeads: [
         "Reservation Code",
@@ -18,7 +17,6 @@ export const data = {
         "Check in",
         "Check out",
         "Number of Guests",
-        "Guest Office",
         ""
     ],
 };

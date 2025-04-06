@@ -14,8 +14,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import type { Office, Region } from "@/Pages/Admin/Office/office.types";
-import { computed, ref, watch } from "vue";
+import type { Office } from "@/Pages/Admin/Office/office.types";
+import { computed, ref } from "vue";
 import DatePicker from "@/Components/DatePicker.vue";
 import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
@@ -25,12 +25,10 @@ import { ArrowDown } from "lucide-vue-next";
 import { validIds } from "@/Pages/Guest/ReservationForm/data";
 
 type ReservationFormProps = {
-    regions: Region[];
-    offices: Office[];
     hostelOffice: Office;
 };
 
-const { offices, regions, hostelOffice } = defineProps<ReservationFormProps>();
+const { hostelOffice } = defineProps<ReservationFormProps>();
 
 const DEFAULT_FIRST_GUEST = {
     first_name: undefined as string | undefined,
@@ -39,53 +37,22 @@ const DEFAULT_FIRST_GUEST = {
     office: undefined as string | undefined,
 };
 
-// const form = useForm({
-//     //reservation details
-//     check_in_date: undefined,
-//     check_out_date: undefined,
-//     hostel_office_id: hostelOffice.id,
-//     guests: [DEFAULT_FIRST_GUEST],
-
-//     //contact info
-//     first_name: "",
-//     middle_initial: undefined,
-//     last_name: "",
-//     email: "",
-//     phone: undefined,
-//     guest_office_id: undefined,
-//     id_type: undefined,
-//     employee_id: "",
-//     purpose_of_stay: "",
-// });
-
 const form = useForm({
     //reservation details
-    check_in_date: "2025-04-05",
-    check_out_date: "2025-04-09",
+    check_in_date: undefined,
+    check_out_date: undefined,
     hostel_office_id: hostelOffice.id,
     guests: [DEFAULT_FIRST_GUEST],
 
     //contact info
-    first_name: "Ver",
+    first_name: "",
     middle_initial: undefined,
-    last_name: "Handuman",
-    email: "v@gmail.com",
-    phone: 9059609327,
-    guest_office_id: undefined,
-    id_type: "National ID",
-    employee_id: "2012321",
-    purpose_of_stay: "Yes",
-});
-
-const selectedRegionId = ref<Region["id"] | null>(null);
-
-const officesInARegion = computed(() =>
-    offices.filter((office) => office.region_id === selectedRegionId.value)
-);
-
-//clear selected office if region is changed
-watch(selectedRegionId, () => {
-    form.guest_office_id = undefined;
+    last_name: "",
+    email: "",
+    phone: undefined,
+    id_type: undefined,
+    employee_id: "",
+    purpose_of_stay: "",
 });
 
 const firstGuestHasFilled = computed<Boolean>(() => {
@@ -240,75 +207,6 @@ function submit() {
                                 </TableCell>
                             </TableRow>
 
-                            <TableRow class="grid border-none md:grid-cols-2">
-                                <TableCell class="space-y-2">
-                                    <InputLabel>Guest's Region</InputLabel>
-                                    <Select v-model="selectedRegionId">
-                                        <SelectTrigger
-                                            class="h-12 rounded-sm shadow-none border-primary-700"
-                                            :invalid="
-                                                !!form.errors.guest_office_id
-                                            "
-                                        >
-                                            <SelectValue
-                                                placeholder="Select guest's region"
-                                            />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectItem
-                                                    v-for="region in regions"
-                                                    :Key="region.id"
-                                                    :value="region.id"
-                                                >
-                                                    {{ region.name }}
-                                                </SelectItem>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError
-                                        v-if="form.errors.guest_office_id"
-                                    >
-                                        {{ form.errors.guest_office_id }}
-                                    </InputError>
-                                </TableCell>
-                                <TableCell class="space-y-2">
-                                    <InputLabel>Guest's Office</InputLabel>
-                                    <Select
-                                        v-model="form.guest_office_id"
-                                        :disabled="
-                                            Boolean(selectedRegionId) === false
-                                        "
-                                    >
-                                        <SelectTrigger
-                                            class="h-12 rounded-sm shadow-none border-primary-700"
-                                            :invalid="
-                                                !!form.errors.guest_office_id
-                                            "
-                                        >
-                                            <SelectValue
-                                                placeholder="Select guest's office"
-                                            />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectItem
-                                                    v-for="office in officesInARegion"
-                                                    :key="office.id"
-                                                    :value="office.id"
-                                                >
-                                                    {{ office.name }}
-                                                </SelectItem>
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError
-                                        v-if="form.errors.guest_office_id"
-                                    >
-                                        {{ form.errors.guest_office_id }}
-                                    </InputError>
-                                </TableCell>
-                            </TableRow>
                             <TableRow class="grid grid-cols-2 border-none">
                                 <TableCell class="space-y-2">
                                     <InputLabel>ID Type</InputLabel>
@@ -391,8 +289,13 @@ function submit() {
                                 <Button
                                     type="submit"
                                     class="w-full h-12 mt-6 text-base"
+                                    :disabled="form.processing"
                                 >
-                                    Submit Reservation
+                                    {{
+                                        form.processing
+                                            ? "Submitting..."
+                                            : "Submit Reservation"
+                                    }}
                                 </Button>
                             </div>
                         </div>

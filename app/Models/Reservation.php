@@ -24,7 +24,6 @@ class Reservation extends Model
         'last_name',
         'phone',
         'email',
-        'guest_office_id',
         'hostel_office_id',
         'id_type',
         'employee_id',
@@ -34,11 +33,6 @@ class Reservation extends Model
     public function guests()
     {
         return $this->hasMany(Guest::class);
-    }
-
-    public function guestOffice()
-    {
-        return $this->belongsTo(Office::class, 'guest_office_id');
     }
 
     public function hostelOffice()

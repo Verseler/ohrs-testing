@@ -46,11 +46,7 @@ import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
 
 usePoll(10000);
 
-type Reservation = Omit<
-    ReservationWithBeds,
-    "guest_office_id" | "host_office_id"
-> & {
-    guest_office: Office;
+type Reservation = Omit<ReservationWithBeds, "host_office_id"> & {
     host_office: Office;
 };
 
@@ -191,9 +187,6 @@ watch(
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.guests.length }}
-                            </TableCell>
-                            <TableCell class="font-medium">
-                                {{ reservation.guest_office.name }}
                             </TableCell>
                             <TableCell>
                                 <StatusBadge :status="reservation.status" />

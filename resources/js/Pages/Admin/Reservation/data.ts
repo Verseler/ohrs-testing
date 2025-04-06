@@ -29,7 +29,6 @@ export const data = {
         "Total Billings",
         "Remaining Balance",
         "Number of Guests",
-        "Guest Office",
         "Status",
         ""
     ],

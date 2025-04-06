@@ -25,7 +25,6 @@ return new class extends Migration {
             $table->string('last_name');
             $table->string('phone');
             $table->string('email');
-            $table->foreignId('guest_office_id')->constrained('offices')->cascadeOnDelete();
             $table->foreignId('hostel_office_id')->constrained('offices')->cascadeOnDelete();
             $table->string('id_type');
             $table->string('employee_id');

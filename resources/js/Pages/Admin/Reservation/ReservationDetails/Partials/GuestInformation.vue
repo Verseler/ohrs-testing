@@ -61,17 +61,6 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 
                 <EmployeeID :value="reservation.employee_id" />
             </div>
-
-            <div>
-                <Label class="text-neutral-700"> Guest Office </Label>
-                <p class="font-medium">
-                    {{
-                        `Region
-                            ${reservation?.guest_office?.region?.name} -
-                            ${reservation?.guest_office?.name}` || "-"
-                    }}
-                </p>
-            </div>
         </CardContent>
     </Card>
 </template>

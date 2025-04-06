@@ -10,7 +10,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 </script>
 
 <template>
-    <Card class="relative md:min-w-96">
+    <Card class="relative max-w-xl md:min-w-[27rem]">
         <CardHeader>
             <CardTitle class="flex items-center justify-between">
                 <span>Reservation Overview</span>
@@ -21,7 +21,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                 </span>
             </CardTitle>
         </CardHeader>
-        <CardContent class="grid grid-cols-2 gap-y-5 gap-x-10">
+        <CardContent class="grid grid-cols-2 gap-y-4 gap-x-2">
             <div>
                 <Label class="text-neutral-700"> Check-in Date </Label>
                 <p class="text-lg font-medium text-primary-500">
@@ -57,25 +57,14 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                 </p>
             </div>
 
-            <div>
+            <div class='col-span-1'>
                 <Label class="text-neutral-700"> ID Type </Label>
                 <p class="font-medium">
                     {{ reservation.id_type }}
                 </p>
             </div>
 
-            <EmployeeID class='col-span-2' :value="reservation.employee_id" />
-
-            <div class="col-span-2">
-                <Label class="text-neutral-700"> Guests Office </Label>
-                <p class="font-medium">
-                    {{
-                        `Region
-                            ${reservation?.guest_office?.region?.name} -
-                            ${reservation?.guest_office?.name}` || "-"
-                    }}
-                </p>
-            </div>
+            <EmployeeID class='col-span-1' :value="reservation.employee_id" />
         </CardContent>
     </Card>
 </template>

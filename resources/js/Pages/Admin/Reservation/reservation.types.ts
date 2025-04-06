@@ -26,7 +26,6 @@ export type Reservation = {
     purpose_of_stay: string | null;
     guests: Guest[];
     extended_reservations: ExtendedReservation[]
-    guest_office_id: number;
     hostel_office_id: number;
     hostel_office: Office;
     reserved_beds: Bed[];
@@ -46,9 +45,8 @@ export type WaitingListFilers = Omit<ReservationFilters, 'status' | 'balance'>;
 
 export type ReservationWithBeds = Omit<
     Reservation,
-    "guest_office_id" | "host_office_id"
+    "host_office_id"
 > & {
-    guest_office: Office;
     hostel_office: Office;
     beds: (Bed & { room: Room })[];
     reservedBeds: Bed[];

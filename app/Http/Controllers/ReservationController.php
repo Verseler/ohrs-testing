@@ -25,7 +25,7 @@ class ReservationController extends Controller
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
-        $query = Reservation::with(relations: ['guests', 'guestOffice', 'hostelOffice'])
+        $query = Reservation::with(relations: ['guests', 'hostelOffice'])
             //Make sure that the reservations is ony accessible by authorized admin
             ->where('hostel_office_id', Auth::user()->office_id)
             //Make sure to not include the pending reservations because it has a dedicated page for that. (Waiting List Page)
@@ -82,7 +82,6 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::with([
             'guests',
-            'guestOffice.region',
             'hostelOffice.region',
             'reservedBeds.room.eligibleGenderSchedules',
             'reservedBedsWithGuests'
@@ -110,11 +109,11 @@ class ReservationController extends Controller
     {
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
-            'sort_by' => ['nullable', Rule::in(['reservation_code', 'created_at', 'first_name', 'check_in_date', 'check_out_date', 'guest_office_id'])],
+            'sort_by' => ['nullable', Rule::in(['reservation_code', 'created_at', 'first_name', 'check_in_date', 'check_out_date'])],
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
-        $query = Reservation::with(relations: ['guests', 'guestOffice', 'hostelOffice'])
+        $query = Reservation::with(relations: ['guests', 'hostelOffice'])
             //Make sure that the reservations is only accessible by authorized admin
             ->where('hostel_office_id', Auth::user()->office_id)
             //Make sure the reservation status is pending
@@ -137,7 +136,6 @@ class ReservationController extends Controller
             'first_name',
             'check_in_date',
             'check_out_date',
-            'guest_office_id'
         ]) ? $request->sort_by : 'created_at';
 
         $sortOrder = $request->filled('sort_order') && $request->sort_order === 'asc' ? 'asc' : 'desc';
