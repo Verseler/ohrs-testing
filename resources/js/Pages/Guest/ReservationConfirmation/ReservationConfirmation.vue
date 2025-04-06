@@ -50,16 +50,21 @@ function downloadConfirmation() {
 }
 
 onMounted(() => {
-    downloadConfirmation();
+    const key = `downloaded-${reservation.reservation_code}`;
 
-    //remind guest to download confirmation if ever they have not downloaded it yet
-    toast.info("Remember to download your confirmation before leaving.", {
-        style: {
-            background: "#3b82f6",
-            color: "white",
-        },
-        position: "top-center",
-    });
+    // Only download if it hasn't been downloaded yet in this session
+    if (!sessionStorage.getItem(key)) {
+        downloadConfirmation();
+        sessionStorage.setItem(key, "true");
+
+        toast.info("Remember to download your confirmation before leaving.", {
+            style: {
+                background: "#3b82f6",
+                color: "white",
+            },
+            position: "top-center",
+        });
+    }
 });
 </script>
 
@@ -69,9 +74,9 @@ onMounted(() => {
     <div class="w-full min-h-screen">
         <Header />
 
-        <div class="container max-w-xl px-4 py-8 mx-auto">
+        <div class="container max-w-xl px-4 py-2 mx-auto">
             <!-- Check Icon -->
-            <div class="flex items-center justify-center mb-8">
+            <div class="flex items-center justify-center mb-4">
                 <div class="p-3 bg-green-600 rounded-full">
                     <Check class="w-8 h-8 text-white" />
                 </div>
