@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use App\Models\Payment;
@@ -20,7 +21,50 @@ class GenerateReportController extends Controller
             Carbon::parse($validated['selected_date'])->setTimezone('Asia/Manila') :
             Carbon::now();
 
+        //Get all report data
+        $data = $this->getReportData($selectedDate);
 
+        return Inertia::render('Admin/GenerateReport/ReportList', [
+            'reports' => $data['reports'],
+            'totalAmount' => $data['totalAmount'],
+        ]);
+    }
+
+    public function download($selected_date)
+    {
+        $selectedDate = Carbon::parse($selected_date)->setTimezone('Asia/Manila');
+
+        //Get all report data
+        $data = $this->getReportData($selectedDate);
+
+        // Generate PDF
+        $pdf = Pdf::loadView('pdf.report', [
+            'reports' => $data['reports'],
+            'totalAmount' => $data['totalAmount'],
+        ]);
+
+        return $pdf->download("hrs-report-{$selected_date}.pdf");
+    }
+
+    public function print($selected_date)
+    {
+        $selectedDate = Carbon::parse($selected_date)->setTimezone('Asia/Manila');
+
+        //Get all report data
+        $data = $this->getReportData($selectedDate);
+
+        // Generate PDF
+        $pdf = Pdf::loadView('pdf.report', [
+            'reports' => $data['reports'],
+            'totalAmount' => $data['totalAmount'],
+        ]);
+
+        return $pdf->stream("hrs-report-{$selected_date}.pdf");
+    }
+
+
+    private function getReportData($selectedDate)
+    {
         if ($selectedDate->isCurrentMonth()) {
             $startDate = $selectedDate->startOfMonth();
             $endDate = Carbon::now('Asia/Manila');
@@ -41,6 +85,7 @@ class GenerateReportController extends Controller
             $checkInDate = Carbon::parse($payment->reservation->check_in_date);
             $checkOutDate = Carbon::parse($payment->reservation->check_out_date);
             $lengthOfStay = $checkInDate->diffInDays($checkOutDate, false);
+
             if ($lengthOfStay === 0) {
                 $lengthOfStay = 1;
             }
@@ -57,9 +102,11 @@ class GenerateReportController extends Controller
 
         $totalAmount = $payments->sum('amount');
 
-        return Inertia::render('Admin/GenerateReport/ReportList', [
+        $data = [
             'reports' => $reports,
             'totalAmount' => $totalAmount,
-        ]);
+        ];
+
+        return $data;
     }
 }

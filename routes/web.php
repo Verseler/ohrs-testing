@@ -88,7 +88,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //* Admin analytics and reports
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/reports', [GenerateReportController::class, 'list'])->name('reports');
+    Route::get('/reports', [GenerateReportController::class, 'list'])->name('report.list');
+    Route::get('/reports/download/{selected_date}', [GenerateReportController::class, 'download'])->name('report.download');
+    Route::get('/reports/print/{selected_date}', [GenerateReportController::class, 'print'])->name('report.print');
 });
 
 //* Admin Notifications

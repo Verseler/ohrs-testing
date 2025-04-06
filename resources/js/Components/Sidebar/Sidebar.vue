@@ -51,7 +51,7 @@ const nav = ref<Array<NavItem>>([
             },
             {
                 label: "Generate Report",
-                route: "reports",
+                route: "report.list",
                 path: "/reports",
                 icon: FileDown,
                 accessible: true,
