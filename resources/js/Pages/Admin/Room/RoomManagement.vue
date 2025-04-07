@@ -31,14 +31,13 @@ import type {
     Room,
     RoomWithBedCounts,
 } from "@/Pages/Admin/Room/room.types";
-import { Head, Link, router, useForm } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import { debounce, formatDate, tomorrowDate } from "@/lib/utils";
 import { Label } from "@/Components/ui/label";
-import DatePicker from "@/Components/DatePicker.vue";
 import { usePoll } from "@inertiajs/vue3";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 import { data } from "@/Pages/Admin/Room/data";
@@ -49,6 +48,7 @@ import AvailabilityBadge from "@/Components/AvailabilityBadge.vue";
 import GenderBadge from "@/Components/GenderBadge.vue";
 import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
 import LinkButton from "@/Components/LinkButton.vue";
+import { InputDate } from "@/Components/ui/input";
 
 usePoll(20000);
 
@@ -194,12 +194,12 @@ function handleDeleteRoom() {
                     >
                         Check In
                     </Label>
-                    <DatePicker
+                    <InputDate
                         id="check_in"
                         v-model="form.check_in_date"
-                        class="!h-10 min-w-64"
-                        :min-value="new Date()"
-                        :max-value="form.check_out_date"
+                        :min="formatDate(new Date())"
+                        :max="form.check_out_date"
+                        class="!h-10 min-w-52"
                     />
                 </div>
                 <div class="relative">
@@ -209,11 +209,11 @@ function handleDeleteRoom() {
                     >
                         Check Out
                     </Label>
-                    <DatePicker
+                    <InputDate
                         id="check_out"
-                        class="!h-10 min-w-64"
                         v-model="form.check_out_date"
-                        :min-value="form.check_in_date"
+                        :min="form.check_in_date"
+                        class="!h-10 min-w-52"
                     />
                 </div>
             </div>

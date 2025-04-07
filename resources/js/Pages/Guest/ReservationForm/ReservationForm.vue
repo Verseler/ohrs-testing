@@ -4,7 +4,7 @@ import Header from "@/Components/Header.vue";
 import { Table, TableCell, TableRow, TableBody } from "@/Components/ui/table";
 import TableSectionHeading from "@/Pages/Guest/ReservationForm/Partials/TableSectionHeading.vue";
 import { Textarea } from "@/Components/ui/textarea";
-import { Input, InputError } from "@/Components/ui/input";
+import { Input, InputError, InputDate } from "@/Components/ui/input";
 import InputLabel from "@/Components/ui/input/InputLabel.vue";
 import {
     Select,
@@ -16,13 +16,13 @@ import {
 } from "@/Components/ui/select";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import { computed, ref } from "vue";
-import DatePicker from "@/Components/DatePicker.vue";
 import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import type { Gender } from "@/Pages/Guest/guest.types";
 import { ArrowDown } from "lucide-vue-next";
 import { validIds } from "@/Pages/Guest/ReservationForm/data";
+import { formatDate } from "@/lib/utils";
 
 type ReservationFormProps = {
     hostelOffice: Office;
@@ -101,11 +101,11 @@ function submit() {
                             <TableRow class="grid border-none md:grid-cols-2">
                                 <TableCell class="space-y-2">
                                     <InputLabel>Check In</InputLabel>
-                                    <DatePicker
+                                    <InputDate
                                         v-model="form.check_in_date"
                                         :invalid="!!form.errors.check_in_date"
-                                        :min-value="new Date()"
-                                        :max-value="form.check_out_date"
+                                        :min="formatDate(new Date())"
+                                        :max="form.check_out_date"
                                     />
                                     <InputError
                                         v-if="form.errors.check_in_date"
@@ -115,10 +115,10 @@ function submit() {
                                 </TableCell>
                                 <TableCell class="space-y-2">
                                     <InputLabel>Check Out</InputLabel>
-                                    <DatePicker
+                                    <InputDate
                                         v-model="form.check_out_date"
                                         :invalid="!!form.errors.check_out_date"
-                                        :min-value="form.check_in_date"
+                                        :min="form.check_in_date"
                                     />
                                     <InputError
                                         v-if="form.errors.check_out_date"

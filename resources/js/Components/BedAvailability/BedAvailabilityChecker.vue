@@ -9,15 +9,16 @@ import {
     DialogDescription,
 } from "@/Components/ui/dialog";
 import { Button } from "@/Components/ui/button";
-import { LoaderCircle, X } from "lucide-vue-next";
-import DatePicker from "@/Components/DatePicker.vue";
+import { LoaderCircle } from "lucide-vue-next";
 import { Separator } from "@/Components/ui/separator";
 import { useForm, usePage } from "@inertiajs/vue3";
 import { PageProps } from "@/types";
 import { Gender } from "@/Pages/Guest/guest.types";
 import BedAvailableItem from "@/Components/BedAvailability/BedAvailableItem.vue";
 import { Label } from "@/Components/ui/label";
-import { InputError } from "../ui/input";
+import { InputError } from "@/Components/ui/input";
+import InputDate from "@/Components/ui/input/InputDate.vue";
+import { formatDate } from "@/lib/utils";
 
 type AvailableBedInRoom = {
     id: number;
@@ -97,10 +98,10 @@ function resetState() {
                 <div class="grid gap-2 py-1 sm:grid-cols-2">
                     <div class="space-y-2">
                         <Label for="check-in-date"> Check-in Date </Label>
-                        <DatePicker
+                        <InputDate
                             id="check-in-date"
                             v-model="form.check_in_date"
-                            :min-value="new Date()"
+                            :min="formatDate(new Date())"
                             :invalid="!!form.errors.check_in_date"
                         />
                         <InputError v-if="!!form.errors.check_in_date">
@@ -110,10 +111,10 @@ function resetState() {
 
                     <div class="space-y-2">
                         <Label for="check-out-date"> Check-out Date </Label>
-                        <DatePicker
+                        <InputDate
                             id="check-out-date"
                             v-model="form.check_out_date"
-                            :min-value="form.check_in_date"
+                            :min="form.check_in_date"
                             :disabled="!form.check_in_date"
                             :invalid="!!form.errors.check_out_date"
                         />

@@ -2,7 +2,7 @@
 import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import { ref, watch } from "vue";
 import { Button } from "@/Components/ui/button";
-import { Input, InputError } from "@/Components/ui/input";
+import { Input, InputError, InputDate } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Separator } from "@/Components/ui/separator";
 import {
@@ -34,14 +34,6 @@ import {
     BreadcrumbPage,
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
-import DatePicker from "@/Components/DatePicker.vue";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
 import type {
     Payment,
     PaymentOption,
@@ -262,7 +254,7 @@ function submitPayLater() {
 
                         <div>
                             <Label>OR Date</Label>
-                            <DatePicker
+                            <InputDate
                                 v-model="form.or_date"
                                 :invalid="!!form.errors.or_date"
                                 class="mt-1"

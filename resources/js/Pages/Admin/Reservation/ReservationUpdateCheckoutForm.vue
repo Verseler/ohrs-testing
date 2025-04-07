@@ -31,8 +31,7 @@ import StatusBadge from "@/Components/StatusBadge.vue";
 import { Separator } from "@/Components/ui/separator";
 import { Label } from "@/Components/ui/label";
 import { Button } from "@/Components/ui/button";
-import DatePicker from "@/Components/DatePicker.vue";
-import { InputError } from "@/Components/ui/input";
+import { InputError, InputDate } from "@/Components/ui/input";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Badge } from "@/Components/ui/badge";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
@@ -228,11 +227,10 @@ function submitExtendReservation() {
                             <Label for="new-checkout-date">
                                 New Check-out Date
                             </Label>
-                            <DatePicker
+                            <InputDate
                                 v-model="form.new_check_out_date"
-                                :min-value="checkInDatePlusOne"
+                                :min="checkInDatePlusOne"
                                 :invalid="!!form.errors.new_check_out_date"
-                                class="!max-w-full"
                             />
                             <div class="grid grid-cols-3 gap-2 md:grid-cols-6">
                                 <Button
