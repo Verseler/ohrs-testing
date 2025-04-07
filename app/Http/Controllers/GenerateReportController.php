@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Office;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -37,10 +38,13 @@ class GenerateReportController extends Controller
         //Get all report data
         $data = $this->getReportData($selectedDate);
 
+        $office = Office::find(Auth::user()->office_id);
+
         // Generate PDF
         $pdf = Pdf::loadView('pdf.report', [
             'reports' => $data['reports'],
             'totalAmount' => $data['totalAmount'],
+            'officeName' => $office->name,
         ]);
 
         return $pdf->download("hrs-report-{$selected_date}.pdf");
@@ -53,10 +57,13 @@ class GenerateReportController extends Controller
         //Get all report data
         $data = $this->getReportData($selectedDate);
 
+        $office = Office::find(Auth::user()->office_id);
+
         // Generate PDF
         $pdf = Pdf::loadView('pdf.report', [
             'reports' => $data['reports'],
             'totalAmount' => $data['totalAmount'],
+            'officeName' => $office->name,
         ]);
 
         return $pdf->stream("hrs-report-{$selected_date}.pdf");

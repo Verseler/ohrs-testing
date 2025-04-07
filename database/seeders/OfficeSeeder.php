@@ -961,7 +961,7 @@ class OfficeSeeder extends Seeder
             ],
             [
                 'region_id' => '13',
-                'name' => 'CENRO Initiao',
+                'name' => 'CENRO Initao',
                 'has_hostel' => false,
             ],
             [
