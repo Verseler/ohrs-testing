@@ -77,7 +77,15 @@
 </head>
 
 <body>
-    @include('pdf.partials.regional-office-header', ['selectedDate' => $selectedDate ?? now()])
+    <header style="text-align: center; line-height: 1; margin-bottom: 12px;">
+        @include('pdf.partials.regional-office-header');
+
+        <div style="display: block; border-top: 1px solid #949494; padding-top: 8px;">
+            <h1 style="font-size: 20px; margin: 0;">ONLINE HOSTEL RESERVATION SYSTEM</h1>
+            <div>Monthly Report for {{ \Carbon\Carbon::parse($selectedDate ?? now())->format('F Y') }}</div>
+            <div>Generated on: {{ \Carbon\Carbon::now()->format('F j, Y h:i A') }}</div>
+        </div>
+    </header>
 
     <table>
         <thead>
