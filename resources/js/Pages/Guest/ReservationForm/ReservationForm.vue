@@ -26,9 +26,10 @@ import { formatDate } from "@/lib/utils";
 
 type ReservationFormProps = {
     hostelOffice: Office;
+    offices: Office[];
 };
 
-const { hostelOffice } = defineProps<ReservationFormProps>();
+const { hostelOffice, offices } = defineProps<ReservationFormProps>();
 
 const DEFAULT_FIRST_GUEST = {
     first_name: undefined as string | undefined,
@@ -283,7 +284,7 @@ function submit() {
                                 </Button>
                             </div>
 
-                            <GuestsDetailsInput :form="form" />
+                            <GuestsDetailsInput :form="form" :offices="offices" />
 
                             <div class="px-2">
                                 <Button

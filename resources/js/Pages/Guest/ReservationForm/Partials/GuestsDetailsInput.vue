@@ -12,10 +12,15 @@ import {
 } from "@/Components/ui/select";
 import { isObjectEmpty, removeItem } from "@/lib/utils";
 import { TableCell, TableRow } from "@/Components/ui/table";
+import { AutoComplete } from "@/Components/ui/auto-complete";
 
 const { form } = defineProps({
     form: {
         type: Object,
+        required: true,
+    },
+    offices: {
+        type: Array,
         required: true,
     },
 });
@@ -56,9 +61,9 @@ function addGuest() {
                     :invalid="!!form.errors[`guests.${index}.last_name`]"
                     placeholder="Last Name"
                 />
-                <Input
-                    v-model.number="guest.office"
-                    class="h-12 border border-green-800"
+                <AutoComplete
+                    v-model="guest.office"
+                    :items="offices as string[]"
                     :invalid="!!form.errors[`guests.${index}.office`]"
                     placeholder="Office"
                 />

@@ -24,8 +24,14 @@ class ReservationProcessController extends Controller
         $hostelOffice = Office::with('region')->where('has_hostel', true)
             ->findOrFail($request->hostel_office_id);
 
+        $offices = Office::with('region')
+            ->get()
+            ->map(fn($office) => "{$office->name} - {$office->region->name}")
+            ->toArray();
+
         return Inertia::render('Guest/ReservationForm/ReservationForm', [
-            'hostelOffice' => $hostelOffice
+            'hostelOffice' => $hostelOffice,
+            'offices' => $offices
         ]);
     }
 
