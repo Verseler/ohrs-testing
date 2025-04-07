@@ -111,7 +111,7 @@ class ReservationAssignBedsController extends Controller
                     if ($bed->room->eligible_gender == 'any') {
                         EligibleGenderSchedule::create([
                             "start_date" => $reservation->check_in_date,
-                            "end_date" => $reservation->check_in_date,
+                            "end_date" => $reservation->check_out_date,
                             "eligible_gender" => $currentGuest->gender,
                             "room_id" => $bed->room->id
                         ]);
