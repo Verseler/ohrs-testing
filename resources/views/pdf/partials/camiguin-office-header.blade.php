@@ -6,9 +6,9 @@
         </td>
         <td style="text-align: center; vertical-align: middle; border: none !important; line-height: 1.2;">
             <div style="font-size: 13px;">Republic of the Philippines</div>
-            <div style="font-size: 13px;">DEPARTMENT OF ENVIRONMENT AND NATURAL RESOURCES</div>
-            <h3 style="font-size: 16px; margin: 0;">Regional Office</h3>
-            <div style="font-size: 13px;">Brgy. Puntod, Cagayan de Oro City</div>
+            <div style="font-size: 13px;">PROVINCIAL ENVIRONMENT AND NATURAL RESOURCES OFFICE</div>
+            <h3 style="font-size: 16px; margin: 0;">Camiguin</h3>
+            <div style="font-size: 13px;">Government Center Lakas, Mambajao, Camiguin</div>
         </td>
         <td style="width: 90px; vertical-align: middle; border: none !important;">
             <img src="{{ public_path('images/bagongPilipinasLogo.png') }}"
