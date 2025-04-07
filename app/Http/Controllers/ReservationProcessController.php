@@ -9,6 +9,7 @@ use App\Models\Region;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
+use App\Jobs\SendReservationCodeEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -117,7 +118,7 @@ class ReservationProcessController extends Controller
                     'content' => $reservation->reservation_code,
                 ];
 
-                Mail::to($reservation->email)->send(new ReservationCodeMail($details));
+                SendReservationCodeEmail::dispatch($reservation->email, $details);
             });
         } catch (\Exception $e) {
             return redirect()->back()->with("error", $e->getMessage());
