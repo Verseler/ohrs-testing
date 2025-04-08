@@ -5,7 +5,7 @@ import { TableCell, TableRow } from '@/Components/ui/table';
 
 <template>
     <TableRow class="border-none">
-        <TableCell class="pt-5 text-lg font-medium text-neutral-800">
+        <TableCell class="text-lg font-medium text-neutral-800">
             <slot />
         </TableCell>
     </TableRow>

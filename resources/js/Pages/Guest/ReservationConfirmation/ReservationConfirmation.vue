@@ -13,7 +13,6 @@ import { Separator } from "@/Components/ui/separator";
 import { Head } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import { Button } from "@/Components/ui/button";
-import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import * as htmlToImage from "html-to-image";
 import { toast } from "vue-sonner";
 import { onMounted } from "vue";
@@ -22,18 +21,17 @@ import ListItem from "@/Pages/Guest/ReservationConfirmation/Partials/ListItem.vu
 import Code from "@/Pages/Guest/ReservationConfirmation/Partials/Code.vue";
 import PendingStatus from "@/Pages/Guest/ReservationConfirmation/Partials/PendingStatus.vue";
 import { Message } from "@/Components/ui/message";
+import { formatDateString } from "@/lib/utils";
 
-type ReservationConfirmationProps = {
-    reservation: Pick<
-        Reservation,
-        "check_in_date" | "check_out_date" | "status" | "reservation_code"
-    > & {
-        hostel_office_name: string;
-        total_guests: number;
-    };
+type ReservationDetails = {
+    from: string;
+    to: string;
+    code: string;
+    hostel_office_name: string;
+    total_guests: number;
 };
 
-const { reservation } = defineProps<ReservationConfirmationProps>();
+const { reservation } = defineProps<{ reservation: ReservationDetails }>();
 
 function downloadConfirmation() {
     htmlToImage
@@ -43,14 +41,14 @@ function downloadConfirmation() {
         })
         .then(function (dataUrl) {
             var link = document.createElement("a");
-            link.download = `${reservation.reservation_code}-HRS-${reservation.hostel_office_name}.jpeg`;
+            link.download = `${reservation.code}-HRS-${reservation.hostel_office_name}.jpeg`;
             link.href = dataUrl;
             link.click();
         });
 }
 
 onMounted(() => {
-    const key = `downloaded-${reservation.reservation_code}`;
+    const key = `downloaded-${reservation.code}`;
 
     // Only download if it hasn't been downloaded yet in this session
     if (!sessionStorage.getItem(key)) {
@@ -94,7 +92,7 @@ onMounted(() => {
             <LinkButton
                 :href="
                     route('reservation.checkStatus', {
-                        code: reservation.reservation_code,
+                        code: reservation.code,
                     })
                 "
                 size="lg"
@@ -115,7 +113,7 @@ onMounted(() => {
                     <h2 class="mb-2 text-sm font-semibold text-neutral-500">
                         RESERVATION CODE
                     </h2>
-                    <Code>{{ reservation.reservation_code }}</Code>
+                    <Code>{{ reservation.code }}</Code>
                 </CardHeader>
 
                 <CardContent class="space-y-6">
@@ -123,20 +121,20 @@ onMounted(() => {
                         class="flex items-center justify-between p-4 rounded-lg bg-muted"
                     >
                         <div class="font-medium">Status</div>
-                        <PendingStatus>{{ reservation.status }}</PendingStatus>
+                        <PendingStatus>Pending</PendingStatus>
                     </div>
 
                     <Separator />
                     <div class="space-y-4">
                         <ListItem
                             :icon="Calendar"
-                            label="Check In"
-                            :value="reservation.check_in_date"
+                            label="From"
+                            :value="formatDateString(reservation.from)"
                         />
                         <ListItem
                             :icon="Calendar"
-                            label="Check Out"
-                            :value="reservation.check_out_date"
+                            label="To"
+                            :value="formatDateString(reservation.to)"
                         />
                         <ListItem
                             :icon="Users"

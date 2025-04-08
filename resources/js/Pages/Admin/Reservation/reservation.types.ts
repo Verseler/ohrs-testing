@@ -8,27 +8,37 @@ export type PaymentType = 'full_payment' | 'pay_later'
 
 export type Reservation = {
     id: number;
-    reservation_code: string;
-    check_in_date: string;
-    check_out_date: string;
-    daily_rate: number;
+    code: string;
     total_billings: number;
     remaining_balance: number;
-    status: ReservationStatus;
     payment_type: PaymentType;
     first_name: string;
     middle_initial: string | null;
     last_name: string;
     phone: string;
     email: string | null;
-    id_type: string;
-    employee_id: string;
-    purpose_of_stay: string | null;
     guests: Guest[];
     extended_reservations: ExtendedReservation[]
     hostel_office_id: number;
     hostel_office: Office;
+    id_type: string;
+    employee_id: string;
     reserved_beds: Bed[];
+    purpose_of_stay: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export type StayDetails = {
+    id: number;
+    check_in_date: string;
+    check_out_date: string;
+    daily_rate: number;
+    is_exempted: boolean;
+    status: ReservationStatus;
+    bed_id: number;
+    reservation_id: number;
+    guest_id: number;
     created_at: string;
     updated_at: string;
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from "@/Components/ui/button";
-import { Input, InputError } from "@/Components/ui/input";
+import { Input, InputDate, InputError } from "@/Components/ui/input";
 import { Plus, Trash } from "lucide-vue-next";
 import {
     Select,
@@ -10,9 +10,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import { isObjectEmpty, removeItem } from "@/lib/utils";
+import { formatDate, removeItem } from "@/lib/utils";
 import { TableCell, TableRow } from "@/Components/ui/table";
 import { AutoComplete } from "@/Components/ui/auto-complete";
+import InputLabel from "@/Components/ui/input/InputLabel.vue";
+import { computed } from "vue";
+import AutoFillButton from "@/Pages/Guest/ReservationForm/Partials/AutoFillButton.vue";
 
 const { form } = defineProps({
     form: {
@@ -24,6 +27,21 @@ const { form } = defineProps({
         required: true,
     },
 });
+
+const firstGuestHasFilled = computed<Boolean>(() => {
+    return Boolean(form.guests[0].first_name || form.guests[0].last_name);
+});
+
+function addEmployeeAsFirstGuest() {
+    form.guests[0] = {
+        first_name: form.first_name,
+        last_name: form.last_name,
+        gender: undefined,
+        office: undefined,
+        check_in_date: undefined as string | undefined,
+        check_out_date: undefined as string | undefined,
+    };
+}
 
 function clearErrors() {
     form.errors = {};
@@ -41,39 +59,79 @@ function addGuest() {
         last_name: undefined,
         gender: undefined,
         office: undefined,
+        check_in_date: undefined as Date | undefined,
+        check_out_date: undefined as Date | undefined,
     });
 }
 </script>
 
 <template>
-    <TableRow class="grid border-none">
-        <div v-for="(guest, index) in form.guests">
-            <TableCell class="grid grid-cols-4 gap-x-1.5">
-                <Input
-                    v-model="guest.first_name"
-                    class="h-12 border border-green-800"
-                    :invalid="!!form.errors[`guests.${index}.first_name`]"
-                    placeholder="First Name"
-                />
-                <Input
-                    v-model="guest.last_name"
-                    class="h-12 border border-green-800"
-                    :invalid="!!form.errors[`guests.${index}.last_name`]"
-                    placeholder="Last Name"
-                />
-                <AutoComplete
-                    v-model="guest.office"
-                    :items="offices as string[]"
-                    :invalid="!!form.errors[`guests.${index}.office`]"
-                    placeholder="Office"
-                />
-                <div class="flex items-center gap-x-1.5">
+    <TableRow class="relative grid gap-4 px-3 border-none">
+        <AutoFillButton
+            v-if="
+                form.first_name &&
+                form.last_name &&
+                firstGuestHasFilled === false
+            "
+            :onClick="addEmployeeAsFirstGuest"
+        />
+
+        <div
+            v-for="(guest, index) in form.guests"
+            class="p-6 pt-3 border rounded-lg shadow-sm bg-neutral-50"
+        >
+            <!-- Heading -->
+            <div class="flex items-center justify-between">
+                <h3 class="px-2 text-lg font-bold">Guest {{ index + 1 }}</h3>
+                <Button
+                    @click="removeGuest(index)"
+                    v-if="form.guests.length > 1"
+                    size="icon"
+                    variant="ghost"
+                    type="button"
+                    class="text-red-500 hover:bg-red-50 hover:text-red-500"
+                >
+                    <Trash />
+                </Button>
+            </div>
+
+            <!-- Content -->
+            <div class="grid md:grid-cols-3 gap-x-2">
+                <TableCell class="space-y-2">
+                    <InputLabel>First Name</InputLabel>
+                    <Input
+                        v-model="guest.first_name"
+                        class="h-12 border border-green-800"
+                        :invalid="!!form.errors[`guests.${index}.first_name`]"
+                    />
+                    <InputError
+                        v-if="!!form.errors[`guests.${index}.first_name`]"
+                    >
+                        {{ form.errors[`guests.${index}.first_name`] }}
+                    </InputError>
+                </TableCell>
+                <TableCell class="space-y-2">
+                    <InputLabel>Last Name</InputLabel>
+                    <Input
+                        v-model="guest.last_name"
+                        class="h-12 border border-green-800"
+                        :invalid="!!form.errors[`guests.${index}.last_name`]"
+                    />
+                    <InputError
+                        v-if="!!form.errors[`guests.${index}.last_name`]"
+                    >
+                        {{ form.errors[`guests.${index}.last_name`] }}
+                    </InputError>
+                </TableCell>
+                <TableCell class="space-y-2">
+                    <InputLabel>Gender</InputLabel>
+
                     <Select class="flex-1" v-model="guest.gender">
                         <SelectTrigger
                             class="h-12 rounded-md shadow-none border-primary-800"
                             :invalid="!!form.errors[`guests.${index}.gender`]"
                         >
-                            <SelectValue placeholder="Gender" />
+                            <SelectValue placeholder="Select a gender" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectGroup>
@@ -83,51 +141,64 @@ function addGuest() {
                         </SelectContent>
                     </Select>
 
-                    <Button
-                        @click="removeGuest(index)"
-                        v-if="form.guests.length > 1"
-                        size="icon"
-                        variant="ghost"
-                        type="button"
-                        class="text-red-500 hover:bg-red-50 hover:text-red-500"
+                    <InputError v-if="!!form.errors[`guests.${index}.gender`]">
+                        {{ form.errors[`guests.${index}.gender`] }}
+                    </InputError>
+                </TableCell>
+
+                <TableCell class="space-y-2">
+                    <InputLabel>Check In</InputLabel>
+                    <InputDate
+                        v-model="guest.check_in_date"
+                        :invalid="
+                            !!form.errors[`guests.${index}.check_in_date`]
+                        "
+                        :min="formatDate(new Date())"
+                        :max="form.check_out_date"
+                    />
+                    <InputError
+                        v-if="!!form.errors[`guests.${index}.check_in_date`]"
                     >
-                        <Trash />
-                    </Button>
-                </div>
-            </TableCell>
-
-            <TableCell
-                v-if="isObjectEmpty(form.errors) === false"
-                class="grid grid-cols-4 p-0 pl-1 -mt-1.5 gap-x-1.5"
-            >
-                <InputError>
-                    {{ form.errors[`guests.${index}.first_name`] }}
-                </InputError>
-
-                <InputError>
-                    {{ form.errors[`guests.${index}.last_name`] }}
-                </InputError>
-
-                <InputError>
-                    {{ form.errors[`guests.${index}.office`] }}
-                </InputError>
-
-                <InputError>
-                    {{ form.errors[`guests.${index}.gender`] }}
-                </InputError>
-            </TableCell>
+                        {{ form.errors[`guests.${index}.check_in_date`] }}
+                    </InputError>
+                </TableCell>
+                <TableCell class="space-y-2">
+                    <InputLabel>Check Out</InputLabel>
+                    <InputDate
+                        v-model="guest.check_out_date"
+                        :invalid="
+                            !!form.errors[`guests.${index}.check_out_date`]
+                        "
+                        :min="form.check_in_date"
+                    />
+                    <InputError
+                        v-if="!!form.errors[`guests.${index}.check_out_date`]"
+                    >
+                        {{ form.errors[`guests.${index}.check_out_date`] }}
+                    </InputError>
+                </TableCell>
+                <TableCell class="space-y-2">
+                    <InputLabel>Office</InputLabel>
+                    <AutoComplete
+                        v-model="guest.office"
+                        :items="(offices as string[])"
+                        :invalid="!!form.errors[`guests.${index}.office`]"
+                    />
+                    <InputError v-if="!!form.errors[`guests.${index}.office`]">
+                        {{ form.errors[`guests.${index}.office`] }}
+                    </InputError>
+                </TableCell>
+            </div>
         </div>
 
-        <div class="px-2 mt-2">
-            <Button
-                @click="addGuest"
-                variant="outline"
-                size="lg"
-                type="button"
-                class="w-full text-green-700 bg-transparent border-green-700 rounded shadow-none hover:bg-green-100"
-            >
-                <Plus /> Add
-            </Button>
-        </div>
+        <Button
+            @click="addGuest"
+            variant="outline"
+            size="lg"
+            type="button"
+            class="w-full text-green-700 bg-transparent border-green-600 rounded shadow-none hover:bg-green-100"
+        >
+            <Plus /> Add
+        </Button>
     </TableRow>
 </template>
