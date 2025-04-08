@@ -42,7 +42,7 @@ export type ReservationFilters = {
     sort_order: 'asc' | 'desc' | null;
 }
 
-export type WaitingListFilers = Omit<ReservationFilters, 'status' | 'balance'>;
+export type WaitingListFilers = Omit<ReservationFilters, 'status' | 'balance' | 'payment_type'>;
 
 export type ReservationWithBeds = Omit<
     Reservation,

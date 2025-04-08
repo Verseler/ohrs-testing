@@ -53,7 +53,7 @@ type Reservation = Omit<ReservationWithBeds, "host_office_id"> & {
 
 type ReservationManagementProps = {
     reservations: LaravelPagination<Reservation>;
-    filters: ReservationFilters;
+    filters: Omit<ReservationFilters, "payment_type">;
 };
 
 const { reservations, filters } = defineProps<ReservationManagementProps>();
