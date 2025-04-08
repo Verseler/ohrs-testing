@@ -160,7 +160,7 @@ function cancelStatus() {
                 class="p-6 mb-6 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
             >
                 <CardTitle class="mb-4 text-2xl font-bold text-center">
-                    Update Status
+                    Update Status to
                 </CardTitle>
 
                 <CardContent>
@@ -184,7 +184,7 @@ function cancelStatus() {
                         @click="showCancelConfirmation()"
                     >
                         <XCircleIcon class="mr-1 !size-5" />
-                        Cancel Reservation
+                        Cancel
                     </Button>
 
                     <div class="mt-3 text-sm text-center text-gray-500">
