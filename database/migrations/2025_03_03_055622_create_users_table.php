@@ -41,7 +41,7 @@ return new class extends Migration {
         DB::table('users')->insert([
             'name' => 'verselerf_handuman',
             'role' => 'super_admin',
-            'office_id' => 175,
+            'office_id' => 176,
             'password' => bcrypt('denrregionx'),
         ]);
 
