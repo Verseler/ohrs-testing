@@ -36,6 +36,7 @@ export type Reservation = {
 export type ReservationFilters = {
     status: ReservationStatus | null;
     balance: 'paid' | 'has_balance' | null;
+    payment_type: PaymentType | null;
     search: string | undefined;
     sort_by: string | null;
     sort_order: 'asc' | 'desc' | null;

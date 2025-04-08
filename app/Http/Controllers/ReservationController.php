@@ -54,6 +54,11 @@ class ReservationController extends Controller
             };
         }
 
+        // Payment Type Filter
+        if ($request->filled('payment_type')) {
+            $query->where('payment_type', $request->payment_type);
+        }
+
         // Sorting updates
         if ($request->filled('sort_by')) {
             $sortBy = in_array($request->sort_by, [
@@ -74,7 +79,7 @@ class ReservationController extends Controller
 
         return Inertia::render("Admin/Reservation/ReservationManagement", [
             'reservations' => $reservations,
-            'filters' => $request->only(['search', 'status', 'balance', 'sort_by', 'sort_order'])
+            'filters' => $request->only(['search', 'status', 'balance', 'payment_type', 'sort_by', 'sort_order'])
         ]);
     }
 

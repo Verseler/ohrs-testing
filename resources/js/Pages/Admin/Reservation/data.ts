@@ -9,6 +9,10 @@ export const data = {
         {value: 'checked_out', label: 'Checked Out'},
         {value: 'canceled', label: 'Canceled'},
     ],
+    filterPaymentType: [
+        {value: 'full_payment', label: 'Full Payment'},
+        {value: 'pay_later', label: 'Pay Later'},
+    ],
     filterBalance: [
         {value: 'paid', label: 'Paid'},
         {value: 'has_balance', label: 'Has Balance'},
@@ -29,6 +33,7 @@ export const data = {
         "Total Billings",
         "Remaining Balance",
         "Number of Guests",
+        "Payment Type",
         "Status",
         ""
     ],

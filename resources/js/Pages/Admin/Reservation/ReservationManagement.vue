@@ -43,6 +43,7 @@ import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
+import PaymentTypeBadge from "@/Components/PaymentTypeBadge.vue";
 
 usePoll(10000);
 
@@ -60,6 +61,7 @@ const { reservations, filters } = defineProps<ReservationManagementProps>();
 const form = useForm<ReservationFilters>({
     status: filters.status,
     balance: filters.balance,
+    payment_type: filters.payment_type,
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
@@ -90,6 +92,7 @@ watch(
     [
         () => form.status,
         () => form.balance,
+        () => form.payment_type,
         () => form.search,
         () => form.sort_by,
         () => form.sort_order,
@@ -124,6 +127,12 @@ watch(
                     placeholder="Balance Status"
                     label="Balance"
                     :items="data.filterBalance"
+                />
+                <SelectField
+                    v-model="form.payment_type"
+                    placeholder="Payment Type"
+                    label="Payment Type"
+                    :items="data.filterPaymentType"
                 />
                 <SelectField
                     v-model="form.sort_by"
@@ -187,6 +196,11 @@ watch(
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.guests.length }}
+                            </TableCell>
+                            <TableCell>
+                                <PaymentTypeBadge
+                                    :payment-type="reservation.payment_type"
+                                />
                             </TableCell>
                             <TableCell>
                                 <StatusBadge :status="reservation.status" />
