@@ -112,11 +112,30 @@ class ReservationStatusController extends Controller
 
     public function checkStatus(string $code)
     {
-        $reservation = Reservation::with(['guests', 'hostelOffice.region'])->where('reservation_code', $code)->first();
+        $reservation = Reservation::with(['hostelOffice.region'])
+            ->select(
+                'id',
+                'reservation_code',
+                'status',
+                'check_in_date',
+                'check_out_date',
+                'total_billings',
+                'remaining_balance',
+                'hostel_office_id',
+                'first_name',
+                'last_name'
+            )
+            ->withCount('guests')
+            ->where('reservation_code', $code)
+            ->first();
 
         if (!$reservation) {
             return redirect()->back()->with('error', 'Reservation doesn\'t exist.');
         }
+
+        // Obscure the guest's name but show first letter
+        $reservation->first_name = $reservation->first_name[0] . str_repeat('*', strlen($reservation->first_name) - 1);
+        $reservation->last_name = $reservation->last_name[0] . str_repeat('*', strlen($reservation->last_name) - 1);
 
         return Inertia::render('Guest/CheckReservationStatus/ReservationStatusResult', [
             'reservation' => $reservation
@@ -138,16 +157,14 @@ class ReservationStatusController extends Controller
             ->select([
                 'id',
                 'reservation_code',
-                'first_name',
-                'middle_initial',
-                'last_name',
                 'check_in_date',
                 'check_out_date',
             ])
             ->where(function ($query) use ($search) {
                 $query->where('reservation_code', 'ILIKE', "%{$search}%")
                     ->orWhere('first_name', 'ILIKE', "%{$search}%")
-                    ->orWhere('last_name', 'ILIKE', "%{$search}%");
+                    ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
             })
             ->get();
 

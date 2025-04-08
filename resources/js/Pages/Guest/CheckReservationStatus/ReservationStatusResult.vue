@@ -12,7 +12,9 @@ import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { computed } from "vue";
 
 type ReservationStatusResult = {
-    reservation: Reservation;
+    reservation: Reservation & {
+        guestCount: number;
+    };
 };
 
 const { reservation } = defineProps<ReservationStatusResult>();
@@ -80,7 +82,7 @@ const statusConfig = computed(() => {
 <template>
     <Head title="Reservation Result" />
 
-    <d class="w-full min-h-screen">
+    <div class="w-full min-h-screen">
         <Header />
 
         <!-- Reservation Status Result -->
@@ -203,5 +205,5 @@ const statusConfig = computed(() => {
                 </div>
             </CardContent>
         </Card>
-    </d>
+    </div>
 </template>

@@ -68,34 +68,7 @@ function submitSearch() {
                         class="flex items-center justify-between"
                     >
                         <p>
-                            {{ reservation.first_name }}
-                            {{ reservation.middle_initial }}
-                            {{ reservation.last_name }}
-                            <span class="block text-xs text-blue-500 md:inline-block">
-                                [{{ reservation.check_in_date }}
-                                <span class="text-neutral-500">to</span>
-                                {{ reservation.check_out_date }}]
-                            </span>
-                        </p>
-                        <Button
-                            @click="
-                                checkReservation(reservation.reservation_code)
-                            "
-                            variant="outline"
-                            class="border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
-                        >
-                            Check Status
-                        </Button>
-                    </div>
-                    <div
-                        v-for="reservation in reservations"
-                        :key="reservation.id"
-                        class="flex items-center justify-between"
-                    >
-                        <p>
-                            {{ reservation.first_name }}
-                            {{ reservation.middle_initial }}
-                            {{ reservation.last_name }}
+                            {{ reservation.reservation_code }}
                             <span class="block text-xs text-blue-500 md:inline-block">
                                 [{{ reservation.check_in_date }}
                                 <span class="text-neutral-500">to</span>
