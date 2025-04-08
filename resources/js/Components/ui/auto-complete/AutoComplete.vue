@@ -88,7 +88,7 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
                 'border-primary-800 focus:border-primary-500': !invalid,
             }"
         />
-    
+
         <ul
             v-if="showSuggestions && filteredItems.length > 0"
             class="absolute z-20 w-full mt-1 overflow-y-auto bg-white border rounded max-h-52"
@@ -99,6 +99,7 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
                 @click="selectItem(item)"
                 :class="{ selected: index === selectedIndex }"
                 class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                tabindex='0'
             >
                 {{ item }}
             </li>
