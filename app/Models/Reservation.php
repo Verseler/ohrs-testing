@@ -11,13 +11,9 @@ class Reservation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'reservation_code',
-        'check_in_date',
-        'check_out_date',
-        'daily_rate',
+        'code',
         'total_billings',
         'remaining_balance',
-        'status',
         'payment_type',
         'first_name',
         'middle_initial',
@@ -40,11 +36,6 @@ class Reservation extends Model
         return $this->belongsTo(Office::class, 'hostel_office_id');
     }
 
-    public function guestBeds()
-    {
-        return $this->hasMany(GuestBeds::class);
-    }
-
     public function payments()
     {
         return $this->hasMany(Payment::class);
@@ -55,6 +46,17 @@ class Reservation extends Model
         return $this->hasMany(PaymentExemption::class);
     }
 
+    public function stayDetails()
+    {
+        return $this->hasMany(StayDetails::class);
+    }
+
+    // TODO: remove
+    public function guestBeds()
+    {
+        return $this->hasMany(GuestBeds::class);
+    }
+
     public function reservedBeds()
     {
         return $this->hasManyThrough(Bed::class, GuestBeds::class, 'reservation_id', 'id', 'id', 'bed_id');
@@ -63,5 +65,25 @@ class Reservation extends Model
     public function reservedBedsWithGuests()
     {
         return $this->guestBeds()->with(['bed.room.eligibleGenderSchedules', 'guest']);
+    }
+
+    public function getStayDateRange()
+    {
+        $stayDetails = $this->stayDetails;
+
+        if ($stayDetails->isEmpty()) {
+            return [
+                'min_check_in_date' => null,
+                'max_check_out_date' => null
+            ];
+        }
+
+        $minCheckInDate = $stayDetails->min('check_in_date');
+        $maxCheckOutDate = $stayDetails->max('check_out_date');
+
+        return [
+            'min_check_in_date' => $minCheckInDate,
+            'max_check_out_date' => $maxCheckOutDate
+        ];
     }
 }

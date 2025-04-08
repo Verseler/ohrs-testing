@@ -21,6 +21,13 @@ class Bed extends Model
         return $this->belongsTo(Room::class);
     }
 
+    public function StayDetails()
+    {
+        return $this->hasMany(StayDetails::class);
+    }
+
+    // TODO: remove
+
     public function guestBeds()
     {
         return $this->hasMany(GuestBeds::class);

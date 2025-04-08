@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->string('last_name');
             $table->string('office');
             $table->enum('gender', ['male', 'female']);
-            $table->boolean('is_exempted')->default(false);
             $table->foreignId('reservation_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

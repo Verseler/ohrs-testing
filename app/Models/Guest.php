@@ -15,8 +15,7 @@ class Guest extends Model
         'last_name',
         'gender',
         'office',
-        'reservation_id',
-        'is_exempted'
+        'reservation_id'
     ];
 
     public function reservation()
@@ -24,13 +23,19 @@ class Guest extends Model
         return $this->belongsTo(Reservation::class);
     }
 
-    public function guestBeds()
-    {
-        return $this->hasMany(GuestBeds::class);
-    }
-
     public function paymentExemption()
     {
         return $this->hasOne(PaymentExemption::class);
+    }
+
+    public function stayDetails()
+    {
+        return $this->hasMany(StayDetails::class);
+    }
+
+    //TODO: remove
+    public function guestBeds()
+    {
+        return $this->hasMany(GuestBeds::class);
     }
 }

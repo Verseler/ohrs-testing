@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ReservationCodeMail;
 use App\Models\Guest;
 use App\Models\Office;
-use App\Models\Region;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
 use App\Jobs\SendReservationCodeEmail;
+use App\Models\StayDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -39,18 +38,18 @@ class ReservationProcessController extends Controller
     {
         $validated = $request->validate(
             [
-                'check_in_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:check_out_date'],
-                'check_out_date' => ['required', 'date', 'after_or_equal:today', 'after_or_equal:check_in_date'],
                 'first_name' => ['required', 'string', 'max:255'],
                 'middle_initial' => ['nullable', 'string', 'max:1'],
                 'last_name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'email', 'max:255'],
                 'phone' => ['required', 'size:10', 'regex:/(9)[0-9]{9}/'],
+                'email' => ['required', 'email', 'max:255'],
                 'hostel_office_id' => ['required', 'numeric'],
                 'id_type' => ['required', 'string'],
                 'employee_id' => ['required', 'string'],
                 'purpose_of_stay' => ['required', 'string'],
                 'guests' => ['required', 'array', 'min:1'],
+                'guests.*.check_in_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:guests.*.check_out_date'],
+                'guests.*.check_out_date' => ['required', 'date', 'after_or_equal:today', 'after_or_equal:guests.*.check_in_date'],
                 'guests.*.first_name' => ['required', 'string', 'max:20'],
                 'guests.*.last_name' => ['required', 'string', 'max:20'],
                 'guests.*.gender' => ['required', Rule::in(['male', 'female'])],
@@ -64,7 +63,13 @@ class ReservationProcessController extends Controller
                 'guests.*last_name.string' => 'Last name must be a string.',
                 'guests.*.last_name.max' => 'Must be at most 20 characters.',
                 'guests.*.gender.required' => 'Required.',
-                'guests.*.office.required' => 'Required'
+                'guests.*.office.required' => 'Required',
+                'guests.*.check_in_date.required' => 'Required.',
+                'guests.*.check_in_date.date' => 'Invalid date.',
+                'guests.*.check_in_date.after_or_equal' => 'Must be after or equal to today.',
+                'guests.*.check_in_date.before_or_equal' => 'Must be before or equal to check out date.',
+                'guests.*.check_out_date.required' => 'Required.',
+                'guests.*.check_out_date.date' => 'Invalid date.',
             ]
         );
 
@@ -74,13 +79,9 @@ class ReservationProcessController extends Controller
 
                 //create an initial reservation
                 $reservation = Reservation::create([
-                    'reservation_code' => $this->generateReservationCode($hostelOffice->name),
-                    'check_in_date' => $validated['check_in_date'],
-                    'check_out_date' => $validated['check_out_date'],
-                    'daily_rate' => 0,
+                    'code' => $this->generateReservationCode($hostelOffice->name),
                     'total_billings' => 0,
                     'remaining_balance' => 0,
-                    'status' => 'pending',
                     'payment_type' => 'full_payment',
                     'first_name' => $validated['first_name'],
                     'middle_initial' => $validated['middle_initial'] ?? null,
@@ -95,15 +96,26 @@ class ReservationProcessController extends Controller
 
                 //create guests
                 foreach ($validated['guests'] as $guest) {
-                    $guest = Guest::create([
+                    $currentGuest = Guest::create([
                         'first_name' => $guest['first_name'],
                         'last_name' => $guest['last_name'],
                         'gender' => $guest['gender'],
                         'office' => $guest['office'],
                         'reservation_id' => $reservation->id,
-                        'is_exempted' => false
+                    ]);
+
+                    StayDetails::create([
+                        'check_in_date' => $guest['check_in_date'],
+                        'check_out_date' => $guest['check_out_date'],
+                        'daily_rate' => 0,
+                        'is_exempted' => false,
+                        'status' => 'pending',
+                        'bed_id' => null,
+                        'reservation_id' => $reservation->id,
+                        'guest_id' => $currentGuest->id,
                     ]);
                 }
+
 
                 // Store reservation details in the session
                 session([
@@ -118,12 +130,11 @@ class ReservationProcessController extends Controller
                     new NewReservationNotification($reservation)
                 );
 
-                //Send reservation code to guest email
+                //Send reservation code to email
                 $details = [
                     'title' => 'Reservation Code - OHRS',
-                    'content' => $reservation->reservation_code,
+                    'content' => $reservation->code,
                 ];
-
                 SendReservationCodeEmail::dispatch($reservation->email, $details);
             });
         } catch (\Exception $e) {
@@ -136,7 +147,7 @@ class ReservationProcessController extends Controller
 
     private function generateReservationCode(string $officeName): string
     {
-        $date = now()->format('Ym'); // Year and month only
+        $date = now()->format('Ym');
 
         // Office acronym codes
         $officeCodes = [
@@ -149,13 +160,13 @@ class ReservationProcessController extends Controller
         $officeCode = $officeCodes[$officeName] ?? 'RES';
 
         // Get the latest reservation for this office in current month
-        $latestReservation = Reservation::where('reservation_code', 'like', "{$officeCode}-{$date}-%")
-            ->orderBy('reservation_code', 'desc')
+        $latestReservation = Reservation::where('code', 'like', "{$officeCode}-{$date}-%")
+            ->orderBy('code', 'desc')
             ->first();
 
         // Determine the next sequence number
         if ($latestReservation) {
-            $parts = explode('-', $latestReservation->reservation_code);
+            $parts = explode('-', $latestReservation->code);
             $lastSequence = (int) end($parts);
             $sequence = $lastSequence + 1;
         } else {
@@ -169,40 +180,40 @@ class ReservationProcessController extends Controller
 
     public function confirmation()
     {
-        $reservationConfirmationInfo = [
-            'check_in_date' => null,
-            'check_out_date' => null,
-            'status' => null,
-            'reservation_code' => null,
+        $reservationDetails = [
+            'from' => null,
+            'to' => null,
+            'code' => null,
             'hostel_office_name' => null,
             'total_guests' => null
         ];
 
         try {
-            DB::transaction(function () use (&$reservationConfirmationInfo) {
+            DB::transaction(function () use (&$reservationDetails) {
                 // Retrieve reservation details from the session
                 $reservationId = session('reservation_id');
                 $totalGuests = session('total_guests');
 
                 $reservation = Reservation::findOrFail($reservationId);
+                $stayRange = $reservation->getStayDateRange();
                 $hostelOffice = Office::with('region')->findOrFail($reservation->hostel_office_id);
                 $regionName = $hostelOffice->region->name;
 
-                $reservationConfirmationInfo = [
-                    'check_in_date' => $reservation->check_in_date,
-                    'check_out_date' => $reservation->check_out_date,
-                    'status' => $reservation->status,
-                    'reservation_code' => $reservation->reservation_code,
+                $reservationDetails = [
+                    'from' => $stayRange['min_check_in_date'],
+                    'to' => $stayRange['max_check_out_date'],
+                    'code' => $reservation->code,
                     'hostel_office_name' => "Region $regionName - $hostelOffice->name",
                     'total_guests' => $totalGuests
                 ];
+        
             });
         } catch (\Exception $e) {
             return redirect()->back()->with('errors', 'An error occurred while processing your reservation.');
         }
 
         return Inertia::render('Guest/ReservationConfirmation/ReservationConfirmation', [
-            'reservation' => $reservationConfirmationInfo
+            'reservation' => $reservationDetails
         ]);
     }
 }
