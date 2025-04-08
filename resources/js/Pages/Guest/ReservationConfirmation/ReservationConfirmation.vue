@@ -88,7 +88,7 @@ onMounted(() => {
             <p class="mb-2 text-center text-muted-foreground text-neutral-500">
                 Your reservation has been successfully submitted. Please wait
                 while your reservation is being processed. You can check your
-                reservation status below.
+                reservation status using the code below.
             </p>
 
             <LinkButton
@@ -107,8 +107,8 @@ onMounted(() => {
                 severity="info"
                 class="flex items-center justify-center mb-2 text-sm gap-x-2"
             >
-                <Info class="size-3.5" /> You can check your reservation in your
-                email.
+                <Info class="size-3.5" /> A copy of your reservation code has
+                been sent to your email.
             </Message>
             <Card id="confirmation" class="rounded-sm shadow">
                 <CardHeader class="pb-4 text-center">
@@ -127,7 +127,6 @@ onMounted(() => {
                     </div>
 
                     <Separator />
-
                     <div class="space-y-4">
                         <ListItem
                             :icon="Calendar"

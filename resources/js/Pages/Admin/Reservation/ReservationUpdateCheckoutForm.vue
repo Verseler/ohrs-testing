@@ -117,7 +117,7 @@ function submitExtendReservation() {
 </script>
 
 <template>
-    <Head title="Update Reservation Checkout" />
+    <Head title="Update Checkout Date" />
 
     <AuthenticatedLayout>
         <div class="flex justify-between min-h-12">
@@ -154,7 +154,7 @@ function submitExtendReservation() {
 
         <PageHeader>
             <template #icon><CalendarCheck /></template>
-            <template #title>Update Reservation Checkout</template>
+            <template #title>Update Checkout Date</template>
         </PageHeader>
 
         <div class="max-w-2xl">

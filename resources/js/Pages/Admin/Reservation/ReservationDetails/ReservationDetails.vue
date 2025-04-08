@@ -179,7 +179,7 @@ onMounted(() => {
                             "
                         >
                             <CalendarPlus class="mr-1" />
-                            Update Reservation
+                            Update Checkout Date
                         </LinkButton>
 
                         <!-- Edit a bed assignment -->
