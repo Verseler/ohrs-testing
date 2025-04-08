@@ -108,7 +108,7 @@ function submit() {
         <form @submit.prevent="showConfirmation" class="max-w-lg space-y-6">
             <!-- Name Field -->
             <div class="flex flex-col gap-2">
-                <Label for="name">Display Name</Label>
+                <Label for="name">Username</Label>
                 <Input
                     id="name"
                     v-model="form.name"

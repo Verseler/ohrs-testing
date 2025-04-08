@@ -95,8 +95,8 @@ function resetState() {
                 </DialogHeader>
 
                 <!-- Date Selection -->
-                <div class="grid gap-2 py-1 sm:grid-cols-2">
-                    <div class="space-y-2">
+                <div class="grid py-1 gap-x-2 sm:grid-cols-2">
+                    <div>
                         <Label for="check-in-date"> Check-in Date </Label>
                         <InputDate
                             id="check-in-date"
@@ -109,7 +109,7 @@ function resetState() {
                         </InputError>
                     </div>
 
-                    <div class="space-y-2">
+                    <div>
                         <Label for="check-out-date"> Check-out Date </Label>
                         <InputDate
                             id="check-out-date"
@@ -128,6 +128,7 @@ function resetState() {
                     @click="searchAvailableBeds"
                     :disabled="!form.check_in_date || !form.check_out_date"
                     class="w-full mb-4 sm:w-auto"
+                    size="lg"
                 >
                     <LoaderCircle
                         v-if="form.processing"
@@ -140,6 +141,7 @@ function resetState() {
 
                 <!-- Results Section -->
                 <div class="max-h-[400px] overflow-y-auto pr-1">
+                    <h3 class="mb-2 text-lg font-semibold">Available bed/s</h3>
                     <div
                         v-if="form.processing"
                         class="flex justify-center py-8"
@@ -149,25 +151,26 @@ function resetState() {
                         />
                     </div>
 
-                    <h3 class="mb-2 text-lg font-semibold">Available bed/s</h3>
-                    <div
-                        v-if="availableRooms && availableRooms.length > 0"
-                        class="space-y-4 overflow-y-auto"
-                    >
-                        <BedAvailableItem
-                            v-for="room in availableRooms"
-                            :key="room.id"
-                            :name="room.name"
-                            :eligibleGender="room.eligible_gender"
-                            :availableBeds="room.beds_count"
-                        />
-                    </div>
-                    <p
-                        v-else
-                        class="py-2 text-sm italic text-center text-neutral-500"
-                    >
-                        No available beds for the selected dates.
-                    </p>
+                    <template v-else>
+                        <div
+                            v-if="availableRooms && availableRooms.length > 0"
+                            class="space-y-4 overflow-y-auto"
+                        >
+                            <BedAvailableItem
+                                v-for="room in availableRooms"
+                                :key="room.id"
+                                :name="room.name"
+                                :eligibleGender="room.eligible_gender"
+                                :availableBeds="room.beds_count"
+                            />
+                        </div>
+                        <p
+                            v-else
+                            class="py-2 text-sm italic text-center text-neutral-500"
+                        >
+                            No available beds for the selected dates.
+                        </p>
+                    </template>
                 </div>
 
                 <DialogFooter class="mt-4">

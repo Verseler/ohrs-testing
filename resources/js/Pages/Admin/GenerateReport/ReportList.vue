@@ -174,7 +174,7 @@ function printReport() {
                         </TableRow>
                     </template>
 
-                    <TableRow class="bg-neutral-200">
+                    <TableRow class="bg-neutral-50">
                         <TableCell colspan="5" class="text-right">
                             Total Amount:
                         </TableCell>
