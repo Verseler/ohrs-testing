@@ -30,12 +30,6 @@ class Guest extends Model
 
     public function stayDetails()
     {
-        return $this->hasMany(StayDetails::class);
-    }
-
-    //TODO: remove
-    public function guestBeds()
-    {
-        return $this->hasMany(GuestBeds::class);
+        return $this->hasOne(StayDetails::class);
     }
 }

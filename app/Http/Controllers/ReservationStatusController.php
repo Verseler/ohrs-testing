@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
-use App\Models\GuestBeds;
+use App\Models\StayDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +16,58 @@ class ReservationStatusController extends Controller
     public function editStatusForm(int $id)
     {
         $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+            ->with(['guests' => function($query) {
+                $query->whereHas('stayDetails', function($query) {
+                    $query->whereNotIn('status', ['canceled', 'checked_out']);
+                });
+            }, 'guests.stayDetails' => function($query) {
+                $query->whereNotIn('status', ['canceled', 'checked_out']);
+            }])
+            ->findOrFail($id);
+
+        return Inertia::render('Admin/Reservation/EditGuestReservationStatus', [
+            'reservation' => $reservation
+        ]);
+    }
+
+    public function editStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'reservation_id' => ['required', 'exists:reservations,id'],
+            'status' => ['required', Rule::in(['confirmed', 'checked_in', 'checked_out'])],
+            'selected_guest_id' => ['required', 'exists:guests,id']
+        ]);
+
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+            ->with('guests.stayDetails')
+            ->findOrFail($validated['reservation_id']);
+
+
+        $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
+
+        $guest->stayDetails()->update([
+            'status' => $validated['status']
+        ]);
+
+        return to_route('reservation.show', ['id' => $reservation->id])
+            ->with('success', 'Reservation status updated successfully.');
+    }
+
+
+    public function editAllStatusForm(int $id)
+    {
+        $reservation = Reservation::with('guests.stayDetails.bed.room')
+            ->addSelect([
+                'min_check_in_date' => StayDetails::select('check_in_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderBy('check_in_date')
+                    ->limit(1),
+                'max_check_out_date' => StayDetails::select('check_out_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderByDesc('check_out_date')
+                    ->limit(1)
+            ])
+            ->where('hostel_office_id', Auth::user()->office_id)
             ->findOrFail($id);
 
         return Inertia::render('Admin/Reservation/EditReservationStatus', [
@@ -23,7 +75,7 @@ class ReservationStatusController extends Controller
         ]);
     }
 
-    public function editStatus(Request $request)
+    public function editAllStatus(Request $request)
     {
         $validated = $request->validate([
             'reservation_id' => ['required', 'exists:reservations,id'],
@@ -33,24 +85,24 @@ class ReservationStatusController extends Controller
         $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
             ->findOrFail($validated['reservation_id']);
 
-        // Check for previous reservations with unpaid balances
+
+        //Prevent checking in new reservation if the previous reservation has unpaid balance or its payment type is not pay later
         if ($validated['status'] === 'checked_in') {
             $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
-                ->with('guestBeds.bed')
+                ->with('stayDetails.bed')
                 ->findOrFail($validated['reservation_id']);
 
-            // Get beds reserved for current reservation
-            $reservedBedIds = $reservation->guestBeds->pluck('bed_id')->toArray();
+            $reservedBedIds = $reservation->stayDetails->pluck('bed_id')->toArray();
 
             // Check for previous reservations of the same beds with unpaid balances
             if (!empty($reservedBedIds)) {
                 $previousReservations = Reservation::where('hostel_office_id', Auth::user()->office_id)
-                    ->whereNotIn('status', ['pending', 'canceled'])
+                    ->whereNotIn('general_status', ['pending', 'canceled'])
                     ->where(function ($query) {
                         $query->where('remaining_balance', '>', 0)
                             ->where('payment_type', '!=', 'pay_later');
                     })
-                    ->whereHas('guestBeds', function ($query) use ($reservedBedIds) {
+                    ->whereHas('stayDetails', function ($query) use ($reservedBedIds) {
                         $query->whereIn('bed_id', $reservedBedIds);
                     })
                     ->whereNot('id', $reservation->id)
@@ -61,25 +113,29 @@ class ReservationStatusController extends Controller
                 }
             }
         }
-
-        $reservation->status = $validated['status'];
+        $reservation->general_status = $validated['status'];
+        $reservation->stayDetails()->update([
+            'status' => $validated['status']
+        ]);
         $reservation->save();
 
         return to_route('reservation.show', ['id' => $reservation->id])
             ->with('success', 'Reservation status updated successfully.');
     }
 
+
+
     public function cancel(int $id)
     {
         try {
             DB::transaction(function () use ($id) {
                 $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
-                    ->with(['guestBeds', 'guests'])
+                    ->with(['stayDetails', 'guests'])
                     ->findOrFail($id);
 
                 // Delete all bed-guest associations for this reservation
-                if ($reservation->guestBeds->isNotEmpty()) {
-                    GuestBeds::where('reservation_id', $reservation->id)->delete();
+                if ($reservation->stayDetails->isNotEmpty()) {
+                    $reservation->stayDetails()->delete();
                 }
 
                 // Delete all guests associated with this reservation
@@ -87,9 +143,11 @@ class ReservationStatusController extends Controller
                     $reservation->guests()->delete();
                 }
 
+                //
+
                 // Update reservation status
-                $reservation->status = 'canceled';
-                $reservation->daily_rate = 0;
+                $reservation->general_status = 'canceled';
+                $reservation->individual_billings = 0;
                 $reservation->total_billings = 0;
                 $reservation->remaining_balance = 0;
                 $reservation->save();
@@ -115,18 +173,26 @@ class ReservationStatusController extends Controller
         $reservation = Reservation::with(['hostelOffice.region'])
             ->select(
                 'id',
-                'reservation_code',
-                'status',
-                'check_in_date',
-                'check_out_date',
+                'code',
+                'general_status',
                 'total_billings',
                 'remaining_balance',
                 'hostel_office_id',
                 'first_name',
                 'last_name'
             )
+            ->addSelect([
+                'min_check_in_date' => StayDetails::select('check_in_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderBy('check_in_date')
+                    ->limit(1),
+                'max_check_out_date' => StayDetails::select('check_out_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderByDesc('check_out_date')
+                    ->limit(1)
+            ])
             ->withCount('guests')
-            ->where('reservation_code', $code)
+            ->where('code', $code)
             ->first();
 
         if (!$reservation) {
@@ -150,20 +216,26 @@ class ReservationStatusController extends Controller
                 'success' => false,
                 'message' => 'Search term cannot be empty',
                 'data' => null
-            ], 400);
+            ]);
         }
 
         $reservations = Reservation::query()
             ->select([
                 'id',
-                'reservation_code',
-                'check_in_date',
-                'check_out_date',
+                'code'
+            ])
+            ->addSelect([
+                'min_check_in_date' => StayDetails::select('check_in_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderBy('check_in_date')
+                    ->limit(1),
+                'max_check_out_date' => StayDetails::select('check_out_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderByDesc('check_out_date')
+                    ->limit(1)
             ])
             ->where(function ($query) use ($search) {
-                $query->where('reservation_code', 'ILIKE', "%{$search}%")
-                    ->orWhere('first_name', 'ILIKE', "%{$search}%")
-                    ->orWhere('last_name', 'ILIKE', "%{$search}%")
+                $query->where('code', 'ILIKE', "%{$search}%")
                     ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
             })
             ->get();

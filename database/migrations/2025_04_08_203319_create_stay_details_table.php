@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->date('check_in_date');
             $table->date('check_out_date');
-            $table->double('daily_rate');
+            $table->double('individual_billings');
             $table->boolean('is_exempted')->default(false);
             $table->enum('status', allowed: ['pending', 'confirmed', 'canceled', 'checked_in', 'checked_out'])->default('pending');
             $table->foreignId('bed_id')->nullable()->constrained()->nullOnDelete();

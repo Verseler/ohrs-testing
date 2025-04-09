@@ -1,4 +1,4 @@
-import type { Guest } from '@/Pages/Guest/guest.types';
+import type { Gender, Guest } from '@/Pages/Guest/guest.types';
 import type { Bed, BedWithGuest, Room } from '@/Pages/Admin/Room/room.types';
 import type { Office } from '@/Pages/Admin/Office/office.types';
 
@@ -25,6 +25,9 @@ export type Reservation = {
     employee_id: string;
     reserved_beds: Bed[];
     purpose_of_stay: string | null;
+    general_status: ReservationStatus;
+    min_check_in_date?: string | null;
+    max_check_out_date?: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -33,18 +36,21 @@ export type StayDetails = {
     id: number;
     check_in_date: string;
     check_out_date: string;
-    daily_rate: number;
+    individual_billings: number;
     is_exempted: boolean;
     status: ReservationStatus;
     bed_id: number;
+    bed: Bed;
     reservation_id: number;
+    reservation: Reservation;
     guest_id: number;
+    guest: Guest;
     created_at: string;
     updated_at: string;
 }
 
 export type ReservationFilters = {
-    status: ReservationStatus | null;
+    general_status: ReservationStatus | null;
     balance: 'paid' | 'has_balance' | null;
     payment_type: PaymentType | null;
     search: string | undefined;
@@ -75,4 +81,14 @@ export type ExtendedReservation = {
     reservation_id: number;
     created_at: string;
     updated_at: string;
+}
+
+
+export type GuestAssignment = {
+    id: number;
+    name: string;
+    check_in_date: string;
+    check_out_date: string;
+    gender: Gender;
+    bed_id: number | null;
 }

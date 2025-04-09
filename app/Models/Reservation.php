@@ -24,6 +24,7 @@ class Reservation extends Model
         'id_type',
         'employee_id',
         'purpose_of_stay',
+        'general_status'
     ];
 
     public function guests()
@@ -51,21 +52,27 @@ class Reservation extends Model
         return $this->hasMany(StayDetails::class);
     }
 
-    // TODO: remove
-    public function guestBeds()
-    {
-        return $this->hasMany(GuestBeds::class);
-    }
 
-    public function reservedBeds()
-    {
-        return $this->hasManyThrough(Bed::class, GuestBeds::class, 'reservation_id', 'id', 'id', 'bed_id');
-    }
+   public function reservedBeds()
+   {
+       return $this->hasManyThrough(Bed::class, StayDetails::class, 'reservation_id', 'id', 'id', 'bed_id');
+   }
 
-    public function reservedBedsWithGuests()
-    {
-        return $this->guestBeds()->with(['bed.room.eligibleGenderSchedules', 'guest']);
-    }
+   public function reservedBedsWithGuests()
+   {
+       return $this->stayDetails()->with(['bed.room.eligibleGenderSchedules', 'guest']);
+   }
+
+   public function recomputeBillings() 
+   {
+        $newTotalBillings = $this->guests->sum('stayDetails.individual_billings');
+        $this->total_billings = $newTotalBillings;
+
+        $totalPayed = $this->payments->sum('amount');
+        $newRemainingBalance = max(0, $newTotalBillings - $totalPayed);
+        $this->remaining_balance = $newRemainingBalance;
+        $this->save();
+   }
 
     public function getStayDateRange()
     {

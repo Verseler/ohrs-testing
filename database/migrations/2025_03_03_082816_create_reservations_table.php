@@ -25,6 +25,7 @@ return new class extends Migration {
             $table->string('id_type');
             $table->string('employee_id');
             $table->text('purpose_of_stay');
+            $table->enum('general_status', allowed: ['pending', 'confirmed', 'canceled', 'checked_in', 'checked_out'])->default('pending');
             $table->timestamps();
         });
     }
