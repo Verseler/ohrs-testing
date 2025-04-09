@@ -21,6 +21,7 @@ const emit = defineEmits<{
 const selectedIndex = ref(-1);
 const showSuggestions = ref(false);
 const container = ref<HTMLElement | null>(null);
+const position = ref<'top' | 'bottom'>('bottom');
 
 const filteredItems = computed(() => {
     if (!model.value) return [];
@@ -33,6 +34,13 @@ const filteredItems = computed(() => {
 const handleInput = () => {
     showSuggestions.value = true;
     selectedIndex.value = -1;
+    
+    // Calculate position
+    if (container.value) {
+        const inputRect = container.value.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - inputRect.bottom;
+        position.value = spaceBelow < 200 ? 'top' : 'bottom';
+    }
 };
 
 const handleArrowDown = () => {
@@ -91,7 +99,12 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
 
         <ul
             v-if="showSuggestions && filteredItems.length > 0"
-            class="absolute z-20 w-full mt-1 overflow-y-auto bg-white border rounded max-h-52"
+            class="absolute z-20 w-full overflow-y-auto bg-white border rounded max-h-52"
+            :class="{
+                'mt-1': position === 'bottom',
+                'mb-1': position === 'top',
+                'bottom-full': position === 'top',
+            }"
         >
             <li
                 v-for="(item, index) in filteredItems"
