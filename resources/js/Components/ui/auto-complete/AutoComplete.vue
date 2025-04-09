@@ -8,7 +8,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    placeholder: "Start typing...",
+    placeholder: "",
     invalid: false,
 });
 
