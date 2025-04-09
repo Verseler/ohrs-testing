@@ -18,12 +18,10 @@ export const data = {
         {value: 'has_balance', label: 'Has Balance'},
     ],
     sortBy: [
-        { value: "reservation_code", label: "Reservation code" },
+        { value: "code", label: "Reservation code" },
         { value: "first_name", label: "Booked by" },
-        { value: "check_in_date", label: "Checked in" },
-        { value: "check_out_date", label: "Checked out" },
         { value: "total_billings", label: "Total billings" },
-        { value: "status", label: "Status" },
+        { value: "general_status", label: "Status" },
     ],
     tableHeads: [
         "Reservation Code",
