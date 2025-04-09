@@ -62,6 +62,7 @@ const form = useForm<WaitingListFilers>({
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
+    general_status: filters.general_status,
 });
 
 const formHasValue = computed(() => form.search || form.sort_by);
@@ -71,6 +72,7 @@ const clearFilter = () => {
     form.search = undefined;
     form.sort_by = null;
     form.sort_order = "asc";
+    form.general_status = null;
 };
 
 function applyFilter() {
@@ -102,7 +104,7 @@ onMounted(() => showSuccess());
 
         <!-- Search, Filter and Sort -->
         <div
-            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
                 <SelectField
@@ -136,7 +138,6 @@ onMounted(() => showSuccess());
                         </TableHead>
                     </TableRowHeader>
                 </TableHeader>
-
                 <TableBody>
                     <template v-if="reservations.data.length > 0">
                         <TableRow
@@ -144,7 +145,7 @@ onMounted(() => showSuccess());
                             :key="reservation.id"
                         >
                             <TableCell class="font-medium">
-                                {{ reservation.reservation_code }}
+                                {{ reservation.code }}
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{
@@ -161,12 +162,16 @@ onMounted(() => showSuccess());
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{
-                                    formatDateString(reservation.check_in_date)
+                                    formatDateString(
+                                        reservation?.min_check_in_date ?? ""
+                                    )
                                 }}
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{
-                                    formatDateString(reservation.check_out_date)
+                                    formatDateString(
+                                        reservation?.max_check_out_date ?? ""
+                                    )
                                 }}
                             </TableCell>
                             <TableCell class="font-medium">

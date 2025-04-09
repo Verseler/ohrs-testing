@@ -2,7 +2,6 @@
 import EmployeeID from "@/Components/EmployeeID.vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Label } from "@/Components/ui/label";
-import { formatDateString } from "@/lib/utils";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import { Users } from "lucide-vue-next";
 
@@ -10,32 +9,18 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
 </script>
 
 <template>
-    <Card class="relative max-w-xl md:min-w-[27rem]">
+    <Card class="relative max-w-xl md:min-w-96">
         <CardHeader>
-            <CardTitle class="flex items-center justify-between">
+            <CardTitle class="flex justify-between items-center">
                 <span>Reservation Overview</span>
                 <span
-                    class="absolute px-3 py-2 ml-1 flex gap-x-1.5 font-normal text-white border rounded-sm rounded-tr-lg right-1 top-1 bg-primary-500 border-primary-500"
+                    class="flex absolute top-1 right-1 gap-x-1.5 px-3 py-2 ml-1 font-normal text-white rounded-sm rounded-tr-lg border bg-primary-500 border-primary-500"
                 >
                     <Users class="size-4" /> {{ reservation.guests.length }}
                 </span>
             </CardTitle>
         </CardHeader>
-        <CardContent class="grid grid-cols-2 gap-y-4 gap-x-2">
-            <div>
-                <Label class="text-neutral-700"> Check-in Date </Label>
-                <p class="text-lg font-medium text-primary-500">
-                    {{ formatDateString(reservation.check_in_date) }}
-                </p>
-            </div>
-
-            <div>
-                <Label class="text-neutral-700">Check-out Date</Label>
-                <p class="text-lg font-medium text-primary-500">
-                    {{ formatDateString(reservation.check_out_date) }}
-                </p>
-            </div>
-
+        <CardContent class="grid grid-cols-2 gap-x-2 gap-y-4">
             <div>
                 <Label class="text-neutral-700"> Booked By </Label>
                 <p class="font-medium">
@@ -53,7 +38,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
             <div class="col-span-2">
                 <Label class="text-neutral-700"> Code </Label>
                 <p class="font-medium">
-                    {{ reservation.reservation_code }}
+                    {{ reservation.code }}
                 </p>
             </div>
 
