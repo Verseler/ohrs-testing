@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use App\Models\Payment;
+use App\Models\StayDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -82,7 +83,17 @@ class GenerateReportController extends Controller
 
         $payments = Payment::with(['reservation.guests', 'reservation.stayDetails'])
             ->whereHas('reservation', function ($query) {
-                $query->where('hostel_office_id', Auth::user()->office_id);
+                $query->addSelect([
+                    'min_check_in_date' => StayDetails::select('check_in_date')
+                        ->whereColumn('reservation_id', 'reservations.id')
+                        ->orderBy('check_in_date')
+                        ->limit(1),
+                    'max_check_out_date' => StayDetails::select('check_out_date')
+                        ->whereColumn('reservation_id', 'reservations.id')
+                        ->orderByDesc('check_out_date')
+                        ->limit(1)
+                ])
+                ->where('hostel_office_id', Auth::user()->office_id);
             })
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'asc')
