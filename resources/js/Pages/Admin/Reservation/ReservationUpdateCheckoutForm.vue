@@ -35,6 +35,7 @@ import { InputError, InputDate } from "@/Components/ui/input";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Badge } from "@/Components/ui/badge";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select";
 
 type ReservationExtendFormProps = {
     reservation: Reservation;
@@ -44,50 +45,59 @@ const { reservation } = defineProps<ReservationExtendFormProps>();
 
 type ExtendForm = {
     reservation_id: number;
-    check_in_date: string | Date;
+    guest_id: number | null;
     new_check_out_date: string | Date;
 };
 
 const form = useForm<ExtendForm>({
-    reservation_id: reservation.id,
-    check_in_date: reservation.check_in_date,
-    new_check_out_date: reservation.check_out_date,
+    reservation_id: reservation?.id,
+    guest_id: null,
+    new_check_out_date: ''
+});
+
+const selectedGuest = computed(() => {
+    if (!form.guest_id) return null;
+    return reservation.guests.find(guest => guest.id === form.guest_id) || null;
 });
 
 const checkInDatePlusOne = computed(() => {
-    const checkInDate = new Date(reservation.check_in_date);
+    if(!selectedGuest.value) return;
+
+    const checkInDate = new Date(selectedGuest.value.stay_details.check_in_date);
     checkInDate.setDate(checkInDate.getDate() + 1);
 
     return checkInDate;
 });
 
 const lessThenOldCheckOut = computed(
-    () => reservation.check_out_date > form.new_check_out_date
+    () => {
+        if(!selectedGuest.value) return;
+
+        return new Date(selectedGuest.value.stay_details.check_in_date) > new Date(form.new_check_out_date)
+    }
 );
 
 const additionalDays = computed(() => {
+    if(!selectedGuest.value || !form.new_check_out_date) return 0;
+
     return getDaysDifference(
-        new Date(reservation.check_out_date),
-        form.new_check_out_date
+        new Date(selectedGuest.value.stay_details.check_out_date),
+        new Date(form.new_check_out_date)
     );
 });
 
 const additionalCharge = computed(() => {
-    return reservation.daily_rate * additionalDays.value;
-});
+    if(!selectedGuest.value) return 0;
 
-const bookedBy = computed(() => {
-    const firstName = reservation.first_name || "N/A";
-    const middleInitial = reservation.middle_initial
-        ? reservation.middle_initial + "."
-        : "";
-    const lastName = reservation.last_name || "N/A";
+    if(selectedGuest.value.stay_details.is_exempted) return 0;
 
-    return `${firstName} ${middleInitial} ${lastName}`;
+    return selectedGuest.value.stay_details.bed.price * additionalDays.value;
 });
 
 function extendByDays(days: number) {
-    const currentCheckout = new Date(reservation.check_out_date);
+    if(!selectedGuest.value) return;
+
+    const currentCheckout = new Date(selectedGuest.value.stay_details.check_out_date);
     const newDate = new Date(currentCheckout);
 
     newDate.setDate(newDate.getDate() + days);
@@ -95,11 +105,12 @@ function extendByDays(days: number) {
 }
 
 function reduceByDays(days: number) {
-    const currentCheckout = new Date(reservation.check_out_date);
+    if(!selectedGuest.value) return;
+
+    const currentCheckout = new Date(selectedGuest.value.stay_details.check_out_date);
     const newDate = new Date(currentCheckout);
     newDate.setDate(newDate.getDate() - days);
-
-    if (newDate <= new Date(reservation.check_in_date)) return;
+    if (newDate <= new Date(selectedGuest.value.stay_details.check_in_date)) return;
 
     form.new_check_out_date = formatDate(newDate) ?? newDate;
 }
@@ -161,67 +172,72 @@ function submitExtendReservation() {
             <Card>
                 <CardHeader>
                     <CardDescription>
-                        Extend the stay for reservation #{{
-                            reservation.reservation_code
-                        }}
+                        Extend the stay for reservation #{{ reservation.code }}
                     </CardDescription>
                 </CardHeader>
 
                 <CardContent class="space-y-6">
+                    <div>
+                        <Label class="mt-4"> Select Guest </Label>
+                        <Select v-model="form.guest_id">
+                            <SelectTrigger
+                                class="mt-2 h-12 rounded-sm shadow-none border-primary-700"
+
+                            >
+                                <SelectValue placeholder="Select a guest" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Guests</SelectLabel>
+                                    <SelectItem
+                                        v-for="guest in reservation.guests"
+                                        :value="guest.id"
+                                        :key="guest.id"
+                                    >
+                                        {{ guest.first_name }}
+                                        {{ guest.last_name }}
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <!-- Current Reservation Summary -->
                     <div class="p-4 rounded-lg bg-muted">
-                        <h3 class="mb-3 font-medium">Current Reservation</h3>
+
 
                         <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p class="text-muted-foreground">Booked By</p>
-                                <p class="font-medium">
-                                    {{ bookedBy }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-muted-foreground">Status</p>
-                                <StatusBadge :status="reservation.status" />
-                            </div>
-                            <div>
+                            <div v-if="selectedGuest">
                                 <p class="text-muted-foreground">
                                     Check-in Date
                                 </p>
                                 <p class="font-medium">
                                     {{
                                         formatDateString(
-                                            reservation.check_in_date
+                                            selectedGuest?.stay_details.check_in_date
                                         )
                                     }}
                                 </p>
                             </div>
-                            <div>
+                            <div v-if="selectedGuest">
                                 <p class="text-muted-foreground">
                                     Current Check-out Date
                                 </p>
                                 <p class="font-medium">
                                     {{
                                         formatDateString(
-                                            reservation.check_out_date
+                                            selectedGuest?.stay_details.check_out_date
                                         )
                                     }}
                                 </p>
                             </div>
-                            <div>
-                                <p>Reservation rate per day</p>
-                                <span class="font-medium">
-                                    ₱{{
-                                        formatCurrency(reservation.daily_rate)
-                                    }}
-                                </span>
-                            </div>
                         </div>
                     </div>
 
-                    <Separator />
+                    <Separator v-if="selectedGuest" />
 
                     <!-- Extension Form -->
-                    <form @submit.prevent="showConfirmation" class="space-y-4">
+                    <form v-if="selectedGuest" @submit.prevent="showConfirmation" class="space-y-4">
                         <!-- New Check-out Date -->
                         <div class="space-y-2">
                             <Label for="new-checkout-date">
@@ -297,7 +313,7 @@ function submitExtendReservation() {
                             v-if="additionalDays > 0"
                             class="p-4 space-y-3 rounded-lg bg-muted/50"
                         >
-                            <div class="flex items-center justify-between">
+                            <div class="flex justify-between items-center">
                                 <h3 class="font-medium">Extension Summary</h3>
                                 <Badge
                                     variant="outline"
@@ -309,12 +325,12 @@ function submitExtendReservation() {
                             </div>
 
                             <div class="space-y-2">
-                                <div class="flex justify-between text-sm">
-                                    <span>Reservation rate per day</span>
+                                <div v-if="selectedGuest" class="flex justify-between text-sm">
+                                    <span>Bed daily rate</span>
                                     <span class="font-medium">
                                         ₱{{
                                             formatCurrency(
-                                                reservation.daily_rate
+                                                selectedGuest?.stay_details.bed.price
                                             )
                                         }}
                                     </span>
@@ -339,10 +355,7 @@ function submitExtendReservation() {
 
                         <!-- New Balance -->
                         <div
-                            v-if="
-                                reservation.check_out_date !==
-                                form.new_check_out_date
-                            "
+                            v-if="form.new_check_out_date"
                             class="p-4 space-y-3 rounded-lg bg-muted/50"
                         >
                             <h3 class="font-medium">New Billings</h3>
@@ -386,12 +399,7 @@ function submitExtendReservation() {
                             </div>
                         </div>
 
-                        <div
-                            v-if="
-                                reservation.check_out_date !==
-                                form.new_check_out_date
-                            "
-                        >
+                        <div>
                             <Button
                                 type="submit"
                                 class="w-full text-base min-h-12"
@@ -399,7 +407,7 @@ function submitExtendReservation() {
                             >
                                 <Loader2Icon
                                     v-if="form.processing"
-                                    class="w-4 h-4 mr-2 animate-spin"
+                                    class="mr-2 w-4 h-4 animate-spin"
                                 />
                                 Extend Reservation
                             </Button>
