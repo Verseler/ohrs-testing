@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import type {
-    ReservationStatus,
-    ReservationWithBeds,
-} from "@/Pages/Admin/Reservation/reservation.types";
+import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import {
     CalendarCheck,
     CalendarPlus,
-    Check,
     CreditCard,
     History,
     Home,
@@ -15,7 +11,6 @@ import {
 } from "lucide-vue-next";
 import PageHeader from "@/Components/PageHeader.vue";
 import { Head } from "@inertiajs/vue3";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -25,7 +20,6 @@ import {
     BreadcrumbPage,
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
-import StatusBadge from "@/Components/StatusBadge.vue";
 import ReservationInformation from "@/Pages/Admin/Reservation/ReservationDetails/Partials/ReservationInformation.vue";
 import GuestInformation from "@/Pages/Admin/Reservation/ReservationDetails/Partials/GuestInformation.vue";
 import ReservedBeds from "@/Pages/Admin/Reservation/ReservationDetails/Partials/ReservedBeds.vue";
@@ -39,7 +33,12 @@ import { SidebarTrigger } from "@/Components/ui/sidebar";
 usePoll(5000);
 
 type ReservationDetailsProps = {
-    reservation: ReservationWithBeds;
+    reservation: ReservationWithBeds & {
+        confirmed_count: number;
+        checked_in_count: number;
+        checked_out_count: number;
+        canceled_count: number;
+    };
     canExempt: boolean;
 };
 
@@ -92,25 +91,24 @@ onMounted(() => {
             <div class="flex flex-col gap-3">
                 <!-- Header with status badge -->
                 <div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex gap-4 items-center">
                         <ReservationCode>
-                            {{ reservation.reservation_code }}
+                            {{ reservation.code }}
                         </ReservationCode>
-
-                        <StatusBadge :status="reservation.status" />
                     </div>
 
-                    <div class="flex flex-wrap justify-end gap-2 mt-4">
+                    <div class="flex flex-wrap gap-2 justify-end mt-4">
                         <!-- Change reservation status -->
+
                         <LinkButton
-                            v-if="
-                                reservation.status == 'confirmed' ||
-                                reservation.status == 'checked_in'
+                        v-if="
+                                reservation.confirmed_count > 0 ||
+                                reservation.checked_in_count > 0
                             "
                             class="flex-1 bg-pink-500 hover:bg-pink-600"
                             :href="
                                 route(
-                                    'reservation.editStatusForm',
+                                    'reservation.editAllStatusForm',
                                     reservation.id
                                 )
                             "
@@ -121,11 +119,7 @@ onMounted(() => {
 
                         <!-- Payment Exemption -->
                         <LinkButton
-                            v-if="
-                                canExempt &&
-                                reservation.status != 'canceled' &&
-                                reservation.status != 'checked_out'
-                            "
+                            v-if="canExempt"
                             class="flex-1 max-w-sm bg-violet-500 hover:bg-violet-600"
                             :href="
                                 route(
@@ -166,10 +160,8 @@ onMounted(() => {
 
                         <!-- Update reservation checkout -->
                         <LinkButton
-                            v-if="
-                                reservation.status == 'confirmed' ||
-                                reservation.status == 'checked_in'
-                            "
+                            v-if="reservation.confirmed_count > 0 ||
+                                reservation.checked_in_count > 0"
                             class="flex-1 bg-red-500 hover:bg-red-600"
                             :href="
                                 route(
@@ -184,10 +176,8 @@ onMounted(() => {
 
                         <!-- Edit a bed assignment -->
                         <LinkButton
-                            v-if="
-                                reservation.status == 'confirmed' ||
-                                reservation.status == 'checked_in'
-                            "
+                            v-if="reservation.confirmed_count > 0 ||
+                                reservation.checked_in_count > 0"
                             class="flex-1 bg-blue-500 hover:bg-blue-600"
                             :href="
                                 route(
@@ -200,54 +190,19 @@ onMounted(() => {
                             Bed Assignment
                         </LinkButton>
                     </div>
-
-                    <!-- Change reservation status -->
-                    <div
-                        v-if="reservation.status === 'pending'"
-                        class="flex justify-end"
-                    >
-                        <LinkButton
-                            class="bg-primary-500 hover:bg-primary-600"
-                            :href="
-                                route(
-                                    'reservation.assignBedsForm',
-                                    reservation.id
-                                )
-                            "
-                        >
-                            <Check class="mr-1" /> Confirm Reservation
-                        </LinkButton>
-                    </div>
                 </div>
 
                 <!-- Main content -->
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <ReservationInformation :reservation="reservation" />
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                   <ReservationInformation :reservation="reservation" />
 
                     <GuestInformation :reservation="reservation" />
 
-                    <!-- Don't show reserved beds if reservation is pending, cancelled or checked_out -->
                     <ReservedBeds
-                        v-if="(['confirmed', 'checked_in'] as ReservationStatus[]).includes(reservation.status)"
+                        v-if="reservation.reserved_beds_with_guests && reservation.reserved_beds_with_guests.length > 0"
                         :reservation="reservation"
+                        class="lg:col-span-2"
                     />
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Purpose of Stay</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p
-                                v-if="reservation.purpose_of_stay"
-                                class="font-medium"
-                            >
-                                {{ reservation.purpose_of_stay }}
-                            </p>
-                            <p v-else class="text-xs italic text-neutral-500">
-                                Not provided
-                            </p>
-                        </CardContent>
-                    </Card>
                 </div>
             </div>
         </div>

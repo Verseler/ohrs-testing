@@ -2,15 +2,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Label } from "@/Components/ui/label";
 import { Separator } from "@/Components/ui/separator";
-import { formatCurrency, formatDateString } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
-import { computed } from "vue";
 
 const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
-
-const notPendingOrCanceled = computed(
-    () => reservation.status !== "pending" && reservation.status !== "canceled"
-);
 </script>
 
 <template>
@@ -19,29 +14,14 @@ const notPendingOrCanceled = computed(
             <CardTitle>Reservation Information</CardTitle>
         </CardHeader>
         <CardContent class="grid gap-4">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <Label class="text-neutral-700">Check-in Date</Label>
-                    <p class="font-medium">
-                        {{ formatDateString(reservation.check_in_date) }}
-                    </p>
-                </div>
-                <div>
-                    <Label class="text-neutral-700">Check-out Date</Label>
-                    <p class="font-medium">
-                        {{ formatDateString(reservation.check_out_date) }}
-                    </p>
-                </div>
-            </div>
 
-            <Separator v-if="notPendingOrCanceled" />
-
-            <div class="grid gap-2" v-if="notPendingOrCanceled">
+            <!--  v-if="notPendingOrCanceled" -->
+            <div class="grid gap-2">
                 <Label class="text-neutral-700">Payment Details</Label>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <p class="text-sm text-muted-foreground">
-                            Total Billing
+                            Total Billings
                         </p>
                         <p class="font-medium">
                             ₱{{ formatCurrency(reservation.total_billings) }}
@@ -77,6 +57,22 @@ const notPendingOrCanceled = computed(
                     }}
                 </p>
             </div>
+
+            <div>
+                <p class="text-sm">
+                    Purpose of Stay
+                </p>
+                <p
+                    v-if="reservation.purpose_of_stay"
+                    class="font-medium"
+                >
+                    {{ reservation.purpose_of_stay }}
+                </p>
+                <p v-else class="text-xs italic text-neutral-500">
+                    Not provided
+                </p>
+            </div>
         </CardContent>
     </Card>
 </template>
+
