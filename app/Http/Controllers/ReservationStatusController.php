@@ -143,11 +143,12 @@ class ReservationStatusController extends Controller
                     $reservation->guests()->delete();
                 }
 
-                //
-
                 // Update reservation status
                 $reservation->general_status = 'canceled';
-                $reservation->individual_billings = 0;
+                $reservation->stayDetails()->update([
+                    'status' => 'canceled',
+                    'individual_billings' => 0
+                ]);
                 $reservation->total_billings = 0;
                 $reservation->remaining_balance = 0;
                 $reservation->save();
@@ -157,7 +158,7 @@ class ReservationStatusController extends Controller
                 ->with('error', 'Failed to cancel reservation: ' . $e->getMessage());
         }
 
-        return redirect()->route('reservation.show', ['id' => $id])
+        return redirect()->route('reservation.list')
             ->with('success', 'Successfully canceled reservation and removed guest data.');
     }
 
