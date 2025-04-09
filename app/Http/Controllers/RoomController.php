@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bed;
-use App\Models\GuestBeds;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,21 +28,18 @@ class RoomController extends Controller
         $checkInDate = $request->check_in_date ? Carbon::parse($request->check_in_date) : Carbon::today();
         $checkOutDate = $request->check_out_date ? Carbon::parse($request->check_out_date) : Carbon::now()->addDays(1);
 
-        // Get all beds reserved for the selected date
-        $guestBeds = new GuestBeds();
-        $reservedBedIds = $guestBeds->reservedBeds($checkInDate, $checkOutDate)
-            ->pluck('bed_id')->toArray();
 
-        //NOTE: one of the rules of hostel is that if the bed is not yet paid it will be locked or
-        // not yet available until it get paid or if the payment_type is pay later.
-        $bedsWithBalance = $guestBeds->bedsWithBalance()->pluck('bed_id')->toArray();
-
-        $excludedBedIds = array_unique(array_merge($reservedBedIds, $bedsWithBalance));
+        $bed = new Bed();
+        $availableBedsIds = $bed->availableBeds(
+            $checkInDate,
+            $checkOutDate,
+            Auth::user()->office_id
+        )->pluck('id')->toArray();
 
         $query = Room::withCount([
             'beds',
-            'beds as available_beds' => function ($query) use ($excludedBedIds) {
-                $query->whereNotIn('id', $excludedBedIds);
+            'beds as available_beds' => function ($query) use ($availableBedsIds) {
+                $query->whereIn('id', $availableBedsIds);
             }
         ])
             //Bed prices
@@ -53,6 +49,7 @@ class RoomController extends Controller
                 }
             ])
             ->where('office_id', Auth::user()->office_id);
+
 
         // Gender Filter
         if ($request->filled('eligible_gender') && in_array($request->eligible_gender, ['any', 'male', 'female'])) {
@@ -122,7 +119,7 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
 
         // Check if any beds in this room have future reservations
-        $hasFutureReservations = $room->beds()->whereHas('guestBeds.guest.reservation', function ($query) {
+        $hasFutureReservations = $room->beds()->whereHas('stayDetails.guest.reservation', function ($query) {
             $query->where('check_out_date', '>=', Carbon::today());
         })->exists();
 
@@ -189,7 +186,7 @@ class RoomController extends Controller
                         $bed = $room->beds()->find($bedData['id']);
 
                         // Check if bed has current or future reservations
-                        $hasReservations = $bed->guestBeds()
+                        $hasReservations = $bed->StayDetails()
                             ->whereHas('guest.reservation', function ($query) {
                                 $query->where('check_out_date', '>=', Carbon::today());
                             })
@@ -232,7 +229,7 @@ class RoomController extends Controller
                 // Check if any of the beds to delete have reservations
                 $reservedBeds = $room->beds()
                     ->whereIn('id', $bedsToDelete)
-                    ->whereHas('guestBeds.guest.reservation', function ($query) {
+                    ->whereHas('stayDetails.guest.reservation', function ($query) {
                         $query->where('check_out_date', '>=', Carbon::today());
                     })
                     ->pluck('id')

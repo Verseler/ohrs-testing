@@ -9,18 +9,13 @@ class StayDetails extends Model
     protected $fillable = [
         'check_in_date',
         'check_out_date',
-        'daily_rate',
+        'individual_billings',
         'is_exempted',
         'status',
         'bed_id',
         'reservation_id',
         'guest_id',
     ];
-
-    public function bed()
-    {
-        return $this->belongsTo(Bed::class);
-    }
 
     public function guest()
     {
@@ -32,4 +27,18 @@ class StayDetails extends Model
         return $this->belongsTo(Reservation::class);
     }
 
+    public function bed()
+    {
+        return $this->belongsTo(Bed::class);
+    }
+
+    public function reservedBeds($checkInDate, $checkOutDate)
+    {
+        return $this->where(function ($query) use ($checkInDate, $checkOutDate) {
+            $query->where('check_in_date', '<=', $checkOutDate)
+                ->where('check_out_date', '>=', $checkInDate)
+                ->whereNotIn('status', ['canceled', 'checked_out'])
+                ->whereNotNull('bed_id');
+        });
+    }
 }
