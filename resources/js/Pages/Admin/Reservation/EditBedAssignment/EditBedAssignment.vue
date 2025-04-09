@@ -14,7 +14,8 @@ import { Head, useForm } from "@inertiajs/vue3";
 import { Home, Info, Pen } from "lucide-vue-next";
 import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import type { Bed } from "@/Pages/Admin/Room/room.types";
-import { Gender, GuestBeds } from "@/Pages/Guest/guest.types";
+import { Gender } from "@/Pages/Guest/guest.types";
+import { StayDetails } from "@/Pages/Admin/Reservation/reservation.types";
 import { computed, ref } from "vue";
 import {
     Select,
@@ -33,39 +34,45 @@ import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
 import GenderBadge from "@/Components/GenderBadge.vue";
-import { roomScheduledEligibleGender } from "../../WaitingList/helpers";
+import { roomScheduledEligibleGender } from "@/Pages/Admin/WaitingList/helpers";
 
 type EditBedAssignmentProps = {
     reservation: ReservationWithBeds & {
-        guest_beds: GuestBeds[];
+        stay_details: StayDetails[];
     };
-    availableBeds: Bed[];
+    availableBeds: Record<number, Bed[]>;
 };
 
 const { reservation, availableBeds: defaultAvailableBeds } =
     defineProps<EditBedAssignmentProps>();
 
-const form = useForm({
+    const form = useForm({
     reservation_id: reservation.id,
     selected_guest_id: null,
     selected_bed_id: null,
 });
 
-const availableBeds = computed(() => {
-    //if bed room has scheduled eligible gender, use it or else use the default
-    const updatedGenderAvailableBeds = defaultAvailableBeds.map((bed) => {
-        const scheduledEligibleGender =
-            bed.room?.eligible_gender_schedules?.[0]?.eligible_gender;
+const availableBedsForGuest = computed(() => {
+    if (!form.selected_guest_id) return [];
+
+    const beds = defaultAvailableBeds[form.selected_guest_id] || [];
+
+    // Update gender information based on schedules if any
+    return beds.map((bed) => {
+        const scheduledEligibleGender = roomScheduledEligibleGender(bed);
 
         if (scheduledEligibleGender) {
-            bed.room.eligible_gender = scheduledEligibleGender;
-            return bed;
+            return {
+                ...bed,
+                room: {
+                    ...bed.room,
+                    eligible_gender: scheduledEligibleGender
+                }
+            };
         }
 
         return bed;
     });
-
-    return updatedGenderAvailableBeds;
 });
 
 const filterBedsByGender = (beds: Bed[], gender: Gender) => {
@@ -88,10 +95,10 @@ const filterBedsByGender = (beds: Bed[], gender: Gender) => {
     );
 };
 
-const selectedGuest = computed<GuestBeds | null>(() => {
-    const guest = reservation.guest_beds.find(
-        (guest_bed) => guest_bed.guest_id == form.selected_guest_id
-    );
+const selectedGuest = computed<StayDetails | null>(() => {
+    if (!form.selected_guest_id) return null;
+
+    const guest = reservation.stay_details?.find((stayDetails) => stayDetails.guest_id == form.selected_guest_id);
 
     return guest ?? null;
 });
@@ -154,9 +161,9 @@ function submit() {
         </PageHeader>
 
         <!-- Main content -->
-        <div class="grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-6 max-w-6xl md:grid-cols-3">
             <form @submit.prevent="showConfirmation" class="col-span-2">
-                <Message severity="info" class="flex items-center mb-3 gap-x-2">
+                <Message severity="info" class="flex gap-x-2 items-center mb-3">
                     <Info class="size-4" />
                     Please select a guest to update their bed assignment
                 </Message>
@@ -174,12 +181,12 @@ function submit() {
                             <SelectGroup>
                                 <SelectLabel>Guests</SelectLabel>
                                 <SelectItem
-                                    v-for="guestBed in reservation.guest_beds"
-                                    :value="guestBed.guest_id"
-                                    :key="guestBed.guest_id"
+                                    v-for="stayDetail in reservation.stay_details"
+                                    :value="stayDetail.guest_id"
+                                    :key="stayDetail.guest_id"
                                 >
-                                    {{ guestBed.guest.first_name }}
-                                    {{ guestBed.guest.last_name }}
+                                    {{ stayDetail.guest.first_name }}
+                                    {{ stayDetail.guest.last_name }}
                                 </SelectItem>
                             </SelectGroup>
                         </SelectContent>
@@ -208,14 +215,14 @@ function submit() {
                                 <SelectLabel>Beds</SelectLabel>
                                 <SelectItem
                                     v-for="bed in filterBedsByGender(
-                                        availableBeds,
+                                        availableBedsForGuest,
                                         selectedGuest?.guest?.gender as Gender
                                     )"
                                     :value="bed.id"
                                     :key="bed.id"
                                 >
                                     <div
-                                        class="flex items-center justify-between"
+                                        class="flex justify-between items-center"
                                     >
                                         <div>
                                             {{ bed.room.name }}
@@ -246,7 +253,7 @@ function submit() {
                 <Button
                     v-if="selectedGuest"
                     type="submit"
-                    class="w-full mt-2 text-base min-h-12"
+                    class="mt-2 w-full text-base min-h-12"
                 >
                     Submit
                 </Button>
@@ -257,9 +264,11 @@ function submit() {
                 class="col-span-1 min-w-80"
                 :firstName="selectedGuest.guest.first_name"
                 :lastName="selectedGuest.guest.last_name"
-                :gender="selectedGuest.guest.gender as Gender"
-                :roomName="selectedGuest.bed.room.name"
-                :bedName="selectedGuest.bed.name"
+                :gender="(selectedGuest.guest.gender as Gender)"
+                :roomName="selectedGuest?.bed?.room?.name ?? '-'"
+                :bedName="selectedGuest?.bed?.name ?? '-'"
+                :checkInDate="selectedGuest.check_in_date"
+                :checkOutDate="selectedGuest.check_out_date"
             />
         </div>
 

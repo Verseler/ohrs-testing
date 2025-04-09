@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
+import { GuestAssignment, ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import {
     Select,
     SelectContent,
@@ -11,59 +11,37 @@ import {
 import { Button } from "@/Components/ui/button";
 import { Bed } from "@/Pages/Admin/Room/room.types";
 import { useForm } from "@inertiajs/vue3";
-import { watch, ref, computed } from "vue";
+import { watch, ref } from "vue";
 import { Gender } from "@/Pages/Guest/guest.types";
 import GenderBadge from "@/Components/GenderBadge.vue";
 import LinkButton from "@/Components/LinkButton.vue";
 import { Check, RefreshCw } from "lucide-vue-next";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { InputError } from "@/Components/ui/input";
-import { getLengthOfStay } from "@/lib/utils";
 import { roomScheduledEligibleGender } from "@/Pages/Admin/WaitingList/helpers";
+import { formatDateString } from "@/lib/utils";
 
 type AssignGuestListProps = {
-    reservation: ReservationWithBeds;
-    availableBeds: Bed[];
+    reservation: ReservationWithBeds & { guestAssignment: GuestAssignment[] };
+    availableBeds: Record<number, Bed[]>;
 };
 
 const { reservation, availableBeds: defaultAvailableBeds } =
     defineProps<AssignGuestListProps>();
 
-// Prepare guest data for the form
-const prepareGuests = () => {
-    return reservation.guests.map((guest) => ({
-        id: guest.id,
-        name: `${guest.first_name} ${guest.last_name}`,
-        gender: guest.gender as Gender,
-        bed_id: null as number | null,
-    }));
-};
-
-
 const form = useForm({
     reservation_id: reservation.id,
-    guests: prepareGuests(),
+    guests: reservation.guestAssignment,
 });
-
-const availableBeds = computed(() => {
-    //if bed room has scheduled eligible gender, use it or else use the default
-    const updatedGenderAvailableBeds = defaultAvailableBeds.map((bed) => {
-        const scheduledEligibleGender =
-            bed.room?.eligible_gender_schedules?.[0]?.eligible_gender;
-
-        if (scheduledEligibleGender) {
-            bed.room.eligible_gender = scheduledEligibleGender;
-            return bed;
-        }
-
-        return bed;
-    });
-
-    return updatedGenderAvailableBeds;
-});
-
 
 const assignedBedIds = ref<number[]>([]);
+const modifiedBeds = ref<Record<number, Bed[]>>({});
+
+// Initialize modified beds with a copy of the originals
+Object.keys(defaultAvailableBeds).forEach(key => {
+    const guestId = Number(key);
+    modifiedBeds.value[guestId] = JSON.parse(JSON.stringify(defaultAvailableBeds[guestId] || []));
+});
 
 // Update assigned beds when form changes
 const updateAssignedBeds = () => {
@@ -75,75 +53,73 @@ const updateAssignedBeds = () => {
 // Watch for changes in guest bed assignments
 watch(form.guests, updateAssignedBeds, { deep: true });
 
-const getAvailableBeds = () =>
-    availableBeds.value.filter((bed) => !assignedBedIds.value.includes(bed.id));
-
+const getAvailableBeds = (guestId: number) => {
+    // Get beds for this guest, filtering out ones already assigned to other guests
+    return (modifiedBeds.value[guestId] || [])
+        .filter(bed => !assignedBedIds.value.includes(bed.id) ||
+            form.guests.find(g => g.id === guestId)?.bed_id === bed.id);
+};
 
 const filterBedsByGender = (beds: Bed[], gender: Gender) => {
-    return  beds
+    return beds
         .filter(
             (bed) =>
                 bed.room.eligible_gender === "any" ||
                 bed.room.eligible_gender === gender
         )
-        // Sort by eligible gender from 'Male' -> 'Female' -> 'Any'
         .sort((a, b) => {
             if (a.room.eligible_gender === b.room.eligible_gender) {
                 return b.id - a.id;
             }
             return b.room.eligible_gender.localeCompare(a.room.eligible_gender);
         });
-
-}
-
-// Update room gender when first bed is assigned
-const updateRoomGender = (bedId: number, gender: Gender) => {
-    const bed = availableBeds.value.find((b) => b.id === bedId);
-
-    if (bed?.room.eligible_gender === "any") {
-        availableBeds.value
-            .filter((b) => b.room.id === bed.room.id)
-            .forEach((b) => (b.room.eligible_gender = gender));
-    }
 };
 
-// Get formatted bed name for display
-const getBedName = (bedId: number) => {
-    const bed = availableBeds.value.find((b) => b.id === bedId);
+const getBedName = (bedId: number, guestId: number) => {
+    const beds = modifiedBeds.value[guestId] || [];
+    const bed = beds.find((b) => b.id === bedId);
     return bed ? `${bed.room.name} - ${bed.name}` : "";
 };
 
-// Handle bed selection
+// Get formatted bed name for display
 const onBedSelect = (guestId: number, bedId: number) => {
-    const guest = form.guests.find((g) => g.id === guestId);
-    if (guest) {
-        guest.bed_id = bedId;
-        updateRoomGender(bedId, guest.gender);
+    // First, clear previous selection if any
+    const previousGuest = form.guests.find(g => g.id === guestId);
+
+    if (previousGuest) {
+        previousGuest.bed_id = bedId;
     }
+
+    // If selecting a bed
+    if (bedId) {
+        // Find the selected bed
+        Object.keys(modifiedBeds.value).forEach(key => {
+            const currentGuestId = Number(key);
+            const beds = modifiedBeds.value[currentGuestId];
+
+            const selectedBed = beds.find(b => b.id === bedId);
+            if (selectedBed && selectedBed.room.eligible_gender === "any") {
+                // Update all beds in this room to match the guest's gender
+                const guestGender = form.guests.find(g => g.id === guestId)?.gender;
+                if (guestGender) {
+                    const roomId = selectedBed.room.id;
+
+                    // Update for all guests
+                    Object.keys(modifiedBeds.value).forEach(guestKey => {
+                        modifiedBeds.value[Number(guestKey)].forEach(bed => {
+                            if (bed.room.id === roomId) {
+                                bed.room.eligible_gender = guestGender;
+                            }
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+    // Update assigned beds list
+    updateAssignedBeds();
 };
-
-
-const lengthOfStay = computed(() =>
-    getLengthOfStay(reservation.check_in_date, reservation.check_out_date)
-);
-
-const totalPrice = computed(() => {
-    const totalBedPrice = form.guests.reduce((price, currentGuest) => {
-        return (
-            price + (currentGuest.bed_id ? getBedPrice(currentGuest.bed_id) : 0)
-        );
-    }, 0);
-
-    return totalBedPrice * lengthOfStay.value;
-});
-
-function getBedPrice(id: number): number {
-    const bed = availableBeds.value.find((bed) => bed.id === id);
-
-    if (!bed) return 0;
-
-    return bed.price;
-}
 
 const submitConfirmation = ref(false);
 
@@ -158,7 +134,7 @@ function submit() {
 
 <template>
     <div class="space-y-2">
-        <div class="flex items-center justify-between">
+        <div class="flex justify-between items-center">
             <p class="text-2xl font-bold text-primary-600">Guests</p>
             <LinkButton
                 variant="outline"
@@ -175,14 +151,20 @@ function submit() {
         <div
             v-for="(guest, index) in form.guests"
             :key="guest.id"
-            class="grid items-center grid-cols-8 gap-x-2"
+            class="grid grid-cols-8 gap-x-2 items-center"
         >
-            <div class="flex justify-between col-span-5 gap-x-2">
+            <div class="flex col-span-5 gap-x-2 justify-between">
                 <p
-                    class="flex items-center flex-1 w-full px-2 capitalize border rounded-md"
+                    class="flex flex-1 items-center px-2 w-full capitalize rounded-md border"
                 >
                     {{ guest.name }}
                 </p>
+                <p class="flex items-center px-3 text-sm rounded-md border">
+                    <span class='text-blue-500'>{{ formatDateString(guest.check_in_date) }}</span>
+                     <span class='mx-1'>to</span>
+                     <span class='text-red-500'>{{ formatDateString(guest.check_out_date) }}</span>
+                </p>
+
                 <GenderBadge
                     class="h-12 text-sm min-w-20"
                     :gender="guest.gender"
@@ -191,29 +173,27 @@ function submit() {
 
             <Select
                 v-bind:modelValue="guest.bed_id"
-                @update:modelValue="
-                    (value) => onBedSelect(guest.id, Number(value))
-                "
+                @update:modelValue="(value) => onBedSelect(guest.id, Number(value))"
             >
                 <SelectTrigger
-                    class="h-12 col-span-3 rounded-sm shadow-none border-primary-700"
+                    class="col-span-3 h-12 rounded-sm shadow-none border-primary-700"
                     :invalid="(form.errors as any)[`guests.${index}.bed_id`]"
                 >
                     <SelectValue placeholder="Select bed">{{
-                        guest.bed_id ? getBedName(guest.bed_id) : "Select bed"
+                        guest.bed_id ? getBedName(guest.bed_id, guest.id) : "Select bed"
                     }}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
                         <SelectItem
                             v-for="bed in filterBedsByGender(
-                                getAvailableBeds(),
+                                getAvailableBeds(guest.id),
                                 guest.gender
                             )"
                             :key="bed.id"
                             :value="bed.id"
                         >
-                            <div class="flex items-center justify-between">
+                            <div class="flex justify-between items-center">
                                 <span class="block text-sm">
                                     {{ `${bed.room.name} - ${bed.name}` }}
                                 </span>
@@ -233,16 +213,12 @@ function submit() {
             </Select>
 
             <InputError
-                class="col-start-6 col-end-10 mt-1"
+                class="col-start-6 col-end-9 mt-1"
                 v-if="(form.errors as Record<string, string>)[`guests.${index}.bed_id`]"
             >
                 {{ (form.errors as Record<string, string>)[`guests.${index}.bed_id`] }}
             </InputError>
         </div>
-
-        <p class="mt-2 text-sm text-end text-neutral-600">
-            Total Price: ₱{{ totalPrice }}
-        </p>
 
         <Button
             @click="showSubmitConfirmation"

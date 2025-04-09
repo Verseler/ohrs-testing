@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { UserIcon, BedIcon, HomeIcon } from "lucide-vue-next";
+import { UserIcon, BedIcon, CalendarIcon } from "lucide-vue-next";
 import type { Gender } from "@/Pages/Guest/guest.types";
+import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
 
 interface GuestDetailsProps {
     firstName: string;
@@ -9,38 +9,40 @@ interface GuestDetailsProps {
     gender: Gender;
     roomName: string;
     bedName: string;
+    checkInDate: string;
+    checkOutDate: string;
 }
 
-const { firstName, lastName, gender, bedName, roomName } =
+const { firstName, lastName, gender, bedName, roomName, checkInDate, checkOutDate } =
     defineProps<GuestDetailsProps>();
 </script>
 
 <template>
-    <div
-        class="max-w-md overflow-hidden bg-white border border-gray-200 rounded-lg shadow max-h-max"
+    <Card
+        class="overflow-hidden max-w-md bg-white rounded-lg border border-gray-200 shadow max-h-max"
     >
-        <!-- Header with guest name -->
-        <div class="px-4 py-3 border-b border-gray-200 bg-primary/10">
-            <h3 class="text-lg font-semibold text-primary">
-                {{ firstName }} {{ lastName }}
-            </h3>
-        </div>
+        <CardHeader>
+            <div class="pb-2 border-b border-gray-200 bg-primary/10">
+                <h3 class="text-lg font-semibold text-primary">
+                    {{ firstName }} {{ lastName }}
+                </h3>
+            </div>
+        </CardHeader>
 
-        <!-- Guest details -->
-        <div class="p-4 space-y-4">
+        <CardContent class="grid grid-cols-2 gap-x-2 gap-y-6">
             <!-- Basic info section -->
             <div class="flex items-start space-x-3">
-                <UserIcon class="w-5 h-5 text-gray-500 mt-0.5" />
+                <UserIcon class="mt-0.5 w-5 h-5 text-gray-500" />
                 <div>
                     <div class="text-sm text-gray-500">Gender</div>
                     <div class="font-medium">{{ gender }}</div>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between gap-2">
+            <div class="flex gap-2 justify-between items-center">
                 <!-- Bed details -->
                 <div class="flex items-start space-x-3">
-                    <BedIcon class="w-5 h-5 text-gray-500 mt-0.5" />
+                    <BedIcon class="mt-0.5 w-5 h-5 text-gray-500" />
                     <div>
                         <div class="text-sm text-gray-500">Prev. Room/Bed</div>
                         <div class="font-medium">
@@ -49,14 +51,33 @@ const { firstName, lastName, gender, bedName, roomName } =
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Card footer with reservation status -->
-        <div class="px-4 py-3 border-t border-gray-200 bg-gray-50">
+            <div class="flex items-start space-x-3">
+                    <CalendarIcon class="mt-0.5 w-5 h-5 text-gray-500" />
+                    <div>
+                        <div class="text-sm text-gray-500">Check-in Date</div>
+                        <div class="font-medium">
+                            {{ checkInDate }}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <CalendarIcon class="mt-0.5 w-5 h-5 text-gray-500" />
+                    <div>
+                        <div class="text-sm text-gray-500">Check-out Date</div>
+                        <div class="font-medium">
+                            {{ checkOutDate }}
+                        </div>
+                    </div>
+                </div>
+        </CardContent>
+
+
+        <CardFooter class="px-4 py-3 bg-gray-50 border-t border-gray-200">
             <div class="flex items-center">
-                <div class="w-2 h-2 mr-2 bg-green-500 rounded-full"></div>
+                <div class="mr-2 w-2 h-2 bg-green-500 rounded-full"></div>
                 <span class="text-sm font-medium">Currently Reserved</span>
             </div>
-        </div>
-    </div>
+        </CardFooter>
+    </Card>
 </template>
