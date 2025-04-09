@@ -20,9 +20,12 @@ class GuestController extends Controller
         ]);
 
         $query = Guest::whereHas('reservation', function ($query) {
-            $query->whereNotIn('status', ['pending', 'canceled'])
-            ->where('hostel_office_id', Auth::user()->office_id);
-        })->with(['reservation']);
+            $query->where('hostel_office_id', Auth::user()->office_id);
+        })
+            ->whereHas('stayDetails', function ($query) {
+                $query->whereNotIn('status', ['pending', 'canceled']);
+            })
+            ->with(['stayDetails']);
 
         // Search Filter
         if ($request->filled('search')) {
