@@ -26,6 +26,8 @@ function checkReservation(code: string) {
 }
 
 function submitSearch() {
+    if(!searchForm.code) return;
+
     searchForm.get(route("reservation.search", { search: searchForm.code }));
 }
 </script>
@@ -36,7 +38,7 @@ function submitSearch() {
     <div class="w-full min-h-screen">
         <Header />
 
-        <div class="max-w-2xl px-4 py-12 mx-auto">
+        <div class="px-4 py-12 mx-auto max-w-2xl">
             <div class="mb-8 text-center">
                 <h1 class="mb-2 text-2xl font-bold text-gray-900">
                     Check Your Reservation Status
@@ -65,19 +67,19 @@ function submitSearch() {
                     <div
                         v-for="reservation in reservations"
                         :key="reservation.id"
-                        class="flex items-center justify-between"
+                        class="flex justify-between items-center"
                     >
                         <p>
-                            {{ reservation.reservation_code }}
+                            {{ reservation.code }}
                             <span class="block text-xs text-blue-500 md:inline-block">
-                                [{{ reservation.check_in_date }}
+                                [{{ reservation.min_check_in_date }}
                                 <span class="text-neutral-500">to</span>
-                                {{ reservation.check_out_date }}]
+                                {{ reservation.max_check_out_date }}]
                             </span>
                         </p>
                         <Button
                             @click="
-                                checkReservation(reservation.reservation_code)
+                                checkReservation(reservation.code)
                             "
                             variant="outline"
                             class="border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
