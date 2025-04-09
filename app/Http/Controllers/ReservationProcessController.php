@@ -11,7 +11,6 @@ use App\Jobs\SendReservationCodeEmail;
 use App\Models\StayDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -107,7 +106,7 @@ class ReservationProcessController extends Controller
                     StayDetails::create([
                         'check_in_date' => $guest['check_in_date'],
                         'check_out_date' => $guest['check_out_date'],
-                        'daily_rate' => 0,
+                        'individual_billings' => 0,
                         'is_exempted' => false,
                         'status' => 'pending',
                         'bed_id' => null,

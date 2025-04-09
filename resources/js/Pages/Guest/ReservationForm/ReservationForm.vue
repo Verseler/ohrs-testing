@@ -21,7 +21,6 @@ import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import type { Gender } from "@/Pages/Guest/guest.types";
 import { validIds } from "@/Pages/Guest/ReservationForm/data";
-import { formatDate } from "@/lib/utils";
 
 type ReservationFormProps = {
     hostelOffice: Office;
@@ -71,7 +70,7 @@ function submit() {
         <Header />
         <div class="container px-2 py-4 mx-auto md:p-8">
             <form @submit.prevent="showConfirmation">
-                <Table>
+                <Table class="overflow-hidden">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
                             Region {{ hostelOffice.region.name }} -
@@ -148,7 +147,7 @@ function submit() {
                                             <Input
                                                 type="number"
                                                 v-model.number="form.phone"
-                                                class="h-12 rounded-sm shadow-none pl-11 border-primary-700"
+                                                class="pl-11 h-12 rounded-sm shadow-none border-primary-700"
                                                 :invalid="!!form.errors.phone"
                                             />
                                         </div>
@@ -249,7 +248,7 @@ function submit() {
                         <div class="px-2">
                             <Button
                                 type="submit"
-                                class="w-full h-12 mt-6 text-base"
+                                class="mt-6 w-full h-12 text-base"
                                 :disabled="form.processing"
                             >
                                 {{
