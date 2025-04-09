@@ -219,7 +219,10 @@ class ReservationAssignBedsController extends Controller
 
                 // change guest bed with the new selected bed and re-calculate billing for possible changes
                 $stayDetails->bed_id = $validated['selected_bed_id'];
-                $stayDetails->individual_billings = $bed->calculateBilling($stayDetails->check_in_date, $stayDetails->check_out_date);
+                if(!$stayDetails->is_exempted) {
+                    $stayDetails->individual_billings = $bed->calculateBilling($stayDetails->check_in_date, $stayDetails->check_out_date);
+                }
+
                 $stayDetails->save();
 
                 //re compute total billings and remaining balance
