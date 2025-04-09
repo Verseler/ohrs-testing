@@ -80,7 +80,7 @@ class GenerateReportController extends Controller
             $endDate = $selectedDate->endOfMonth();
         }
 
-        $payments = Payment::with('reservation.guests')
+        $payments = Payment::with(['reservation.guests', 'reservation.stayDetails'])
             ->whereHas('reservation', function ($query) {
                 $query->where('hostel_office_id', Auth::user()->office_id);
             })
@@ -89,11 +89,13 @@ class GenerateReportController extends Controller
             ->get();
 
         $reports = $payments->map(function ($payment) {
-            $checkInDate = Carbon::parse($payment->reservation->check_in_date);
-            $checkOutDate = Carbon::parse($payment->reservation->check_out_date);
-            $lengthOfStay = $checkInDate->diffInDays($checkOutDate, false);
+            $stayDetails = $payment->reservation->stayDetails->first();
 
-            if ($lengthOfStay === 0) {
+            $checkInDate = Carbon::parse($stayDetails->check_in_date);
+            $checkOutDate = Carbon::parse($stayDetails->check_out_date);
+            $lengthOfStay = $checkInDate->diffInDays($checkOutDate);
+
+            if ($lengthOfStay == 0) {
                 $lengthOfStay = 1;
             }
 

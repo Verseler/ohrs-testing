@@ -23,8 +23,11 @@ class DashboardController extends Controller
 
         $pendingReservationsCount = Reservation::where([
             ['hostel_office_id', '=', Auth::user()->office_id],
-            ['status', '=', 'pending']
-        ])->count();
+        ])
+            ->whereHas('stayDetails', function ($query) {
+                $query->where('status', 'pending');
+            })
+            ->count();
 
         $unpaidReservationsCount = Reservation::where([
             ['hostel_office_id', '=', Auth::user()->office_id],
@@ -32,13 +35,21 @@ class DashboardController extends Controller
 
         $overdueCheckinCount = Reservation::where([
             ['hostel_office_id', '=', Auth::user()->office_id],
-            ['status', '=', 'confirmed']
-        ])->where('check_in_date', '<', Carbon::now())->count();
+        ])
+            ->whereHas('stayDetails', function ($query) {
+                $query->where('status', 'confirmed');
+                $query->where('check_in_date', '<', Carbon::now());
+            })
+            ->count();
 
         $overdueCheckoutCount = Reservation::where([
             ['hostel_office_id', '=', Auth::user()->office_id],
-            ['status', '=', 'checked_in']
-        ])->where('check_out_date', '<', Carbon::now())->count();
+        ])
+            ->whereHas('stayDetails', function ($query) {
+                $query->where('status', 'checked_in');
+                $query->where('check_out_date', '<', Carbon::now());
+            })
+            ->count();
 
         //For monthly revenue of selected year ($monthlyRevenueYear)
         $monthlyRevenues = [
@@ -63,8 +74,10 @@ class DashboardController extends Controller
                 $query->where([
                     ['hostel_office_id', '=', Auth::user()->office_id]
                 ])
-                    ->whereYear('check_in_date', $monthlyRevenueYear->year)
-                    ->whereMonth('check_in_date', $monthNumber);
+                    ->whereHas('stayDetails', function ($query) use ($monthlyRevenueYear, $monthNumber) {
+                        $query->whereYear('check_in_date', $monthlyRevenueYear->year)
+                            ->whereMonth('check_in_date', $monthNumber);
+                    });
             })
                 ->sum('amount');
         }
