@@ -21,4 +21,9 @@ class Payment extends Model
     {
         return $this->belongsTo(Reservation::class);
     }
+
+    public function totalPayed($reservationId)
+    {
+        return $this->where('reservation_id', $reservationId)->sum('amount');
+    }
 }

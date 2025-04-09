@@ -153,7 +153,7 @@ const closeReceiptDialog = () => {
                 >
                 <CardDescription>
                     Transaction history for reservation #{{
-                        reservationPaymentHistory.reservation_code
+                        reservationPaymentHistory.code
                     }}
                 </CardDescription>
             </CardHeader>
@@ -198,9 +198,9 @@ const closeReceiptDialog = () => {
                     <div
                         v-for="payment in reservationPaymentHistory.payments"
                         :key="payment.id"
-                        class="flex flex-col p-3 border rounded-md bg-primary-50"
+                        class="flex flex-col p-3 rounded-md border bg-primary-50"
                     >
-                        <div class="flex items-start justify-between">
+                        <div class="flex justify-between items-start">
                             <div>
                                 <div class="font-medium">Record Payment</div>
                                 <div class="text-xs text-muted-foreground">
@@ -217,7 +217,7 @@ const closeReceiptDialog = () => {
                         </div>
 
                         <div
-                            class="flex items-center justify-between pt-2 mt-2 border-t border-dashed"
+                            class="flex justify-between items-center pt-2 mt-2 border-t border-dashed"
                         >
                             <div class="flex items-center">
                                 <span class="text-xs text-muted-foreground">
@@ -237,7 +237,7 @@ const closeReceiptDialog = () => {
                     <div
                         v-for="exemptedPayment in exemptedPayments"
                         :key="exemptedPayment.id"
-                        class="flex flex-col p-3 border rounded-md bg-primary-50"
+                        class="flex flex-col p-3 rounded-md border bg-primary-50"
                     >
                         <div class="flex items-start">
                             <div>
@@ -269,7 +269,7 @@ const closeReceiptDialog = () => {
                                 }}
                                 of reservation
                                 {{
-                                    exemptedPayment.reservation.reservation_code
+                                    exemptedPayment.reservation.code
                                 }}
                                 .
                                 <span class="text-xs font-bold">Reason:</span>
@@ -282,10 +282,10 @@ const closeReceiptDialog = () => {
                 <!-- No Payments -->
                 <div
                     v-else
-                    class="py-8 text-center border rounded-md text-neutral-500"
+                    class="py-8 text-center rounded-md border text-neutral-500"
                 >
                     <ReceiptIcon
-                        class="w-10 h-10 mx-auto mb-2 text-muted-foreground"
+                        class="mx-auto mb-2 w-10 h-10 text-muted-foreground"
                     />
                     <p class="text-muted-foreground">
                         No payment records found for this reservation.
@@ -300,7 +300,7 @@ const closeReceiptDialog = () => {
                         <DialogTitle>Payment Receipt</DialogTitle>
                         <DialogDescription>
                             CODE:
-                            {{ reservationPaymentHistory.reservation_code }}
+                            {{ reservationPaymentHistory.code }}
                         </DialogDescription>
                     </DialogHeader>
 
