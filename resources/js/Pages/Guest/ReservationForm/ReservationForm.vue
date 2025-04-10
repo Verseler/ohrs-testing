@@ -83,7 +83,7 @@ function submit() {
                             Employee Making the Reservation
                         </TableSectionHeading>
 
-                        <div class="grid mb-6 lg:grid-cols-2">
+                        <div class="grid mb-8 lg:grid-cols-2">
                             <!-- Left Column -->
                             <div>
                                 <TableRow
@@ -104,7 +104,7 @@ function submit() {
                                     </TableCell>
 
                                     <TableCell class="space-y-2">
-                                        <InputLabel optional>M.I.</InputLabel>
+                                        <InputLabel>M.I.</InputLabel>
                                         <Input
                                             v-model="form.middle_initial"
                                             class="h-12 rounded-sm shadow-none border-primary-700"
@@ -147,7 +147,7 @@ function submit() {
                                             <Input
                                                 type="number"
                                                 v-model.number="form.phone"
-                                                class="pl-11 h-12 rounded-sm shadow-none border-primary-700"
+                                                class="h-12 rounded-sm shadow-none pl-11 border-primary-700"
                                                 :invalid="!!form.errors.phone"
                                             />
                                         </div>
@@ -248,7 +248,7 @@ function submit() {
                         <div class="px-2">
                             <Button
                                 type="submit"
-                                class="mt-6 w-full h-12 text-base"
+                                class="w-full h-12 mt-6 text-base"
                                 :disabled="form.processing"
                             >
                                 {{

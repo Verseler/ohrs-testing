@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->double('total_billings');
             $table->double('remaining_balance');
             $table->string('first_name');
-            $table->string('middle_initial')->nullable();
+            $table->string('middle_initial');
             $table->string('last_name');
             $table->string('phone');
             $table->string('email');
