@@ -38,7 +38,7 @@ function submitSearch() {
     <div class="w-full min-h-screen">
         <Header />
 
-        <div class="px-4 py-12 mx-auto max-w-2xl">
+        <div class="max-w-2xl px-4 py-12 mx-auto">
             <div class="mb-8 text-center">
                 <h1 class="mb-2 text-2xl font-bold text-gray-900">
                     Check Your Reservation Status
@@ -67,11 +67,13 @@ function submitSearch() {
                     <div
                         v-for="reservation in reservations"
                         :key="reservation.id"
-                        class="flex justify-between items-center"
+                        class="flex items-center justify-between"
                     >
                         <p>
                             {{ reservation.code }}
-                            <span class="block text-xs text-blue-500 md:inline-block">
+                            <span
+                             v-if="reservation.min_check_in_date && reservation.max_check_out_date"
+                             class="block text-xs text-blue-500 md:inline-block">
                                 [{{ reservation.min_check_in_date }}
                                 <span class="text-neutral-500">to</span>
                                 {{ reservation.max_check_out_date }}]
