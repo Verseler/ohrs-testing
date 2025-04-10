@@ -34,7 +34,7 @@ const filteredItems = computed(() => {
 const handleInput = () => {
     showSuggestions.value = true;
     selectedIndex.value = -1;
-    
+
     // Calculate position
     if (container.value) {
         const inputRect = container.value.getBoundingClientRect();
@@ -90,7 +90,7 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
             @keydown.up="handleArrowUp"
             @keydown.enter="selectItem"
             @keydown.esc="closeSuggestions"
-            class="w-full h-12 rounded-md focus:ring-primary-800"
+            class="w-full h-12 bg-transparent rounded-md focus:ring-primary-800"
             :class="{
                 'border-red-500 focus:border-red-500': invalid,
                 'border-primary-800 focus:border-primary-500': !invalid,
