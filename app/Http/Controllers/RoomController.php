@@ -95,7 +95,7 @@ class RoomController extends Controller
         ]);
 
 
-        $roomNameAlreadyExisted = Room::where('name', $validated['name'])->first();
+        $roomNameAlreadyExisted = Room::where('name', $validated['name'])->where('office_id', Auth::user()->office_id)->first();
         if ($roomNameAlreadyExisted) {
             return redirect()->back()->with('error', 'Room name already existed.');
         }
