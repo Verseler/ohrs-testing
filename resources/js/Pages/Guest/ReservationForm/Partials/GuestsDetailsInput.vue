@@ -154,7 +154,7 @@ function addGuest() {
                             !!form.errors[`guests.${index}.check_in_date`]
                         "
                         :min="formatDate(new Date())"
-                        :max="form.check_out_date"
+                        :max="guest.check_out_date"
                     />
                     <InputError
                         v-if="!!form.errors[`guests.${index}.check_in_date`]"
@@ -169,7 +169,8 @@ function addGuest() {
                         :invalid="
                             !!form.errors[`guests.${index}.check_out_date`]
                         "
-                        :min="form.check_in_date"
+                        :min="guest.check_in_date"
+                        :disabled="!guest.check_in_date"
                     />
                     <InputError
                         v-if="!!form.errors[`guests.${index}.check_out_date`]"
