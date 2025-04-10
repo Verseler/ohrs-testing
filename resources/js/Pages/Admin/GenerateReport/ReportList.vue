@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import { Download, Printer } from "lucide-vue-next";
+import { Download, FileDown, Home, Printer } from "lucide-vue-next";
 import {
     Table,
     TableBody,
     TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -14,20 +13,26 @@ import {
 import MonthPicker from "@/Components/MonthPicker.vue";
 import { watch } from "vue";
 import { Button } from "@/Components/ui/button";
-import {
-    downloadReport,
-    printReport,
-} from "@/Pages/Admin/GenerateReport/report.helpers";
-import ReportHeading from "@/Pages/Admin/GenerateReport/Partials/ReportHeading.vue";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "@/Components/ui/breadcrumb";
+import PageHeader from "@/Components/PageHeader.vue";
+import TableContainer from "@/Components/ui/table/TableContainer.vue";
+import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 
 type Report = {
     date: string;
     orNumber: string;
-    particulars: string;
-    amount: number;
+    bookedBy: string;
     numberOfGuests: number;
+    numberOfDays: number;
+    amount: number;
 };
 
 type GenerateReportProps = {
@@ -42,22 +47,73 @@ const form = useForm({
 });
 
 function changeDate() {
-    form.get(route("reports", { date: form.selected_date }), {
+    form.get(route("report.list", { date: form.selected_date }), {
         preserveScroll: true,
         preserveState: true,
-        only: ["reports"],
     });
 }
 
 watch(() => form.selected_date, changeDate);
+
+function downloadReport() {
+    if (!form.selected_date) {
+        return;
+    }
+
+    const url = `/reports/download/${formatDate(form.selected_date)}`;
+    window.open(url, "_blank");
+}
+
+function printReport() {
+    if (!form.selected_date) {
+        return;
+    }
+
+    const url = `/reports/print/${formatDate(form.selected_date)}`;
+    const pdfWindow = window.open(url, "_blank");
+
+    if (pdfWindow) {
+        pdfWindow.addEventListener("load", () => {
+            pdfWindow.print();
+        });
+    } else {
+        alert("Please allow popups for this website");
+    }
+}
 </script>
 
 <template>
     <Head title="Generate Report" />
 
     <AuthenticatedLayout>
-        <div class="flex justify-end mb-20 gap-x-2">
-            <SidebarTrigger class="mr-auto size-9" />
+        <div class="flex justify-between min-h-12">
+            <Breadcrumb>
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <SidebarTrigger class="me-2" />
+                    </BreadcrumbItem>
+
+                    <BreadcrumbItem>
+                        <BreadcrumbLink :href="route('dashboard')">
+                            <Home class="size-4" />
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbLink :href="route('office.list')">
+                            Generate Report
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
+        </div>
+
+        <PageHeader>
+            <template #icon><FileDown /></template>
+            <template #title>Generate Report</template>
+        </PageHeader>
+
+        <div class="flex items-center justify-end mb-2 gap-x-2">
             <MonthPicker v-model="form.selected_date" />
             <Button @click="downloadReport" class="md:min-w-28">
                 <Download /><span class="hidden md:block">Download</span>
@@ -66,87 +122,68 @@ watch(() => form.selected_date, changeDate);
                 @click="printReport"
                 class="text-white bg-neutral-800 md:min-w-28 hover:bg-neutral-700 hover:text-white"
             >
-                <Printer class="mr-1" /><span class="hidden md:block"
-                    >Print</span
-                >
+                <Printer class="md:mr-1" />
+                <span class="hidden md:block">Print</span>
             </Button>
         </div>
 
-        <div class="max-w-[300mm] mx-auto">
-            <div id="reports" class="font-[sans-serif]">
-                <ReportHeading />
+        <TableContainer>
+            <Table>
+                <TableHeader>
+                    <TableRowHeader>
+                        <TableHead> Date </TableHead>
+                        <TableHead> OR Number </TableHead>
+                        <TableHead> Booked By </TableHead>
+                        <TableHead> Number of Guests </TableHead>
+                        <TableHead> Number of Days </TableHead>
+                        <TableHead> Amount </TableHead>
+                    </TableRowHeader>
+                </TableHeader>
 
-                <Table class="w-full border-collapse">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead> Date </TableHead>
-                            <TableHead> OR Number </TableHead>
-                            <TableHead> Particulars </TableHead>
-                            <TableHead> Number of Guests </TableHead>
-                            <TableHead> Amount </TableHead>
+                <TableBody>
+                    <template v-if="reports && reports.length > 0">
+                        <TableRow v-for="report in reports" :key="report.date">
+                            <TableCell>
+                                {{ report.date }}
+                            </TableCell>
+                            <TableCell>
+                                {{ report.orNumber }}
+                            </TableCell>
+                            <TableCell>
+                                {{ report.bookedBy }}
+                            </TableCell>
+                            <TableCell>
+                                {{ report.numberOfGuests }}
+                            </TableCell>
+                            <TableCell>
+                                {{ report.numberOfDays }}
+                            </TableCell>
+                            <TableCell>
+                                {{ formatCurrency(report.amount) }}
+                            </TableCell>
                         </TableRow>
-                    </TableHeader>
-
-                    <TableBody>
-                        <template v-if="reports && reports.length > 0">
-                            <TableRow
-                                v-for="report in reports"
-                                :key="report.date"
+                    </template>
+                    <template v-else>
+                        <TableRow>
+                            <TableCell
+                                colspan="6"
+                                class="py-10 italic text-center text-neutral-500"
                             >
-                                <TableCell style="height: 3rem">
-                                    {{ report.date }}
-                                </TableCell>
-                                <TableCell style="height: 3rem">
-                                    {{ report.orNumber }}
-                                </TableCell>
-                                <TableCell style="height: 3rem">
-                                    {{ report.particulars }}
-                                </TableCell>
-                                <TableCell style="height: 3rem">
-                                    {{ report.numberOfGuests }}
-                                </TableCell>
-                                <TableCell style="height: 3rem">
-                                    {{ formatCurrency(report.amount) }}
-                                </TableCell>
-                            </TableRow>
-                        </template>
-                        <template v-else>
-                            <TableRow>
-                                <TableCell
-                                    colspan="5"
-                                    class="py-10 italic text-center text-neutral-500"
-                                >
-                                    No records found.
-                                </TableCell>
-                            </TableRow>
-                        </template>
-                    </TableBody>
-                    <TableFooter class="table-footer-group bg-white">
-                        <TableRow>
-                            <TableCell colspan="4" class="text-right">
-                                Total Amount:
-                            </TableCell>
-                            <TableCell class="font-semibold">
-                                {{ formatCurrency(totalAmount) }}
+                                No records found.
                             </TableCell>
                         </TableRow>
-                    </TableFooter>
-                </Table>
-            </div>
-        </div>
+                    </template>
+
+                    <TableRow class="bg-neutral-50">
+                        <TableCell colspan="5" class="text-right">
+                            Total Amount:
+                        </TableCell>
+                        <TableCell class="font-bold">
+                            {{ formatCurrency(totalAmount) }}
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </TableContainer>
     </AuthenticatedLayout>
 </template>
-
-<style scoped>
-th {
-    font-weight: bold;
-}
-
-th,
-td {
-    border: 1px solid black;
-    padding: 8px;
-    text-align: left;
-    color: black;
-}
-</style>

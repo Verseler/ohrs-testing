@@ -2,21 +2,11 @@
 import GenderBadge from "@/Components/GenderBadge.vue";
 import PageHeader from "@/Components/PageHeader.vue";
 import Searchbox from "@/Components/Searchbox.vue";
-import { Button } from "@/Components/ui/button";
 import {
     Paginator,
     PaginatorButton,
     PaginatorInfo,
 } from "@/Components/ui/paginator";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
 import {
     Table,
     TableBody,
@@ -31,7 +21,6 @@ import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { debounce, formatDateString } from "@/lib/utils";
 import type { Gender, Guest, GuestsFilters } from "@/Pages/Guest/guest.types";
-import type { Region } from "@/Pages/Admin/Office/office.types";
 import type { LaravelPagination } from "@/types";
 import { Head, useForm } from "@inertiajs/vue3";
 import { Users } from "lucide-vue-next";
@@ -49,25 +38,20 @@ usePoll(8000);
 type GuestListProps = {
     guests: LaravelPagination<Guest>;
     filters: GuestsFilters;
-    regions: Region[];
 };
 
 const { guests, filters } = defineProps<GuestListProps>();
 
 const form = useForm<Partial<GuestsFilters>>({
-    region_id: filters.region_id,
     gender: filters.gender,
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
-const formHasValue = computed(
-    () => form.region_id || form.gender || form.search || form.sort_by
-);
+const formHasValue = computed(() => form.gender || form.search || form.sort_by);
 
 function clearFilters() {
-    form.region_id = undefined;
     form.gender = undefined;
     form.search = undefined;
     form.sort_by = undefined;
@@ -84,7 +68,6 @@ function applyFilter() {
 
 watch(
     [
-        () => form.region_id,
         () => form.gender,
         () => form.search,
         () => form.sort_by,
@@ -106,26 +89,9 @@ watch(
 
         <!-- Search, Filter and Sort -->
         <div
-            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
-                <Select v-model="form.region_id">
-                    <SelectTrigger class="md:w-40">
-                        <SelectValue placeholder="Select a region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Region</SelectLabel>
-                            <SelectItem
-                                v-for="region in regions"
-                                :key="region.id"
-                                :value="region.id"
-                            >
-                                {{ region.name }}
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
                 <SelectField
                     v-model="form.gender"
                     :items="data.filterGender"
@@ -173,25 +139,19 @@ watch(
                                 <GenderBadge :gender="guest.gender as Gender" />
                             </TableCell>
                             <TableCell>
-                                {{ guest.phone ?? " - " }}
-                            </TableCell>
-                            <TableCell>
-                                Region {{ guest.office.region.name }}
-                            </TableCell>
-                            <TableCell>
-                                {{ guest.office.name }}
+                                {{ guest.office }}
                             </TableCell>
                             <TableCell>
                                 {{
                                     formatDateString(
-                                        guest.reservation.check_in_date
+                                        guest.stay_details.check_in_date
                                     )
                                 }}
                             </TableCell>
                             <TableCell>
                                 {{
                                     formatDateString(
-                                        guest.reservation.check_out_date
+                                        guest.stay_details.check_out_date
                                     )
                                 }}
                             </TableCell>

@@ -11,23 +11,20 @@ class Reservation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'reservation_code',
-        'check_in_date',
-        'check_out_date',
-        'daily_rate',
+        'code',
         'total_billings',
         'remaining_balance',
-        'status',
         'payment_type',
         'first_name',
         'middle_initial',
         'last_name',
         'phone',
         'email',
-        'guest_office_id',
         'hostel_office_id',
+        'id_type',
         'employee_id',
         'purpose_of_stay',
+        'general_status'
     ];
 
     public function guests()
@@ -35,19 +32,9 @@ class Reservation extends Model
         return $this->hasMany(Guest::class);
     }
 
-    public function guestOffice()
-    {
-        return $this->belongsTo(Office::class, 'guest_office_id');
-    }
-
     public function hostelOffice()
     {
         return $this->belongsTo(Office::class, 'hostel_office_id');
-    }
-
-    public function guestBeds()
-    {
-        return $this->hasMany(GuestBeds::class);
     }
 
     public function payments()
@@ -55,18 +42,55 @@ class Reservation extends Model
         return $this->hasMany(Payment::class);
     }
 
-    public function PaymentExemptions()
+    public function paymentExemptions()
     {
         return $this->hasMany(PaymentExemption::class);
     }
 
-    public function reservedBeds()
+    public function stayDetails()
     {
-        return $this->hasManyThrough(Bed::class, GuestBeds::class, 'reservation_id', 'id', 'id', 'bed_id');
+        return $this->hasMany(StayDetails::class);
     }
 
-    public function reservedBedsWithGuests()
+
+   public function reservedBeds()
+   {
+       return $this->hasManyThrough(Bed::class, StayDetails::class, 'reservation_id', 'id', 'id', 'bed_id');
+   }
+
+   public function reservedBedsWithGuests()
+   {
+       return $this->stayDetails()->with(['bed.room.eligibleGenderSchedules', 'guest']);
+   }
+
+   public function recomputeBillings() 
+   {
+        $newTotalBillings = $this->guests->sum('stayDetails.individual_billings');
+        $this->total_billings = $newTotalBillings;
+
+        $totalPayed = $this->payments->sum('amount');
+        $newRemainingBalance = max(0, $newTotalBillings - $totalPayed);
+        $this->remaining_balance = $newRemainingBalance;
+        $this->save();
+   }
+
+    public function getStayDateRange()
     {
-        return $this->guestBeds()->with(['bed.room.eligibleGenderSchedules', 'guest']);
+        $stayDetails = $this->stayDetails;
+
+        if ($stayDetails->isEmpty()) {
+            return [
+                'min_check_in_date' => null,
+                'max_check_out_date' => null
+            ];
+        }
+
+        $minCheckInDate = $stayDetails->min('check_in_date');
+        $maxCheckOutDate = $stayDetails->max('check_out_date');
+
+        return [
+            'min_check_in_date' => $minCheckInDate,
+            'max_check_out_date' => $maxCheckOutDate
+        ];
     }
 }

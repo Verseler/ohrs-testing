@@ -1,25 +1,34 @@
 <script setup lang="ts">
 import Header from "@/Components/Header.vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { Head, router, useForm, usePage } from "@inertiajs/vue3";
 import type { PageProps } from "@/types";
-import { Info } from "lucide-vue-next";
-import { Message } from "@/Components/ui/message";
 import SearchCodeForm from "@/Pages/Guest/CheckReservationStatus/Partials/SearchCodeForm.vue";
-
-type CheckReservationStatusProps = {
-    canLogin: boolean;
-};
-
-const { canLogin } = defineProps<CheckReservationStatusProps>();
+import { computed } from "vue";
+import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 
 const page = usePage<PageProps>();
 
-const form = useForm({
-    code: '',
+const reservations = computed<Reservation[] | null>(() => {
+    const response = page.props.response_data as Reservation[];
+    return response || null;
 });
 
-function checkReservation() {
-    form.get(route('reservation.checkStatus', { code: form.code }));
+const searchForm = useForm({
+    code: "",
+});
+
+function checkReservation(code: string) {
+    router.visit(route("reservation.checkStatus", { code: code }), {
+        method: "get",
+    });
+}
+
+function submitSearch() {
+    if(!searchForm.code) return;
+
+    searchForm.get(route("reservation.search", { search: searchForm.code }));
 }
 </script>
 
@@ -27,7 +36,7 @@ function checkReservation() {
     <Head title="Check Reservation Status" />
 
     <div class="w-full min-h-screen">
-        <Header :can-login="canLogin" :user="page.props.auth.user" />
+        <Header />
 
         <div class="max-w-2xl px-4 py-12 mx-auto">
             <div class="mb-8 text-center">
@@ -35,27 +44,53 @@ function checkReservation() {
                     Check Your Reservation Status
                 </h1>
                 <p class="text-gray-600">
-                    Enter your reservation code to view the current status of
-                    your booking.
+                    "Enter your reservation code or the name of the employee who
+                    made the booking to check the status of your reservation.
                 </p>
             </div>
 
             <SearchCodeForm
-                v-model="form.code"
+                v-model="searchForm.code"
                 :error="page.props.flash.error ?? ''"
-                :loading="form.processing"
-                :submit="checkReservation"
+                :loading="searchForm.processing"
+                :submit="submitSearch"
             />
 
-            <!-- Help Information -->
-            <Message
-                severity="info"
-                class="flex items-center p-4 mb-6 text-sm gap-x-2"
+            <Card
+                v-if="reservations && reservations.length > 0"
+                class="rounded-md shadow-none"
             >
-                <Info class="size-4" />
-                Your reservation code was automatically downloaded after your
-                reservation was created.
-            </Message>
+                <CardHeader>
+                    <CardTitle> Search Results </CardTitle>
+                </CardHeader>
+                <CardContent class="space-y-2.5 max-h-[16rem] overflow-y-auto">
+                    <div
+                        v-for="reservation in reservations"
+                        :key="reservation.id"
+                        class="flex items-center justify-between"
+                    >
+                        <p>
+                            {{ reservation.code }}
+                            <span
+                             v-if="reservation.min_check_in_date && reservation.max_check_out_date"
+                             class="block text-xs text-blue-500 md:inline-block">
+                                [{{ reservation.min_check_in_date }}
+                                <span class="text-neutral-500">to</span>
+                                {{ reservation.max_check_out_date }}]
+                            </span>
+                        </p>
+                        <Button
+                            @click="
+                                checkReservation(reservation.code)
+                            "
+                            variant="outline"
+                            class="border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
+                        >
+                            Check Status
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     </div>
 </template>

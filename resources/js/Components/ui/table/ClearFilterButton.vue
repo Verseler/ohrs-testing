@@ -9,7 +9,7 @@ import { FilterX } from "lucide-vue-next";
     <Button
         variant="destructive"
         size="icon"
-        class="w-20 px-2 md:w-max"
+        class="w-20 px-2 md:w-9"
     >
         <FilterX /><span class='block md:hidden'>Clear</span>
     </Button>

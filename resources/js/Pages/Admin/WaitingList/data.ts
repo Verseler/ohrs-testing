@@ -4,21 +4,19 @@ export const data = {
         { label: 'Waiting List', href: null }
     ],
     sortBy: [
-        { value: "reservation_code", label: "Reservation Code" },
+        { value: "code", label: "Reservation Code" },
         { value: "created_at", label: "Requested date" },
-        { value: "first_name", label: "Book by" },
-        { value: "check_in_date", label: "Check in" },
-        { value: "check_out_date", label: "Check out" },
-        { value: "guest_office_id", label: "Guest Office" },
+        { value: "first_name", label: "Booked by" },
+        { value: "min_check_in_date", label: "Check in" },
+        { value: "max_check_out_date", label: "Check out" },
     ],
     tableHeads: [
         "Reservation Code",
         "Requested Date",
-        "Book by",
+        "Booked by",
         "Check in",
         "Check out",
-        "Total Guests",
-        "Guest Office",
+        "Number of Guests",
         ""
     ],
 };

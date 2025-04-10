@@ -20,6 +20,7 @@ import {
 } from "@/Components/ui/paginator";
 import type {
     ReservationFilters,
+    ReservationStatus,
     Reservation as ReservationWithBeds,
 } from "@/Pages/Admin/Reservation/reservation.types";
 import type { LaravelPagination } from "@/types/index";
@@ -43,15 +44,13 @@ import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
+import PaymentTypeBadge from "@/Components/PaymentTypeBadge.vue";
 
 usePoll(10000);
 
-type Reservation = Omit<
-    ReservationWithBeds,
-    "guest_office_id" | "host_office_id"
-> & {
-    guest_office: Office;
+type Reservation = Omit<ReservationWithBeds, "host_office_id"> & {
     host_office: Office;
+    majorityStatus: ReservationStatus;
 };
 
 type ReservationManagementProps = {
@@ -62,20 +61,22 @@ type ReservationManagementProps = {
 const { reservations, filters } = defineProps<ReservationManagementProps>();
 
 const form = useForm<ReservationFilters>({
-    status: filters.status,
+    general_status: filters.general_status,
     balance: filters.balance,
+    payment_type: filters.payment_type,
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
 const formHasValue = computed(
-    () => form.search || form.balance || form.status || form.sort_by
+    () => form.search || form.balance || form.general_status || form.sort_by || form.payment_type
 );
 
 //Room Filter
 const clearFilter = () => {
-    form.status = null;
+    form.general_status = null;
+    form.payment_type = null;
     form.balance = null;
     form.search = undefined;
     form.sort_by = null;
@@ -92,8 +93,9 @@ function applyFilter() {
 
 watch(
     [
-        () => form.status,
+        () => form.general_status,
         () => form.balance,
+        () => form.payment_type,
         () => form.search,
         () => form.sort_by,
         () => form.sort_order,
@@ -114,11 +116,11 @@ watch(
 
         <!-- Search, Filter and Sort -->
         <div
-            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
                 <SelectField
-                    v-model="(form.status as string)"
+                    v-model="(form.general_status as string)"
                     placeholder="Reservation Status"
                     label="Status"
                     :items="data.filterStatus"
@@ -128,6 +130,12 @@ watch(
                     placeholder="Balance Status"
                     label="Balance"
                     :items="data.filterBalance"
+                />
+                <SelectField
+                    v-model="form.payment_type"
+                    placeholder="Payment Type"
+                    label="Payment Type"
+                    :items="data.filterPaymentType"
                 />
                 <SelectField
                     v-model="form.sort_by"
@@ -167,7 +175,7 @@ watch(
                             :key="reservation.id"
                         >
                             <TableCell class="font-medium">
-                                {{ reservation.reservation_code }}
+                                {{ reservation.code }}
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.first_name }}
@@ -178,10 +186,10 @@ watch(
                                 {{ reservation.last_name }}
                             </TableCell>
                             <TableCell class="font-medium">
-                                {{ reservation.check_in_date }}
+                                {{ reservation.min_check_in_date ?? '-' }}
                             </TableCell>
                             <TableCell class="font-medium">
-                                {{ reservation.check_out_date }}
+                                {{ reservation.max_check_out_date ?? '-' }}
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.total_billings }}
@@ -192,11 +200,13 @@ watch(
                             <TableCell class="font-medium">
                                 {{ reservation.guests.length }}
                             </TableCell>
-                            <TableCell class="font-medium">
-                                {{ reservation.guest_office.name }}
+                            <TableCell>
+                                <PaymentTypeBadge
+                                    :payment-type="reservation.payment_type"
+                                />
                             </TableCell>
                             <TableCell>
-                                <StatusBadge :status="reservation.status" />
+                                <StatusBadge :status="reservation.general_status" />
                             </TableCell>
                             <TableCell class="text-right">
                                 <Popover>

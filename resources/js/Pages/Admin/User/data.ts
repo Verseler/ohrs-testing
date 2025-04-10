@@ -9,13 +9,11 @@ export const data = {
     ],
     sortBy: [
         { value: "name", label: "Name" },
-        { value: "email", label: "Email" },
         { value: "role", label: "Role" },
     ],
     tableHeads: [
         "Name",
-        "Email",
-        "Hostel Office",
+        "Hostel Location",
         "Role",
         ""
     ],

@@ -18,8 +18,8 @@ const { gender } = defineProps<{ gender: Gender }>();
                 : 'success'
         "
     >
-        <Mars v-if="gender === 'female'" class="size-3.5" />
-        <Venus v-else-if="gender === 'male'" class="size-3.5" />
+        <Mars v-if="gender === 'female'" class="size-3.5 min-w-3" />
+        <Venus v-else-if="gender === 'male'" class="size-3.5 min-w-3" />
         <VenusAndMars v-else class="size-3.5" />
         {{ gender }}
     </Badge>

@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExtendReservationController;
+use App\Http\Controllers\UpdateReservationCheckoutController;
 use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\NotificationController;
@@ -15,40 +15,45 @@ use App\Http\Controllers\ReservationStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
 use App\Models\Office;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-//* All
 Route::get('/', function () {
     $hostels = Office::with('region')->where('has_hostel', true)->get();
 
     return Inertia::render('LandingPage', [
-        'canLogin' => Route::has('login'),
         'hostels' => $hostels
     ]);
 });
+Route::get('/rooms/available-beds', [RoomController::class, 'getAvailableRooms'])->name('room.checkAvailableBeds');
 
 //* Guest Reservation Process
 Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
 Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
-Route::get('/reservation/status', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
+Route::get('/reservation/status/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
+Route::get('reservation/search/{search}', [ReservationStatusController::class, 'search'])->name('reservation.search');
 
 //* Admin Reservation
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations', [ReservationController::class, 'list'])->name('reservation.list');
-    Route::put('/reservations/edit-status', [ReservationStatusController::class, 'editStatus'])->name('reservation.editStatus');
-    Route::post('/reservations/extend', [ExtendReservationController::class, 'extend'])->name('reservation.extend');
-    Route::get('/reservations/{id}/extend', [ExtendReservationController::class, 'extendForm'])->name('reservation.extendForm');
-    Route::get('/reservations/{id}/edit-status', [ReservationStatusController::class, 'editStatusForm'])->name('reservation.editStatusForm');
-    Route::put('/reservations/{id}/cancel', [ReservationStatusController::class, 'cancel'])->name('reservation.cancel');
+    Route::get('/reservations/{id}/edit-checkout', [UpdateReservationCheckoutController::class, 'updateCheckoutForm'])->name('reservation.updateCheckoutForm');
     Route::get('/reservations/{id}/edit-bed-assignment', [ReservationAssignBedsController::class, 'editBedAssignmentForm'])->name('reservation.editBedAssignmentForm');
     Route::put('/reservations/edit-assign-bed', [ReservationAssignBedsController::class, 'editAssignBed'])->name('reservation.editAssignBed');
     Route::get('/reservations/{id}/edit-assign-bed', [ReservationAssignBedsController::class, 'editAssignBedForm'])->name('reservation.editAssignBedForm');
     Route::get('/reservations/{id}', [ReservationController::class, 'show'])->name('reservation.show');
+});
+
+//* Admin Reservation Status
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/reservations/edit-checkout', [UpdateReservationCheckoutController::class, 'updateCheckout'])->name('reservation.updateCheckout');
+    Route::put('/reservations/edit-status', [ReservationStatusController::class, 'editAllStatus'])->name('reservation.editAllStatus');
+    Route::put('/reservations/edit-status/guest', [ReservationStatusController::class, 'editStatus'])->name('reservation.editStatus');
+    Route::get('/reservations/{id}/edit-status/guest', [ReservationStatusController::class, 'editStatusForm'])->name('reservation.editStatusForm');
+    Route::get('/reservations/{id}/edit-status', [ReservationStatusController::class, 'editAllStatusForm'])->name('reservation.editAllStatusForm');
+    Route::put('/reservations/{id}/cancel', [ReservationStatusController::class, 'cancel'])->name('reservation.cancel');
 });
 
 //* Admin Reservation Payment
@@ -89,7 +94,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 //* Admin analytics and reports
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/reports', [GenerateReportController::class, 'list'])->name('reports');
+    Route::get('/reports', [GenerateReportController::class, 'list'])->name('report.list');
+    Route::get('/reports/download/{selected_date}', [GenerateReportController::class, 'download'])->name('report.download');
+    Route::get('/reports/print/{selected_date}', [GenerateReportController::class, 'print'])->name('report.print');
 });
 
 //* Admin Notifications

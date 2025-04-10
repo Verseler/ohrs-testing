@@ -100,7 +100,6 @@ function showSubmitConfirmation() {
                     id="name"
                     v-model="form.name"
                     :invalid="!!form.errors.name"
-                    autofocus
                 />
 
                 <InputError v-if="form.errors.name">
@@ -146,7 +145,7 @@ function showSubmitConfirmation() {
                 <div class="grid grid-cols-3 gap-x-4">
                     <!-- Increment and decrement number of bed(s) -->
                     <div class="col-span-2 space-y-2">
-                        <Label>Number of Bed(s)</Label>
+                        <Label>Number of Beds</Label>
                         <ValueAdjuster
                             :value="form.number_of_beds"
                             :on-decrease="decreaseBed"

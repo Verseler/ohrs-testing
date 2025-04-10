@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { Head, router, usePage } from "@inertiajs/vue3";
-import { XCircleIcon, Home, CalendarCheck } from "lucide-vue-next";
+import { XCircleIcon, Home, CalendarCheck, PenIcon } from "lucide-vue-next";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -27,11 +27,15 @@ import { usePoll } from "@inertiajs/vue3";
 import { PageProps } from "@/types";
 import { Message } from "@/Components/ui/message";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import LinkButton from "@/Components/LinkButton.vue";
 
 usePoll(10000);
 
 type EditReservationStatusProps = {
-    reservation: Reservation;
+    reservation: Reservation & {
+        min_check_in_date: string;
+        max_check_out_date: string;
+    };
 };
 
 const { reservation } = defineProps<EditReservationStatusProps>();
@@ -40,8 +44,8 @@ const page = usePage<PageProps>();
 
 const cancelable = computed(
     () =>
-        reservation.status !== "checked_in" &&
-        reservation.status !== "checked_out"
+        reservation.general_status !== "checked_in" &&
+        reservation.general_status !== "checked_out"
 );
 
 //In chronological order
@@ -53,11 +57,11 @@ const status: ReservationStatus[] = [
 ];
 
 const nextStatus = computed(() => {
-    const currentIndex = status.indexOf(reservation.status);
+    const currentIndex = status.indexOf(reservation.general_status);
     return status[currentIndex + 1];
 });
 
-const bookBy = computed(
+const bookedBy = computed(
     () => `${reservation.first_name} ${reservation.last_name}`
 );
 
@@ -75,7 +79,7 @@ function showCancelConfirmation() {
 
 function changeStatus(newStatus: ReservationStatus) {
     router.put(
-        route("reservation.editStatus", {
+        route("reservation.editAllStatus", {
             reservation_id: reservation.id,
             status: newStatus,
         })
@@ -105,7 +109,11 @@ function cancelStatus() {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Office Management</BreadcrumbPage>
+                        <BreadcrumbLink :href="route('reservation.list')">Reservation Management</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                        <BreadcrumbPage>Edit Reservation Status</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
@@ -120,10 +128,19 @@ function cancelStatus() {
             <template #title>Edit Reservation Status</template>
         </PageHeader>
 
-        <div class="max-w-2xl px-4 py-8">
+        <div class="px-4 py-8 2xl:max-w-4xl">
+          <div class="flex justify-end items-center mb-2">
+            <LinkButton
+                :href="route('reservation.editStatusForm', { id: reservation.id })"
+            >
+                <PenIcon />
+                Specific Guest
+            </LinkButton>
+          </div>
+
             <!-- Reservation Details -->
             <Card
-                class="p-6 mb-6 bg-white border border-gray-200 rounded-lg shadow-sm"
+                class="p-6 mb-6 bg-white rounded-lg border border-gray-200 shadow-sm"
             >
                 <CardTitle class="mb-4 text-2xl font-bold text-center">
                     Reservation Status
@@ -131,16 +148,16 @@ function cancelStatus() {
 
                 <CardContent class="text-center">
                     <p class="text-lg font-medium">
-                        {{ bookBy }}
+                        {{ bookedBy }}
                     </p>
                     <p class="text-gray-600">
-                        {{ formatDateString(reservation.check_in_date) }} -
-                        {{ formatDateString(reservation.check_out_date) }}
+                        {{ formatDateString(reservation.min_check_in_date) }} -
+                        {{ formatDateString(reservation.max_check_out_date) }}
                     </p>
                     <p class="mt-1 text-sm text-gray-500">
-                        Reservation CODE: {{ reservation.reservation_code }}
+                        Reservation CODE: {{ reservation.code }}
                     </p>
-                    <ReservationStatusBadge :status="reservation.status" />
+                    <ReservationStatusBadge :status="reservation.general_status" />
                 </CardContent>
             </Card>
 
@@ -154,13 +171,13 @@ function cancelStatus() {
             <!-- Change Status Button -->
             <Card
                 v-if="
-                    reservation.status !== 'checked_out' &&
-                    reservation.status !== 'canceled'
+                    reservation.general_status !== 'checked_out' &&
+                    reservation.general_status !== 'canceled'
                 "
-                class="p-6 mb-6 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
+                class="p-6 mb-6 text-center bg-white rounded-lg border border-gray-200 shadow-sm"
             >
                 <CardTitle class="mb-4 text-2xl font-bold text-center">
-                    Update Status
+                    Update Status to
                 </CardTitle>
 
                 <CardContent>
@@ -184,7 +201,7 @@ function cancelStatus() {
                         @click="showCancelConfirmation()"
                     >
                         <XCircleIcon class="mr-1 !size-5" />
-                        Cancel Reservation
+                        Cancel
                     </Button>
 
                     <div class="mt-3 text-sm text-center text-gray-500">
@@ -210,7 +227,7 @@ function cancelStatus() {
             title="Are you sure you want to cancel the reservation?"
             description="This action cannot be undone. Please confirm your action to cancel the reservation."
             severity="danger"
-            confirm-label="Confirm Cancel"
+            confirm-label="Confirm"
         />
     </AuthenticatedLayout>
 </template>

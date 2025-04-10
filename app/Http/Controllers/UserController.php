@@ -44,7 +44,7 @@ class UserController extends Controller
 
         // Sorting
         if ($request->filled('sort_by')) {
-            $sortBy = in_array($request->sort_by, ['name', 'email', 'role']) ? $request->sort_by : 'name';
+            $sortBy = in_array($request->sort_by, ['name', 'role']) ? $request->sort_by : 'name';
             $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
             $query->orderBy($sortBy, $sortOrder);
         }
@@ -78,8 +78,7 @@ class UserController extends Controller
 
         $validated = $request->validate(
             [
-                'name' => ['required', 'string', 'max:20'],
-                'email' => ['required', 'email', 'unique:users'],
+                'name' => ['required', 'string', 'max:20', 'unique:users'],
                 'office_id' => ['required', 'exists:offices,id'],
                 'role' => ['required', Rule::in(['admin', 'super_admin'])],
                 'password' => [
@@ -93,7 +92,6 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
             'role' => $validated['role'],
             'office_id' => $validated['office_id'],
             'password' => Hash::make($validated['password']),

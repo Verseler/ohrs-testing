@@ -6,7 +6,6 @@ export type UserRole = 'admin' | 'super_admin';
 export interface User {
     id: number;
     name: string;
-    email: string;
     role: UserRole;
     office_id: number;
     office: Office;
@@ -25,7 +24,8 @@ export type PageProps<
         user: User;
     };
     flash: Flash,
-    unreadNotificationCount: number
+    unreadNotificationCount: number,
+    response_data: unknown
 };
 
 export type LaravelPagination<T> = {

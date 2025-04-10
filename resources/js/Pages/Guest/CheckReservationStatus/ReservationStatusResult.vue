@@ -5,23 +5,21 @@ import type {
     Reservation,
     ReservationStatus,
 } from "@/Pages/Admin/Reservation/reservation.types";
-import type { PageProps } from "@/types";
 import { usePoll } from "@inertiajs/vue3";
-import { Head, usePage } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import { CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { computed } from "vue";
 
 type ReservationStatusResult = {
-    reservation: Reservation;
-    canLogin: boolean;
+    reservation: Reservation & {
+        guests_count: number;
+    };
 };
 
-const { reservation, canLogin } = defineProps<ReservationStatusResult>();
+const { reservation } = defineProps<ReservationStatusResult>();
 
 usePoll(15000);
-
-const page = usePage<PageProps>();
 
 const statusConfig = computed(() => {
     if (!reservation) return null;
@@ -42,7 +40,7 @@ const statusConfig = computed(() => {
             borderColor: "border-yellow-200",
             title: "Pending",
             description:
-                "Your reservation is currently being processed. Please check back for updates.",
+                "Your reservation is waiting for approval. Please check back for updates.",
         },
         confirmed: {
             icon: CheckCircleIcon,
@@ -77,28 +75,28 @@ const statusConfig = computed(() => {
         },
     };
 
-    return configs[reservation.status];
+    return configs[reservation.general_status];
 });
 </script>
 
 <template>
     <Head title="Reservation Result" />
 
-    <d class="w-full min-h-screen">
-        <Header :can-login="canLogin" :user="page.props.auth.user" />
+    <div class="w-full min-h-screen">
+        <Header />
 
         <!-- Reservation Status Result -->
         <Card
             v-if="reservation"
-            class="max-w-xl mx-auto mt-20 mb-2 overflow-hidden border-none rounded-none shadow-none md:rounded-xl md:border md:shadow"
+            class="overflow-hidden mx-auto mt-20 mb-2 max-w-xl rounded-none border-none shadow-none md:rounded-xl md:border md:shadow"
         >
             <!-- Status Header -->
             <CardHeader
-                class="flex flex-col p-6 gap-y-2"
+                class="flex flex-col gap-y-2 p-6"
                 :class="statusConfig?.color"
             >
                 <div class="flex items-center">
-                    <component :is="statusConfig?.icon" class="w-6 h-6 mr-2" />
+                    <component :is="statusConfig?.icon" class="mr-2 w-6 h-6" />
                     <h2 class="text-lg font-semibold">
                         {{ statusConfig?.title }}
                     </h2>
@@ -113,7 +111,7 @@ const statusConfig = computed(() => {
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <h3 class="text-sm font-medium text-gray-500">
-                            Book By
+                            Booked By
                         </h3>
                         <p class="mt-1">
                             {{
@@ -126,11 +124,17 @@ const statusConfig = computed(() => {
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-medium text-gray-500">
+                        <h3
+                            v-if="reservation?.general_status !== 'canceled'"
+                            class="text-sm font-medium text-gray-500"
+                        >
                             Number of Guests
                         </h3>
-                        <p class="mt-1">
-                            {{ reservation?.guests?.length }}
+                        <p
+                            v-if="reservation?.general_status !== 'canceled'"
+                            class="mt-1"
+                        >
+                            {{ reservation?.guests_count }}
                         </p>
                     </div>
 
@@ -141,7 +145,7 @@ const statusConfig = computed(() => {
                         <p class="mt-1">
                             {{
                                 formatDateString(
-                                    reservation?.check_in_date || ""
+                                    reservation?.min_check_in_date || ""
                                 )
                             }}
                         </p>
@@ -154,7 +158,7 @@ const statusConfig = computed(() => {
                         <p class="mt-1">
                             {{
                                 formatDateString(
-                                    reservation?.check_out_date || ""
+                                    reservation?.max_check_out_date || ""
                                 )
                             }}
                         </p>
@@ -162,8 +166,8 @@ const statusConfig = computed(() => {
 
                     <div
                         v-if="
-                            reservation.status !== 'pending' &&
-                            reservation.status !== 'canceled' &&
+                            reservation.general_status !== 'pending' &&
+                            reservation.general_status !== 'canceled' &&
                             reservation.total_billings
                         "
                     >
@@ -177,8 +181,8 @@ const statusConfig = computed(() => {
 
                     <div
                         v-if="
-                            reservation.status !== 'pending' &&
-                            reservation.status !== 'canceled'
+                            reservation.general_status !== 'pending' &&
+                            reservation.general_status !== 'canceled'
                         "
                     >
                         <h3 class="text-sm font-medium text-gray-500">
@@ -188,8 +192,18 @@ const statusConfig = computed(() => {
                             ₱{{ formatCurrency(reservation.remaining_balance) }}
                         </p>
                     </div>
+
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Hostel Location
+                        </h3>
+                        <p class="mt-1">
+                            Region {{ reservation.hostel_office.region.name }} -
+                            {{ reservation.hostel_office.name }}
+                        </p>
+                    </div>
                 </div>
             </CardContent>
         </Card>
-    </d>
+    </div>
 </template>

@@ -19,7 +19,7 @@ function toggle() {
         @click="toggle"
         size="icon"
         variant="outline"
-        class="w-28 text-neutral-500 md:w-max"
+        class="w-28 text-neutral-500 md:w-9"
     >
         <ArrowDownNarrowWide v-if="model === 'asc'" />
         <ArrowUpWideNarrow v-else />

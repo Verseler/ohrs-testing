@@ -29,7 +29,10 @@ import {
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import type { Payment } from "@/Pages/Admin/Payment/payment.types";
+import type {
+    Payment,
+    PaymentExemption,
+} from "@/Pages/Admin/Payment/payment.types";
 import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import {
     formatCurrency,
@@ -46,9 +49,10 @@ type ReservationPaymentHistoryProps = {
     reservationPaymentHistory: Reservation & {
         payments: Payment[];
     };
+    exemptedPayments: PaymentExemption[];
 };
 
-const { reservationPaymentHistory } =
+const { reservationPaymentHistory, exemptedPayments } =
     defineProps<ReservationPaymentHistoryProps>();
 
 const totalBillings = computed(() =>
@@ -149,7 +153,7 @@ const closeReceiptDialog = () => {
                 >
                 <CardDescription>
                     Transaction history for reservation #{{
-                        reservationPaymentHistory.reservation_code
+                        reservationPaymentHistory.code
                     }}
                 </CardDescription>
             </CardHeader>
@@ -183,17 +187,20 @@ const closeReceiptDialog = () => {
                     </AmountCard>
                 </div>
 
-                <!-- Payments List -->
                 <div
-                    v-if="reservationPaymentHistory.payments.length > 0"
+                    v-if="
+                        reservationPaymentHistory.payments.length > 0 ||
+                        exemptedPayments.length > 0
+                    "
                     class="space-y-3"
                 >
+                    <!-- List of Payments -->
                     <div
                         v-for="payment in reservationPaymentHistory.payments"
                         :key="payment.id"
-                        class="flex flex-col p-3 border rounded-md bg-primary-50"
+                        class="flex flex-col p-3 rounded-md border bg-primary-50"
                     >
-                        <div class="flex items-start justify-between">
+                        <div class="flex justify-between items-start">
                             <div>
                                 <div class="font-medium">Record Payment</div>
                                 <div class="text-xs text-muted-foreground">
@@ -210,7 +217,7 @@ const closeReceiptDialog = () => {
                         </div>
 
                         <div
-                            class="flex items-center justify-between pt-2 mt-2 border-t border-dashed"
+                            class="flex justify-between items-center pt-2 mt-2 border-t border-dashed"
                         >
                             <div class="flex items-center">
                                 <span class="text-xs text-muted-foreground">
@@ -225,15 +232,60 @@ const closeReceiptDialog = () => {
                             </div>
                         </div>
                     </div>
+
+                    <!-- List of exempted payments -->
+                    <div
+                        v-for="exemptedPayment in exemptedPayments"
+                        :key="exemptedPayment.id"
+                        class="flex flex-col p-3 rounded-md border bg-primary-50"
+                    >
+                        <div class="flex items-start">
+                            <div>
+                                <div class="font-medium">Exempted Payment</div>
+                                <div class="text-xs text-muted-foreground">
+                                    {{
+                                        formatDateTimeString(
+                                            exemptedPayment.created_at
+                                        )
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center pt-2 mt-2 border-t border-dashed"
+                        >
+                            <p class="text-sm text-muted-foreground">
+                                Guest
+                                <span class="text-primary-500">{{
+                                    `${exemptedPayment.guest.first_name} ${exemptedPayment.guest.last_name}`
+                                }}</span>
+                                is exempted from payment by
+                                <span class="text-primary-500">
+                                    {{ exemptedPayment.user.name }}
+                                </span>
+                                {{
+                                    ` [${exemptedPayment.user.office.name} - ${exemptedPayment.user.role}]`
+                                }}
+                                of reservation
+                                {{
+                                    exemptedPayment.reservation.code
+                                }}
+                                .
+                                <span class="text-xs font-bold">Reason:</span>
+                                {{ exemptedPayment.reason }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- No Payments -->
                 <div
                     v-else
-                    class="py-8 text-center border rounded-md text-neutral-500"
+                    class="py-8 text-center rounded-md border text-neutral-500"
                 >
                     <ReceiptIcon
-                        class="w-10 h-10 mx-auto mb-2 text-muted-foreground"
+                        class="mx-auto mb-2 w-10 h-10 text-muted-foreground"
                     />
                     <p class="text-muted-foreground">
                         No payment records found for this reservation.
@@ -247,7 +299,8 @@ const closeReceiptDialog = () => {
                     <DialogHeader>
                         <DialogTitle>Payment Receipt</DialogTitle>
                         <DialogDescription>
-                           CODE: {{ reservationPaymentHistory.reservation_code }}
+                            CODE:
+                            {{ reservationPaymentHistory.code }}
                         </DialogDescription>
                     </DialogHeader>
 

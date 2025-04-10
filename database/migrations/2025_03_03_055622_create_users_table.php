@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -12,8 +13,7 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('password');
             $table->enum('role', ['admin', 'super_admin'])->default('admin');
             $table->foreignId('office_id')->constrained()->cascadeOnDelete();
@@ -36,6 +36,15 @@ return new class extends Migration {
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        //Add a default super admin
+        DB::table('users')->insert([
+            'name' => 'verselerf_handuman',
+            'role' => 'super_admin',
+            'office_id' => 176,
+            'password' => bcrypt('denrregionx'),
+        ]);
+
     }
 
     /**

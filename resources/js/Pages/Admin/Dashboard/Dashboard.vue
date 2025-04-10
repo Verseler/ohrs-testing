@@ -14,7 +14,7 @@ import YearPicker from "@/Components/YearPicker.vue";
 import { BarChart } from "@/Components/ui/chart-bar";
 import PageHeader from "@/Components/PageHeader.vue";
 import { Message } from "@/Components/ui/message";
-import { computed, onMounted, watch } from "vue";
+import { onMounted, watch } from "vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import { usePoll } from "@inertiajs/vue3";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
@@ -37,8 +37,6 @@ const {
     overdueCheckoutCount,
     monthlyRevenues,
 } = defineProps<DashboardProps>();
-
-const zeroReservation = computed(() => pendingReservationsCount <= 0);
 
 const form = useForm({
     selected_date: new Date(),
@@ -85,11 +83,7 @@ function updateDashboardData() {
         <section id="stats" class="grid grid-cols-2 gap-3 md:grid-cols-4">
             <StatsCard>
                 <template #title>Pending Reservations</template>
-                <template #value>
-                    <span :class="{ 'text-red-500': zeroReservation }">
-                        {{ pendingReservationsCount }}
-                    </span>
-                </template>
+                <template #value>{{ pendingReservationsCount }}</template>
                 <template #icon><CalendarClockIcon /></template>
             </StatsCard>
             <StatsCard>
@@ -123,21 +117,30 @@ function updateDashboardData() {
                 <YearPicker v-model="form.monthly_revenue_year" />
             </div>
 
-            <BarChart
-                class="w-full"
-                :data="monthlyRevenues"
-                index="name"
-                :categories="['revenue']"
-                :y-formatter="
-                    (tick, i) => {
-                        return typeof tick === 'number'
-                            ? `₱ ${new Intl.NumberFormat('us')
-                                  .format(tick)
-                                  .toString()}`
-                            : '';
-                    }
-                "
-            />
+            <div class="relative">
+                <div
+                    style="writing-mode: vertical-rl; transform: rotate(180deg)"
+                    class="absolute inset-y-0 flex justify-center my-auto -left-3"
+                >
+                    <p class='font-medium text-neutral-600'>Peso</p>
+                </div>
+
+                <BarChart
+                    class="w-full pl-5"
+                    :data="monthlyRevenues"
+                    index="name"
+                    :categories="['revenue']"
+                    :y-formatter="
+                        (tick, i) => {
+                            return typeof tick === 'number'
+                                ? `${new Intl.NumberFormat('us')
+                                      .format(tick)
+                                      .toString()}`
+                                : '';
+                        }
+                    "
+                />
+            </div>
         </section>
     </AuthenticatedLayout>
 </template>

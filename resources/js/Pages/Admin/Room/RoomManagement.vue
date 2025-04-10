@@ -31,14 +31,13 @@ import type {
     Room,
     RoomWithBedCounts,
 } from "@/Pages/Admin/Room/room.types";
-import { Head, Link, router, useForm } from "@inertiajs/vue3";
+import { Head, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
-import { debounce, formatDate, tomorrowDate, yesterdayDate } from "@/lib/utils";
+import { debounce, formatDate, tomorrowDate } from "@/lib/utils";
 import { Label } from "@/Components/ui/label";
-import DatePicker from "@/Components/DatePicker.vue";
 import { usePoll } from "@inertiajs/vue3";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 import { data } from "@/Pages/Admin/Room/data";
@@ -48,6 +47,8 @@ import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import AvailabilityBadge from "@/Components/AvailabilityBadge.vue";
 import GenderBadge from "@/Components/GenderBadge.vue";
 import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
+import LinkButton from "@/Components/LinkButton.vue";
+import { InputDate } from "@/Components/ui/input";
 
 usePoll(20000);
 
@@ -143,9 +144,9 @@ function handleDeleteRoom() {
         <div class="flex justify-between min-h-12">
             <Breadcrumbs :items="data.breadcrumbs" />
 
-            <Link :href="route('room.createForm')">
-                <Button><Plus /><span>Add Room</span></Button>
-            </Link>
+            <LinkButton :href="route('room.createForm')">
+                <Plus /><span>Add Room</span>
+            </LinkButton>
         </div>
 
         <PageHeader>
@@ -155,7 +156,7 @@ function handleDeleteRoom() {
 
         <!-- Filter and Sort -->
         <div
-            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
                 <SelectField
@@ -183,7 +184,9 @@ function handleDeleteRoom() {
                 </div>
             </div>
 
-            <div class="flex items-center ml-auto gap-x-2 h-9">
+            <div
+                class="gap-x-2 items-center space-y-2 md:space-y-0 md:ml-auto md:flex md:h-9"
+            >
                 <div class="relative">
                     <Label
                         for="check_in"
@@ -191,12 +194,12 @@ function handleDeleteRoom() {
                     >
                         Check In
                     </Label>
-                    <DatePicker
+                    <InputDate
                         id="check_in"
                         v-model="form.check_in_date"
-                        class="!h-10 min-w-64"
-                        :min-value="yesterdayDate()"
-                        :max-value="form.check_out_date"
+                        :min="formatDate(new Date())"
+                        :max="form.check_out_date"
+                        class="!h-10 min-w-52"
                     />
                 </div>
                 <div class="relative">
@@ -206,11 +209,11 @@ function handleDeleteRoom() {
                     >
                         Check Out
                     </Label>
-                    <DatePicker
+                    <InputDate
                         id="check_out"
-                        class="!h-10 min-w-64"
                         v-model="form.check_out_date"
-                        :min-value="form.check_in_date"
+                        :min="form.check_in_date"
+                        class="!h-10 min-w-52"
                     />
                 </div>
             </div>
@@ -240,8 +243,11 @@ function handleDeleteRoom() {
                             </TableCell>
                             <TableCell>
                                 <AvailabilityBadge
-                                    v-if="room.available_beds"
-                                    :available="room.available_beds <= 0"
+                                    :available="
+                                        room.available_beds !== undefined &&
+                                        room.available_beds !== null &&
+                                        room.available_beds <= 0
+                                    "
                                 />
                             </TableCell>
                             <TableCell>

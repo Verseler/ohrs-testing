@@ -1,4 +1,5 @@
-import type { Gender, Guest, GuestBeds } from '@/Pages/Guest/guest.types';
+import type { Gender, Guest } from '@/Pages/Guest/guest.types';
+import type { StayDetails } from '@/Pages/Admin/Reservation/reservation.types';
 
 export type RoomStatus = 'available' | 'fully_occupied' | 'maintenance';
 
@@ -53,7 +54,7 @@ export type RoomWithBed = Room & {
 }
 
 
-export type BedWithGuest = GuestBeds & {
+export type BedWithGuest = StayDetails & {
     bed: Bed;
     guest: Guest;
 }

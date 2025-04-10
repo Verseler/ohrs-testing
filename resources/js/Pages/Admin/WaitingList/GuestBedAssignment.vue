@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
+import type { GuestAssignment, ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { CalendarCheck, Home, Info, XCircle } from "lucide-vue-next";
+import { CalendarCheck, Home } from "lucide-vue-next";
 import PageHeader from "@/Components/PageHeader.vue";
 import { Head, router } from "@inertiajs/vue3";
 import {
@@ -14,22 +14,18 @@ import {
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
 import { onMounted, ref } from "vue";
-import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
 import AssignGuestList from "@/Pages/Admin/WaitingList/Partials/AssignGuestList.vue";
 import { Bed } from "@/Pages/Admin/Room/room.types";
-import { Message } from "@/Components/ui/message";
-import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
-import { usePoll } from "@inertiajs/vue3";
 import { showSuccess } from "@/Composables/useFlash";
 import { Separator } from "@/Components/ui/separator";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
-
-usePoll(15000);
+import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
+import { Button } from "@/Components/ui/button";
 
 type GuestBedAssignmentProps = {
-    reservation: ReservationWithBeds;
-    availableBeds: Bed[];
+    reservation: ReservationWithBeds & { guestAssignment: GuestAssignment[] };
+    availableBeds: Record<number, Bed[]>;
 };
 
 const { reservation, availableBeds } = defineProps<GuestBedAssignmentProps>();
@@ -87,7 +83,7 @@ onMounted(() => showSuccess());
         </PageHeader>
 
         <!-- Main content -->
-        <div class="flex flex-col max-w-6xl gap-6 md:flex-row">
+        <div class="flex flex-col gap-6 max-w-7xl xl:flex-row">
             <AssignGuestList
                 :reservation="reservation"
                 :availableBeds="availableBeds"
@@ -99,20 +95,11 @@ onMounted(() => showSuccess());
             <div class="max-w-md mx-auto">
                 <ReservationOverview :reservation="reservation" />
 
-                <Message
-                    severity="info"
-                    class="flex items-center mt-6 mb-2 text-sm gap-x-2"
-                >
-                    <Info class="size-6" />
-                    If ever there is no available beds or beds are not enough
-                    for all guests, you can cancel the reservation if needed.
-                </Message>
-
                 <Button
                     @click="showCancelConfirmation"
                     type="button"
                     variant="outline"
-                    class="w-full text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
+                    class="w-full mt-4 text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
                 >
                     <XCircle />
                     Cancel Reservation

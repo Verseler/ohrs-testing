@@ -14,13 +14,16 @@ class Payment extends Model
         "amount",
         "or_number",
         "or_date",
-        "transaction_id",
-        "payment_method",
         "reservation_id",
     ];
 
     public function reservation()
     {
         return $this->belongsTo(Reservation::class);
+    }
+
+    public function totalPayed($reservationId)
+    {
+        return $this->where('reservation_id', $reservationId)->sum('amount');
     }
 }

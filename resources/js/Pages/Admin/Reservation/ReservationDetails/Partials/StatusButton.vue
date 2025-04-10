@@ -26,31 +26,31 @@ type ButtonConfig = {
 // Button configurations for next steps
 const buttonConfigs: Record<ReservationStatus, ButtonConfig> = {
     pending: {
-        label: "Pending Reservation",
+        label: "Pending",
         icon: ClockIcon,
         color: "bg-yellow-500 hover:bg-yellow-600 text-white",
         description: "Reservation is pending approval",
     },
     confirmed: {
-        label: "Confirm Reservation",
+        label: "Confirm",
         icon: CheckCircleIcon,
         color: "bg-green-500 hover:bg-green-600 text-white",
         description: "Reservation has been approved",
     },
     checked_in: {
-        label: "Check In Guest",
+        label: "Check In",
         icon: BedIcon,
         color: "bg-blue-500 hover:bg-blue-600 text-white",
         description: "Guest has arrived at the hostel",
     },
     checked_out: {
-        label: "Check Out Guest",
+        label: "Check Out",
         icon: LogOutIcon,
         color: "bg-purple-500 hover:bg-purple-600 text-white",
         description: "Guest has departed from the hostel",
     },
     canceled: {
-        label: "Cancel Reservation",
+        label: "Cancel",
         icon: XCircleIcon,
         color: "bg-red-500 hover:bg-red-600 text-white",
         description: "Cancel this reservation",

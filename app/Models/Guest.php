@@ -13,29 +13,23 @@ class Guest extends Model
     protected $fillable = [
         'first_name',
         'last_name',
-        'phone',
         'gender',
-        'office_id',
+        'office',
         'reservation_id'
     ];
-
-    public function office()
-    {
-        return $this->belongsTo(Office::class);
-    }
 
     public function reservation()
     {
         return $this->belongsTo(Reservation::class);
     }
 
-    public function guestBeds()
-    {
-        return $this->hasMany(GuestBeds::class);
-    }
-
     public function paymentExemption()
     {
         return $this->hasOne(PaymentExemption::class);
+    }
+
+    public function stayDetails()
+    {
+        return $this->hasOne(StayDetails::class);
     }
 }

@@ -24,13 +24,13 @@ type StatusConfig = {
 
 const statusConfigs: Record<ReservationStatus, StatusConfig> = {
     pending: {
-        label: "Pending",
+        label: "Pending Reservation",
         icon: ClockIcon,
         color: "bg-yellow-100 border-yellow-300 text-yellow-800",
         nextSteps: ["confirmed", "canceled"],
     },
     confirmed: {
-        label: "Confirmed",
+        label: "Confirmed Reservation",
         icon: CheckCircleIcon,
         color: "bg-green-100 border-green-300 text-green-800",
         nextSteps: ["checked_in", "canceled"],
@@ -48,7 +48,7 @@ const statusConfigs: Record<ReservationStatus, StatusConfig> = {
         nextSteps: [],
     },
     canceled: {
-        label: "Canceled",
+        label: "Canceled Reservation",
         icon: XCircleIcon,
         color: "bg-red-100 border-red-300 text-red-800",
         nextSteps: [],

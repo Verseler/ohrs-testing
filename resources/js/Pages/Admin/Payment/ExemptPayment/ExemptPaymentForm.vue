@@ -13,7 +13,7 @@ import {
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
 import PageHeader from "@/Components/PageHeader.vue";
-import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
+import type { Reservation, StayDetails } from "@/Pages/Admin/Reservation/reservation.types";
 import { useForm } from "@inertiajs/vue3";
 import InputLabel from "@/Components/ui/input/InputLabel.vue";
 import {
@@ -26,7 +26,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import { Textarea } from "@/Components/ui/textarea";
-import { Guest, GuestBeds } from "@/Pages/Guest/guest.types";
+import { Guest } from "@/Pages/Guest/guest.types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { InputError } from "@/Components/ui/input";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
@@ -44,7 +44,7 @@ const form = useForm({
 });
 
 type SelectedGuest = Guest & {
-    guest_beds: GuestBeds[];
+    stay_details: StayDetails;
 };
 
 const selectedGuest = computed<SelectedGuest | null>(() => {
@@ -129,7 +129,7 @@ function submit() {
                     <h3 class="text-lg font-medium">Selected Guest</h3>
                     <div class="flex items-center mt-4">
                         <div
-                            class="flex items-center justify-center rounded-full size-14 bg-primary-100"
+                            class="flex justify-center items-center rounded-full size-14 bg-primary-100"
                         >
                             <UserIcon class="text-primary-500" />
                         </div>
@@ -140,9 +140,9 @@ function submit() {
                             </h4>
                             <p class="text-sm text-neutral-100">
                                 Room:
-                                {{ selectedGuest.guest_beds[0].bed.room.name }}
+                                {{ selectedGuest.stay_details.bed.room.name }}
                                 • Bed:
-                                {{ selectedGuest.guest_beds[0].bed.name }}
+                                {{ selectedGuest.stay_details.bed.name }}
                             </p>
                         </div>
                     </div>
@@ -197,7 +197,7 @@ function submit() {
                             <Textarea
                                 v-model="form.reason"
                                 rows="3"
-                                class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                class="block px-3 py-2 mt-1 w-full rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 placeholder="Add any additional information about this exemption..."
                             ></Textarea>
                             <InputError v-if="!!form.errors.reason">
@@ -206,7 +206,7 @@ function submit() {
                         </div>
 
                         <!-- Approval section -->
-                        <div class="p-4 rounded-md bg-gray-50">
+                        <div class="p-4 bg-gray-50 rounded-md">
                             <div class="flex items-start">
                                 <div class="flex-shrink-0">
                                     <ShieldCheckIcon

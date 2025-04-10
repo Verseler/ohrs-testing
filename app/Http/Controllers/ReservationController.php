@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\StayDetails;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -19,31 +20,38 @@ class ReservationController extends Controller
     {
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
-            'status' => ['nullable', Rule::in(['pending', 'confirmed', 'checked_in', 'checked_out', 'canceled'])],
+            'general_status' => ['nullable', Rule::in(['pending', 'confirmed', 'checked_in', 'checked_out', 'canceled'])],
             'balance' => ['nullable', Rule::in(['paid', 'has_balance'])],
-            'sort_by' => ['nullable', Rule::in(['reservation_code', 'first_name', 'check_in_date', 'check_out_date', 'total_billing', 'remaining_balance', 'status'])],
+            'sort_by' => ['nullable', Rule::in(['code', 'first_name', 'check_in_date', 'check_out_date', 'total_billings', 'remaining_balance', 'general_status'])],
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
-        $query = Reservation::with(relations: ['guests', 'guestOffice', 'hostelOffice'])
-            //Make sure that the reservations is ony accessible by authorized admin
+        $query = Reservation::with(relations: ['guests', 'hostelOffice', 'stayDetails'])
             ->where('hostel_office_id', Auth::user()->office_id)
-            //Make sure to not include the pending reservations because it has a dedicated page for that. (Waiting List Page)
-            ->whereNotIn('status', ['pending']);
-
+            ->whereNot('general_status', 'pending')
+            ->addSelect([
+                'min_check_in_date' => StayDetails::select('check_in_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderBy('check_in_date')
+                    ->limit(1),
+                'max_check_out_date' => StayDetails::select('check_out_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderByDesc('check_out_date')
+                    ->limit(1)
+            ])->orderBy('general_status', 'desc');
 
         // Search Filter
         if ($request->filled('search')) {
             $query->where(function ($query) use ($request) {
                 $query->where('first_name', 'ILIKE', "%{$request->search}%")
                     ->orWhere('last_name', 'ILIKE', "%{$request->search}%")
-                    ->orWhere('reservation_code', 'ILIKE', "%{$request->search}%");
+                    ->orWhere('code', 'ILIKE', "%{$request->search}%");
             });
         }
 
         // Status Filter
-        if ($request->filled('status') && in_array($request->status, ['confirmed', 'checked_in', 'checked_out', 'canceled'])) {
-            $query->where('status', $request->status);
+        if ($request->filled('general_status') && in_array($request->general_status, ['confirmed', 'checked_in', 'checked_out', 'canceled'])) {
+            $query->where('general_status', $request->general_status);
         }
 
         // Balance Filter
@@ -54,17 +62,22 @@ class ReservationController extends Controller
             };
         }
 
+        // Payment Type Filter
+        if ($request->filled('payment_type')) {
+            $query->where('payment_type', $request->payment_type);
+        }
+
         // Sorting updates
         if ($request->filled('sort_by')) {
             $sortBy = in_array($request->sort_by, [
-                'reservation_code',
+                'code',
                 'first_name',
                 'check_in_date',
                 'check_out_date',
                 'total_billings',
                 'remaining_balance',
-                'status'
-            ]) ? $request->sort_by : 'reservation_code';
+                'general_status'
+            ]) ? $request->sort_by : 'code';
 
             $sortOrder = $request->sort_order === 'desc' ? 'desc' : 'asc';
             $query->orderBy($sortBy, $sortOrder);
@@ -74,7 +87,7 @@ class ReservationController extends Controller
 
         return Inertia::render("Admin/Reservation/ReservationManagement", [
             'reservations' => $reservations,
-            'filters' => $request->only(['search', 'status', 'balance', 'sort_by', 'sort_order'])
+            'filters' => $request->only(['search', 'general_status', 'balance', 'payment_type', 'sort_by', 'sort_order'])
         ]);
     }
 
@@ -82,25 +95,35 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::with([
             'guests',
-            'guestOffice.region',
             'hostelOffice.region',
-            'reservedBeds.room.eligibleGenderSchedules',
             'reservedBedsWithGuests'
-        ])->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
-
-        $this->authorize('view', $reservation);
+        ])
+        ->withCount([
+            'stayDetails as confirmed_count' => function($query) {
+                $query->where('status', 'confirmed');
+            },
+            'stayDetails as checked_in_count' => function($query) {
+                $query->where('status', 'checked_in');
+            },
+            'stayDetails as checked_out_count' => function($query) {
+                $query->where('status', 'checked_out');
+            },
+            'stayDetails as canceled_count' => function($query) {
+                $query->where('status', 'canceled');
+            }
+        ])
+        ->whereNot('general_status', 'pending')
+        ->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
 
         $isSuperAdmin = Auth::user()->role === 'super_admin';
         $hasRemainingBalance = $reservation->remaining_balance > 0;
-        $validReservationStatus = $reservation->status !== 'pending'
-            && $reservation->status !== 'checked_out'
-            && $reservation->status !== 'canceled';
 
-        $canExempt = $isSuperAdmin && $hasRemainingBalance && $validReservationStatus;
+        $canExempt = $isSuperAdmin && $hasRemainingBalance && ($reservation->confirmed_count > 0 || $reservation->checked_in_count > 0);
+
 
         return Inertia::render("Admin/Reservation/ReservationDetails/ReservationDetails", [
             'reservation' => $reservation,
-            'canExempt' => $canExempt
+            'canExempt' => $canExempt,
         ]);
     }
 
@@ -110,34 +133,40 @@ class ReservationController extends Controller
     {
         $request->validate([
             'search' => ['nullable', 'string', 'max:255'],
-            'sort_by' => ['nullable', Rule::in(['reservation_code', 'created_at', 'first_name', 'check_in_date', 'check_out_date', 'guest_office_id'])],
+            'sort_by' => ['nullable', Rule::in(['code', 'created_at', 'first_name', 'min_check_in_date', 'max_check_out_date'])],
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
-        $query = Reservation::with(relations: ['guests', 'guestOffice', 'hostelOffice'])
-            //Make sure that the reservations is only accessible by authorized admin
+        $query = Reservation::with(relations: ['guests', 'hostelOffice', 'stayDetails'])
             ->where('hostel_office_id', Auth::user()->office_id)
-            //Make sure the reservation status is pending
-            ->whereIn('status', ['pending']);
-
+            ->where('general_status', 'pending')
+            ->addSelect([
+                'min_check_in_date' => StayDetails::select('check_in_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderBy('check_in_date')
+                    ->limit(1),
+                'max_check_out_date' => StayDetails::select('check_out_date')
+                    ->whereColumn('reservation_id', 'reservations.id')
+                    ->orderByDesc('check_out_date')
+                    ->limit(1)
+            ]);
 
         // Search Filter
         if ($request->filled('search')) {
             $query->where(function ($query) use ($request) {
                 $query->where('first_name', 'ILIKE', "%{$request->search}%")
                     ->orWhere('last_name', 'ILIKE', "%{$request->search}%")
-                    ->orWhere('reservation_code', 'ILIKE', "%{$request->search}%");
+                    ->orWhere('code', 'ILIKE', "%{$request->search}%");
             });
         }
 
         // Sorting updates
         $sortBy = $request->filled('sort_by') && in_array($request->sort_by, [
-            'reservation_code',
+            'code',
             'created_at',
             'first_name',
-            'check_in_date',
-            'check_out_date',
-            'guest_office_id'
+            'min_check_in_date',
+            'max_check_out_date',
         ]) ? $request->sort_by : 'created_at';
 
         $sortOrder = $request->filled('sort_order') && $request->sort_order === 'asc' ? 'asc' : 'desc';
@@ -150,6 +179,4 @@ class ReservationController extends Controller
             'filters' => $request->only(['search', 'sort_by', 'sort_order'])
         ]);
     }
-
-
 }

@@ -1,25 +1,21 @@
 <script setup lang="ts">
-import { usePage } from "@inertiajs/vue3";
-import type { PageProps } from "@/types";
+import { Head } from "@inertiajs/vue3";
 import Header from "@/Components/Header.vue";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import HostelCard from "@/Components/HostelCard.vue";
 
 type LandingPageProps = {
-    canLogin: boolean;
     hostels: Office[];
 };
 
-const { canLogin, hostels } = defineProps<LandingPageProps>();
-
-const page = usePage<PageProps>();
+const { hostels } = defineProps<LandingPageProps>();
 </script>
 
 <template>
     <Head title="Reservation Form" />
 
     <div class="w-full min-h-screen">
-        <Header :can-login="canLogin" :user="page.props.auth.user" />
+        <Header />
 
         <div class="max-w-4xl px-4 py-12 mx-auto">
             <div class="mb-10 text-center">
@@ -43,11 +39,6 @@ const page = usePage<PageProps>();
                         :has-hostel="hostel.has_hostel"
                         :hostel-name="hostel.name"
                         :region-name="hostel.region.name"
-                        :class="
-                            hostel.has_hostel
-                                ? 'hover:shadow-md hover:border-primary/50'
-                                : 'opacity-75'
-                        "
                     />
                 </template>
                 <p v-else class="text-sm italic text-neutral-500">
