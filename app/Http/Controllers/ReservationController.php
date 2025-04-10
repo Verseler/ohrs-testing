@@ -112,9 +112,7 @@ class ReservationController extends Controller
                 $query->where('status', 'canceled');
             }
         ])
-        ->whereHas('stayDetails', function ($query) {
-            $query->whereNot('status', 'pending');
-        })
+        ->whereNot('general_status', 'pending')
         ->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
 
         $isSuperAdmin = Auth::user()->role === 'super_admin';
