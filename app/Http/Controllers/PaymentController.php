@@ -173,6 +173,6 @@ class PaymentController extends Controller
 
         return redirect()->route('reservation.show', [
             'id' => $validated['reservation_id']
-        ]);
+        ])->with('success', 'Successfully exempted payment.');
     }
 }
