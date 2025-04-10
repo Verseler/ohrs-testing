@@ -54,8 +54,10 @@ class ReservationAssignBedsController extends Controller
             $availableBeds = $bed->availableBeds($checkInDate, $checkOutDate, $hostelOfficeId);
             $filteredByGender = $availableBeds->filter(function ($bed) use ($guest, $checkInDate, $checkOutDate) {
                 return $bed->isEligibleForGender($bed->room, $guest['gender'], $checkInDate, $checkOutDate);
+            })->sortByDesc(function($bed) {
+                return $bed->room->eligible_gender;
             });
-            $availableBedsForGuests[$guest->id] = $filteredByGender;
+            $availableBedsForGuests[$guest->id] = $filteredByGender->values();
         }
 
         return Inertia::render('Admin/WaitingList/GuestBedAssignment', [

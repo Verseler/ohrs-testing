@@ -96,7 +96,6 @@ const onBedSelect = (guestId: number, bedId: number) => {
         Object.keys(modifiedBeds.value).forEach(key => {
             const currentGuestId = Number(key);
             const beds = modifiedBeds.value[currentGuestId];
-
             const selectedBed = beds.find(b => b.id === bedId);
             if (selectedBed && selectedBed.room.eligible_gender === "any") {
                 // Update all beds in this room to match the guest's gender
@@ -134,7 +133,7 @@ function submit() {
 
 <template>
     <div class="space-y-2">
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
             <p class="text-2xl font-bold text-primary-600">Guests</p>
             <LinkButton
                 variant="outline"
@@ -151,15 +150,15 @@ function submit() {
         <div
             v-for="(guest, index) in form.guests"
             :key="guest.id"
-            class="grid grid-cols-8 gap-x-2 items-center"
+            class="grid items-center grid-cols-8 gap-x-2"
         >
-            <div class="flex col-span-5 gap-x-2 justify-between">
+            <div class="flex justify-between col-span-5 gap-x-2">
                 <p
-                    class="flex flex-1 items-center px-2 w-full capitalize rounded-md border"
+                    class="flex items-center flex-1 w-full px-2 capitalize border rounded-md"
                 >
                     {{ guest.name }}
                 </p>
-                <p class="flex items-center px-3 text-sm rounded-md border">
+                <p class="flex items-center px-3 text-sm border rounded-md">
                     <span class='text-blue-500'>{{ formatDateString(guest.check_in_date) }}</span>
                      <span class='mx-1'>to</span>
                      <span class='text-red-500'>{{ formatDateString(guest.check_out_date) }}</span>
@@ -176,7 +175,7 @@ function submit() {
                 @update:modelValue="(value) => onBedSelect(guest.id, Number(value))"
             >
                 <SelectTrigger
-                    class="col-span-3 h-12 rounded-sm shadow-none border-primary-700"
+                    class="h-12 col-span-3 rounded-sm shadow-none border-primary-700"
                     :invalid="(form.errors as any)[`guests.${index}.bed_id`]"
                 >
                     <SelectValue placeholder="Select bed">{{
@@ -193,7 +192,7 @@ function submit() {
                             :key="bed.id"
                             :value="bed.id"
                         >
-                            <div class="flex justify-between items-center">
+                            <div class="flex items-center justify-between">
                                 <span class="block text-sm">
                                     {{ `${bed.room.name} - ${bed.name}` }}
                                 </span>

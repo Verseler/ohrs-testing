@@ -83,7 +83,7 @@ onMounted(() => showSuccess());
         </PageHeader>
 
         <!-- Main content -->
-        <div class="flex flex-col gap-6 max-w-7xl md:flex-row">
+        <div class="flex flex-col gap-6 max-w-7xl xl:flex-row">
             <AssignGuestList
                 :reservation="reservation"
                 :availableBeds="availableBeds"
@@ -92,14 +92,14 @@ onMounted(() => showSuccess());
 
             <Separator class="my-4 md:hidden" />
 
-            <div class="mx-auto max-w-md">
+            <div class="max-w-md mx-auto">
                 <ReservationOverview :reservation="reservation" />
 
                 <Button
                     @click="showCancelConfirmation"
                     type="button"
                     variant="outline"
-                    class="mt-4 w-full text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
+                    class="w-full mt-4 text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
                 >
                     <XCircle />
                     Cancel Reservation
