@@ -89,7 +89,7 @@
         <div style="display: block; border-top: 1px solid #949494; padding-top: 8px; line-height: 1.2;">
             <h1 style="font-size: 18px; margin: 0;">ONLINE HOSTEL RESERVATION SYSTEM</h1>
             <div style="font-size: 13px; margin: 0;">
-                Monthly Report for
+                Collectable monthly Report for
                 {{ \Carbon\Carbon::parse($selectedDate ??
                 now())->format('F Y') }}
             </div>
@@ -102,8 +102,6 @@
     <table>
         <thead>
             <tr>
-                <th>Date</th>
-                <th>OR Number</th>
                 <th>Booked By</th>
                 <th>Number of Guests</th>
                 <th>Number of Days</th>
@@ -113,8 +111,6 @@
         <tbody>
             @forelse ($reports as $report)
             <tr>
-                <td>{{ $report['date'] }}</td>
-                <td>{{ $report['orNumber'] }}</td>
                 <td>{{ $report['bookedBy'] }}</td>
                 <td>{{ $report['numberOfGuests'] }}</td>
                 <td>{{ $report['numberOfDays'] }}</td>
@@ -122,12 +118,12 @@
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="italic text-center">No records found.</td>
+                <td colspan="4" class="italic text-center">No records found.</td>
             </tr>
             @endforelse
 
             <tr>
-                <td colspan="5" class="font-bold text-right">Total Amount:</td>
+                <td colspan="3" class="font-bold text-right">Total Amount:</td>
                 <td class="font-bold">{{ number_format($totalAmount, 2) }}</td>
             </tr>
         </tbody>

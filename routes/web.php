@@ -95,8 +95,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/reports', [GenerateReportController::class, 'list'])->name('report.list');
-    Route::get('/reports/download/{selected_date}', [GenerateReportController::class, 'download'])->name('report.download');
-    Route::get('/reports/print/{selected_date}', [GenerateReportController::class, 'print'])->name('report.print');
+    Route::get('/reports/download/{selected_date}/{type}', [GenerateReportController::class, 'download'])->name('report.download');
+    Route::get('/reports/print/{selected_date}/{type}', [GenerateReportController::class, 'print'])->name('report.print');
 });
 
 //* Admin Notifications
