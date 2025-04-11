@@ -38,7 +38,6 @@ const { hostels } = defineProps<LandingPageProps>();
                         :hostel-id="hostel.id"
                         :has-hostel="hostel.has_hostel"
                         :hostel-name="hostel.name"
-                        :region-name="hostel.region.name"
                     />
                 </template>
                 <p v-else class="text-sm italic text-neutral-500">

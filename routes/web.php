@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $hostels = Office::with('region')->where('has_hostel', true)->get();
+    $hostels = Office::where('has_hostel', true)->get();
 
     return Inertia::render('LandingPage', [
         'hostels' => $hostels

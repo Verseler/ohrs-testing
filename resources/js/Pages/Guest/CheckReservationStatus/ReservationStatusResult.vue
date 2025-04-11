@@ -198,7 +198,6 @@ const statusConfig = computed(() => {
                             Hostel Location
                         </h3>
                         <p class="mt-1">
-                            Region {{ reservation.hostel_office.region.name }} -
                             {{ reservation.hostel_office.name }}
                         </p>
                     </div>

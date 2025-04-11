@@ -171,7 +171,7 @@ class ReservationStatusController extends Controller
 
     public function checkStatus(string $code)
     {
-        $reservation = Reservation::with(['hostelOffice.region'])
+        $reservation = Reservation::with(['hostelOffice'])
             ->select(
                 'id',
                 'code',

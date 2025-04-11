@@ -19,17 +19,16 @@ class ReservationProcessController extends Controller
 {
     public function form(Request $request)
     {
-        $hostelOffice = Office::with('region')->where('has_hostel', true)
+        $hostelOffice = Office::where('has_hostel', true)
             ->findOrFail($request->hostel_office_id);
 
-        $offices = Office::with('region')
-            ->get()
+        $offices = Office::get()
             ->map(function($office) {
                 if($office->name == 'Central Office') {
                     return $office->name;
                 }
 
-                return "{$office->name} - {$office->region->name}";
+                return $office->name;
             })
             ->toArray();
 
@@ -156,7 +155,7 @@ class ReservationProcessController extends Controller
 
         // Office acronym codes
         $officeCodes = [
-            'Regional Office' => 'RO',
+            'Regional Office 10' => 'RO',
             'PENRO Camiguin' => 'TCAM',
             'PENRO Misamis Oriental' => 'ILPLS',
         ];
@@ -201,14 +200,13 @@ class ReservationProcessController extends Controller
 
                 $reservation = Reservation::findOrFail($reservationId);
                 $stayRange = $reservation->getStayDateRange();
-                $hostelOffice = Office::with('region')->findOrFail($reservation->hostel_office_id);
-                $regionName = $hostelOffice->region->name;
+                $hostelOffice = Office::findOrFail($reservation->hostel_office_id);
 
                 $reservationDetails = [
                     'from' => $stayRange['min_check_in_date'],
                     'to' => $stayRange['max_check_out_date'],
                     'code' => $reservation->code,
-                    'hostel_office_name' => "Region $regionName - $hostelOffice->name",
+                    'hostel_office_name' => $hostelOffice->name,
                     'total_guests' => $totalGuests
                 ];
 

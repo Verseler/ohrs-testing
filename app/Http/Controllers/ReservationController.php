@@ -95,7 +95,7 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::with([
             'guests',
-            'hostelOffice.region',
+            'hostelOffice',
             'reservedBedsWithGuests'
         ])
         ->withCount([

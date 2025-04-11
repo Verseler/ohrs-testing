@@ -73,14 +73,13 @@ function submit() {
                 <Table class="overflow-hidden">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
-                            Region {{ hostelOffice.region.name }} -
                             {{ hostelOffice.name }} Reservation
                         </TableCell>
                     </TableRow>
 
                     <TableBody>
                         <TableSectionHeading>
-                            Employee Making the Reservation
+                            Contact Information of Person Making the Reservation
                         </TableSectionHeading>
 
                         <div class="grid mb-8 lg:grid-cols-2">

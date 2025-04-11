@@ -38,17 +38,7 @@ import {
 } from "lucide-vue-next";
 import { computed, onMounted, ref, watch } from "vue";
 import type { UserFilters } from "@/Pages/Admin/User/user.types";
-import type { Region } from "@/Pages/Admin/Office/office.types";
 import { debounce } from "@/lib/utils";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import Searchbox from "@/Components/Searchbox.vue";
 import RoleBadge from "@/Pages/Admin/User/Partials/RoleBadge.vue";
@@ -66,13 +56,11 @@ usePoll(25000);
 type UserManagementProps = {
     users: LaravelPagination<User>;
     filters: UserFilters;
-    regions: Region[];
 };
 
 const { users, filters } = defineProps<UserManagementProps>();
 
 const form = useForm<Partial<UserFilters>>({
-    region_id: filters?.region_id,
     role: filters?.role,
     search: filters?.search,
     sort_by: filters?.sort_by,
@@ -80,12 +68,11 @@ const form = useForm<Partial<UserFilters>>({
 });
 
 const formHasValue = computed(
-    () => form.region_id || form.role || form.search || form.sort_by
+    () => form.role || form.search || form.sort_by
 );
 
 //User Filter
 function clearFilter() {
-    form.region_id = undefined;
     form.role = undefined;
     form.search = undefined;
     form.sort_by = undefined;
@@ -102,7 +89,6 @@ function applyFilter() {
 
 watch(
     [
-        () => form.region_id,
         () => form.role,
         () => form.search,
         () => form.sort_by,
@@ -161,24 +147,6 @@ function deleteUser() {
             class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
-                <Select v-model="form.region_id">
-                    <SelectTrigger class="md:w-40">
-                        <SelectValue placeholder="Select a region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Region</SelectLabel>
-                            <SelectItem
-                                v-for="region in regions"
-                                :key="region.id"
-                                :value="region.id"
-                            >
-                                {{ region.name }}
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-
                 <SelectField
                     v-model="form.role"
                     placeholder="Select a role"
@@ -224,7 +192,6 @@ function deleteUser() {
                                 {{ user.name }}
                             </TableCell>
                             <TableCell class="font-medium">
-                                Region {{ user.office?.region?.name }} -
                                 {{ user.office?.name }}
                             </TableCell>
                             <TableCell class="font-medium">

@@ -6,13 +6,11 @@ import BedAvailabilityChecker from "@/Components/BedAvailability/BedAvailability
 
 type HostelCardProps = {
     hostelName: string;
-    regionName: string;
     hasHostel: boolean;
     hostelId: number;
 };
 
-const { hasHostel, hostelId, hostelName, regionName } =
-    defineProps<HostelCardProps>();
+const { hasHostel, hostelId, hostelName } = defineProps<HostelCardProps>();
 </script>
 
 <template>
@@ -31,12 +29,9 @@ const { hasHostel, hostelId, hostelName, regionName } =
                 </div>
             </div>
 
-            <h2 class="text-lg font-semibold text-center">
+            <h2 class="text-lg font-semibold mb-4 text-center">
                 {{ hostelName }}
             </h2>
-            <p class="mb-3 text-sm font-medium text-center text-neutral-500">
-                Region {{ regionName }}
-            </p>
 
             <div class="flex justify-center">
                 <div v-if="hasHostel" class="flex gap-x-2">
