@@ -29,6 +29,7 @@ import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 type ReportType = 'revenue' | 'collectable';
 
 type Report = {
+    id: string;
     date: string;
     orNumber: string;
     bookedBy: string;
@@ -40,7 +41,7 @@ type Report = {
 type GenerateReportProps = {
     revenueReport: Report[];
     revenueTotalAmount: number;
-    collectableReport: Pick<Report, 'bookedBy' | 'numberOfGuests' | 'numberOfDays' | 'amount'>[];
+    collectableReport: Pick<Report, 'bookedBy' | 'numberOfGuests' | 'numberOfDays' | 'amount' | 'id'>[];
     collectableTotalAmount: number;
 };
 
@@ -152,7 +153,7 @@ function printReport(type: ReportType) {
 
                     <TableBody>
                         <template v-if="revenueReport && revenueReport.length > 0">
-                            <TableRow v-for="report in revenueReport" :key="report.date">
+                            <TableRow v-for="report in revenueReport" :key="report.id">
                                 <TableCell>
                                     {{ report.date }}
                                 </TableCell>
@@ -199,7 +200,7 @@ function printReport(type: ReportType) {
 
 
         <!-- Collectables Table -->
-        <div class="mt-20">
+        <div class="mt-28">
             <div class="flex items-center justify-end mb-2 gap-x-2">
                 <h1 class="text-2xl font-bold mr-auto ps-2">Collectables</h1>
                 <MonthPicker v-model="form.selected_collectable_date" />
@@ -228,8 +229,7 @@ function printReport(type: ReportType) {
 
                     <TableBody>
                         <template v-if="collectableReport && collectableReport.length > 0">
-                            <!-- TODO: key? -->
-                            <TableRow v-for="report in collectableReport" :key="report.bookedBy">
+                            <TableRow v-for="report in collectableReport" :key="report.id">
                                 <TableCell>
                                     {{ report.bookedBy }}
                                 </TableCell>

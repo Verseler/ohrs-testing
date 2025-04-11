@@ -137,7 +137,10 @@ class GenerateReportController extends Controller
                 $lengthOfStay = 1;
             }
 
+            $now = Carbon::now();
+
             return [
+                'id' => "{$payment->id} - {$now->toDateString()}",
                 'date' => $payment->created_at->toDateString(),
                 'orNumber' => $payment->or_number,
                 'bookedBy' => $payment->reservation->first_name . ' ' . $payment->reservation->last_name,
@@ -193,7 +196,10 @@ class GenerateReportController extends Controller
                 $lengthOfStay = 1;
             }
 
+            $now = Carbon::now();
+
             return [
+                'id' => "{$reservation->id} - {$now->toDateString()}",
                 'bookedBy' => "{$reservation->first_name} {$reservation->last_name}",
                 'numberOfGuests' => $reservation->guests->count(),
                 'numberOfDays' => $lengthOfStay,
