@@ -88,7 +88,6 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
             @input="handleInput"
             @keydown.down="handleArrowDown"
             @keydown.up="handleArrowUp"
-            @keydown.enter="selectItem"
             @keydown.esc="closeSuggestions"
             class="w-full h-12 bg-transparent rounded-md focus:ring-primary-800"
             :class="{
