@@ -64,10 +64,6 @@ function submit() {
                     autocomplete="current-password"
                     autofocus
                 />
-
-                <InputError>
-                    {{ form.errors.password }}
-                </InputError>
             </div>
 
             <div class="block mt-4">
