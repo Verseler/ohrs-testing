@@ -13,6 +13,7 @@ class Office extends Model
     protected $fillable = [
         'name',
         'has_hostel',
+        'hostel_name'
     ];
 
     public function users()

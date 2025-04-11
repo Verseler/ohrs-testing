@@ -45,6 +45,7 @@ class OfficeController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'has_hostel' => 'required|boolean',
+            'hostel_name' => 'nullable|string|max:255',
         ]);
 
         $office = Office::find($request->id);
@@ -54,6 +55,7 @@ class OfficeController extends Controller
 
         $office->name = $validated['name'];
         $office->has_hostel = $validated['has_hostel'];
+        $office->hostel_name = $validated['hostel_name'] ?? null;
         $office->save();
 
         return redirect()->route('office.list');

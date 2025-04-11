@@ -3,21 +3,16 @@ import { HotelIcon } from "lucide-vue-next";
 import LinkButton from "@/Components/LinkButton.vue";
 import Button from "@/Components/ui/button/Button.vue";
 import BedAvailabilityChecker from "@/Components/BedAvailability/BedAvailabilityChecker.vue";
+import type { Office } from "@/Pages/Admin/Office/office.types";
 
-type HostelCardProps = {
-    hostelName: string;
-    hasHostel: boolean;
-    hostelId: number;
-};
-
-const { hasHostel, hostelId, hostelName } = defineProps<HostelCardProps>();
+const { hostel } = defineProps<{ hostel: Office }>();
 </script>
 
 <template>
     <div
         class="overflow-hidden transition-all duration-200 bg-white border border-gray-200 rounded-lg shadow-sm min-w-64"
         :class="
-            hasHostel ? 'hover:shadow-md hover:border-primary/50' : 'opacity-75'
+            hostel.has_hostel ? 'hover:shadow-md hover:border-primary/50' : 'opacity-75'
         "
     >
         <div class="p-6">
@@ -30,21 +25,21 @@ const { hasHostel, hostelId, hostelName } = defineProps<HostelCardProps>();
             </div>
 
             <h2 class="text-lg font-semibold mb-4 text-center">
-                {{ hostelName }}
+                {{ hostel.hostel_name || hostel.name }}
             </h2>
 
             <div class="flex justify-center">
-                <div v-if="hasHostel" class="flex gap-x-2">
+                <div v-if="hostel.has_hostel" class="flex gap-x-2">
                     <LinkButton
                         :href="
                             route('reservation.form', {
-                                hostel_office_id: hostelId,
+                                hostel_office_id: hostel.id,
                             })
                         "
                     >
                         Make Reservation
                     </LinkButton>
-                    <BedAvailabilityChecker :hostelId="hostelId" />
+                    <BedAvailabilityChecker :hostelId="hostel.id" />
                 </div>
 
                 <Button v-else disabled class="w-full opacity-70">

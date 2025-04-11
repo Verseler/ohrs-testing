@@ -73,7 +73,7 @@ function submit() {
                 <Table class="overflow-hidden">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
-                            {{ hostelOffice.name }} Reservation
+                            {{ hostelOffice.hostel_name || hostelOffice.name }}
                         </TableCell>
                     </TableRow>
 

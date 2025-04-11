@@ -19,6 +19,7 @@ import {  Home, Hotel } from "lucide-vue-next";
 import { Button } from "@/Components/ui/button";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import { watch } from "vue";
 
 type UpsertOfficeProps = {
     office: Office | null;
@@ -27,12 +28,19 @@ type UpsertOfficeProps = {
 const { office } = defineProps<UpsertOfficeProps>();
 
 
-type UpsertOfficeForm = Pick<Office, "name" | "has_hostel">;
+type UpsertOfficeForm = Pick<Office, "name" | "has_hostel" | "hostel_name">;
 
 const form: InertiaForm<Partial<UpsertOfficeForm>> = useForm({
     id: office?.id ?? undefined,
     name: office?.name ?? undefined,
     has_hostel: office?.has_hostel ?? false,
+    hostel_name: office?.hostel_name ?? undefined,
+});
+
+watch(() => form.has_hostel, () => {
+    if(!form.has_hostel) {
+        form.hostel_name = undefined;
+    }
 });
 
 function showSubmitConfirmation() {
@@ -119,6 +127,20 @@ function showSubmitConfirmation() {
                 </RadioGroup>
                 <InputError v-if="form.errors.has_hostel">
                     {{ form.errors.has_hostel }}
+                </InputError>
+            </div>
+
+            <div v-if="form.has_hostel" class="flex flex-col gap-2">
+                <Label for="hostel_name">Hostel Name</Label>
+                <Input
+                    id="hostel_name"
+                    v-model="form.hostel_name"
+                    :invalid="!!form.errors.hostel_name"
+                    autofocus
+                />
+
+                <InputError v-if="form.errors.hostel_name">
+                    {{ form.errors.hostel_name }}
                 </InputError>
             </div>
 
