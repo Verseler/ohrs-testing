@@ -122,7 +122,7 @@ function updateDashboardData() {
                     style="writing-mode: vertical-rl; transform: rotate(180deg)"
                     class="absolute inset-y-0 flex justify-center my-auto -left-3"
                 >
-                    <p class='font-medium text-neutral-600'>Peso</p>
+                    <p class='text-sm font-medium tracking-wide uppercase text-neutral-600'>In &nbsp; Philippines &nbsp; Pesos</p>
                 </div>
 
                 <BarChart
