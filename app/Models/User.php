@@ -51,4 +51,22 @@ class User extends Authenticatable
 
         return false;
     }
+
+    public function isSystemAdmin()
+    {
+        if ($this->role === 'system_admin') {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function hasRole($role)
+    {
+        if ($this->role === $role) {
+            return true;
+        }
+
+        return false;
+    }
 }

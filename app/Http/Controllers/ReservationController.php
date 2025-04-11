@@ -116,9 +116,10 @@ class ReservationController extends Controller
         ->where('hostel_office_id', Auth::user()->office_id)->findOrFail($id);
 
         $isSuperAdmin = Auth::user()->role === 'super_admin';
+        $isSystemAdmin = Auth::user()->role === 'system_admin';
         $hasRemainingBalance = $reservation->remaining_balance > 0;
 
-        $canExempt = $isSuperAdmin && $hasRemainingBalance && ($reservation->confirmed_count > 0 || $reservation->checked_in_count > 0);
+        $canExempt = ($isSuperAdmin || $isSystemAdmin) && $hasRemainingBalance && ($reservation->confirmed_count > 0 || $reservation->checked_in_count > 0);
 
 
         return Inertia::render("Admin/Reservation/ReservationDetails/ReservationDetails", [

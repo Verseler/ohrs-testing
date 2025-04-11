@@ -64,7 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reservations/payment/{id}', [PaymentController::class, 'paymentForm'])->name('reservation.paymentForm');
 });
 
-Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:super_admin,system_admin'])->group(function () {
     Route::post('/reservations/payment/exempt', [PaymentController::class, 'exemptPayment'])->name('reservation.exemptPayment');
     Route::get('/reservations/payment/{id}/exempt', [PaymentController::class, 'exemptPaymentForm'])->name('reservation.exemptPaymentForm');
 });
@@ -109,8 +109,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-//* Super Admin Office Management
-Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
+//* Office Management
+Route::middleware(['auth', 'verified', 'role:system_admin'])->group(function () {
     Route::get('/offices', [OfficeController::class, 'list'])->name('office.list');
     Route::get('/offices/form/{id?}', [OfficeController::class, 'upsertForm'])->name('office.upsertForm');
     Route::post('/offices/upsert/{id?}', [OfficeController::class, 'upsert'])->name('office.upsert');
@@ -118,8 +118,8 @@ Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
 });
 
 
-//* Super Admin User Management
-Route::middleware(['auth', 'verified', 'isSuperAdmin'])->group(function () {
+//* User Management
+Route::middleware(['auth', 'verified', 'role:system_admin'])->group(function () {
     Route::get('/users', [UserController::class, 'list'])->name('user.list');
     Route::get('/users/create', [UserController::class, 'createForm'])->name('user.createForm');
     Route::post('/users/create', [UserController::class, 'create'])->name('user.create');

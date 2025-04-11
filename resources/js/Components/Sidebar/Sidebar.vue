@@ -14,7 +14,7 @@ import {
     CalendarClock,
     Users,
     FileDown,
-    ShieldUser,
+    UserCheck,
 } from "lucide-vue-next";
 import type { NavItem } from "@/Components/Sidebar/sidebar.type";
 import type { PageProps } from "@/types";
@@ -31,11 +31,12 @@ import {
     SidebarMenu,
     SidebarMenuItem,
 } from "@/Components/ui/sidebar";
+import { roleLabel } from "@/lib/utils";
 
 const page = usePage<PageProps>();
 
-const isSuperAdmin = computed(
-    () => page.props.auth.user.role === "super_admin"
+const isSystemAdmin = computed(
+    () => page.props.auth.user.role === "system_admin"
 );
 
 const nav = ref<Array<NavItem>>([
@@ -94,14 +95,14 @@ const nav = ref<Array<NavItem>>([
                 route: "office.list",
                 path: "/offices",
                 icon: Hotel,
-                accessible: isSuperAdmin.value,
+                accessible: isSystemAdmin.value,
             },
             {
-                label: "Users",
+                label: "User",
                 route: "user.list",
                 path: "/users",
-                icon: ShieldUser,
-                accessible: isSuperAdmin.value,
+                icon: UserCheck,
+                accessible: isSystemAdmin.value,
             },
         ],
     },
@@ -167,11 +168,7 @@ function handleLogout() {
                         aria-label="user-role"
                         class="text-[0.60rem] text-neutral-200 capitalize"
                     >
-                        {{
-                            page.props?.auth?.user?.role === "super_admin"
-                                ? "Super Admin"
-                                : "Admin"
-                        }}
+                        {{ roleLabel(page.props.auth.user.role) }}
                     </span>
                 </div>
             </div>

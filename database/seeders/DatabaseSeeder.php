@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'verselerf_handuman',
-            'role' => 'super_admin',
+            'role' => 'system_admin',
             'office_id' => 176,
             'password' => bcrypt('1010101010'),
         ]);
