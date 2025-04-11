@@ -7,7 +7,7 @@ import type {
 } from "@/Pages/Admin/Reservation/reservation.types";
 import { usePoll } from "@inertiajs/vue3";
 import { Head } from "@inertiajs/vue3";
-import { CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
+import { ArrowLeft, CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { computed } from "vue";
 
@@ -85,124 +85,132 @@ const statusConfig = computed(() => {
     <div class="w-full min-h-screen">
         <Header />
 
-        <!-- Reservation Status Result -->
-        <Card
-            v-if="reservation"
-            class="overflow-hidden mx-auto mt-20 mb-2 max-w-xl rounded-none border-none shadow-none md:rounded-xl md:border md:shadow"
+        <div
+         v-if="reservation"
+        class="max-w-2xl p-4 mx-auto mt-20 mb-2 overflow-hidden rounded-none"
         >
-            <!-- Status Header -->
-            <CardHeader
-                class="flex flex-col gap-y-2 p-6"
-                :class="statusConfig?.color"
-            >
-                <div class="flex items-center">
-                    <component :is="statusConfig?.icon" class="mr-2 w-6 h-6" />
-                    <h2 class="text-lg font-semibold">
-                        {{ statusConfig?.title }}
-                    </h2>
-                </div>
 
-                <!-- Status Description -->
-                <p class="pl-8">{{ statusConfig?.description }}</p>
-            </CardHeader>
+            <div class="flex justify-end mb-2">
+                <a onclick="history.back();return false;" class="flex items-center gap-2 px-4 py-2 transition-colors border rounded-md cursor-pointer text-primary-500 hover:bg-primary-50 border-primary-500"><ArrowLeft class="size-4" />Back</a>
+            </div>
 
-            <!-- Limited Reservation Details -->
-            <CardContent class="p-6 space-y-4">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500">
-                            Booked By
-                        </h3>
-                        <p class="mt-1">
-                            {{
-                                obscureName(
-                                    reservation.first_name,
-                                    reservation.last_name
-                                )
-                            }}
-                        </p>
+
+            <!-- Reservation Status Result -->
+            <Card class="shadow-none md:shadow">
+                <!-- Status Header -->
+                <CardHeader
+                    class="flex flex-col p-6 rounded-tl-lg rounded-tr-lg gap-y-2"
+                    :class="statusConfig?.color"
+                >
+                    <div class="flex items-center">
+                        <component :is="statusConfig?.icon" class="w-6 h-6 mr-2" />
+                        <h2 class="text-lg font-semibold">
+                            {{ statusConfig?.title }}
+                        </h2>
                     </div>
 
-                    <div>
-                        <h3
-                            v-if="reservation?.general_status !== 'canceled'"
-                            class="text-sm font-medium text-gray-500"
+                    <!-- Status Description -->
+                    <p class="pl-8">{{ statusConfig?.description }}</p>
+                </CardHeader>
+
+                <!-- Limited Reservation Details -->
+                <CardContent class="p-6 space-y-4">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500">
+                                Booked By
+                            </h3>
+                            <p class="mt-1">
+                                {{
+                                    obscureName(
+                                        reservation.first_name,
+                                        reservation.last_name
+                                    )
+                                }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3
+                                v-if="reservation?.general_status !== 'canceled'"
+                                class="text-sm font-medium text-gray-500"
+                            >
+                                Number of Guests
+                            </h3>
+                            <p
+                                v-if="reservation?.general_status !== 'canceled'"
+                                class="mt-1"
+                            >
+                                {{ reservation?.guests_count }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500">
+                                Check-in Date
+                            </h3>
+                            <p class="mt-1">
+                                {{
+                                    formatDateString(
+                                        reservation?.min_check_in_date || ""
+                                    )
+                                }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500">
+                                Check-out Date
+                            </h3>
+                            <p class="mt-1">
+                                {{
+                                    formatDateString(
+                                        reservation?.max_check_out_date || ""
+                                    )
+                                }}
+                            </p>
+                        </div>
+
+                        <div
+                            v-if="
+                                reservation.general_status !== 'pending' &&
+                                reservation.general_status !== 'canceled' &&
+                                reservation.total_billings
+                            "
                         >
-                            Number of Guests
-                        </h3>
-                        <p
-                            v-if="reservation?.general_status !== 'canceled'"
-                            class="mt-1"
+                            <h3 class="text-sm font-medium text-gray-500">
+                                Total Billings
+                            </h3>
+                            <p class="mt-1">
+                                ₱{{ formatCurrency(reservation.total_billings) }}
+                            </p>
+                        </div>
+
+                        <div
+                            v-if="
+                                reservation.general_status !== 'pending' &&
+                                reservation.general_status !== 'canceled'
+                            "
                         >
-                            {{ reservation?.guests_count }}
-                        </p>
-                    </div>
+                            <h3 class="text-sm font-medium text-gray-500">
+                                Remaining Balance
+                            </h3>
+                            <p class="mt-1">
+                                ₱{{ formatCurrency(reservation.remaining_balance) }}
+                            </p>
+                        </div>
 
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500">
-                            Check-in Date
-                        </h3>
-                        <p class="mt-1">
-                            {{
-                                formatDateString(
-                                    reservation?.min_check_in_date || ""
-                                )
-                            }}
-                        </p>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500">
+                                Hostel Location
+                            </h3>
+                            <p class="mt-1">
+                                {{ reservation.hostel_office.name }}
+                            </p>
+                        </div>
                     </div>
-
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500">
-                            Check-out Date
-                        </h3>
-                        <p class="mt-1">
-                            {{
-                                formatDateString(
-                                    reservation?.max_check_out_date || ""
-                                )
-                            }}
-                        </p>
-                    </div>
-
-                    <div
-                        v-if="
-                            reservation.general_status !== 'pending' &&
-                            reservation.general_status !== 'canceled' &&
-                            reservation.total_billings
-                        "
-                    >
-                        <h3 class="text-sm font-medium text-gray-500">
-                            Total Billings
-                        </h3>
-                        <p class="mt-1">
-                            ₱{{ formatCurrency(reservation.total_billings) }}
-                        </p>
-                    </div>
-
-                    <div
-                        v-if="
-                            reservation.general_status !== 'pending' &&
-                            reservation.general_status !== 'canceled'
-                        "
-                    >
-                        <h3 class="text-sm font-medium text-gray-500">
-                            Remaining Balance
-                        </h3>
-                        <p class="mt-1">
-                            ₱{{ formatCurrency(reservation.remaining_balance) }}
-                        </p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500">
-                            Hostel Location
-                        </h3>
-                        <p class="mt-1">
-                            {{ reservation.hostel_office.name }}
-                        </p>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+        </div>
     </div>
 </template>
