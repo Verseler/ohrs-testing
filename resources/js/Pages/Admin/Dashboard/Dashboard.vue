@@ -9,7 +9,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import NotificationLinkButton from "@/Components/NotificationLinkButton.vue";
 import type { MonthlyRevenue } from "@/Pages/Admin/Dashboard/dashboard.types";
 import StatsCard from "@/Components/Analytics/StatsCard.vue";
-import { formatYear, getMonthYear } from "@/lib/utils";
+import { formatCurrency, formatYear, getMonthYear } from "@/lib/utils";
 import YearPicker from "@/Components/YearPicker.vue";
 import { BarChart } from "@/Components/ui/chart-bar";
 import PageHeader from "@/Components/PageHeader.vue";
@@ -28,6 +28,8 @@ type DashboardProps = {
     overdueCheckinCount: number;
     overdueCheckoutCount: number;
     monthlyRevenues: MonthlyRevenue[];
+    runningRevenue: number;
+    runningCollectables: number;
 };
 
 const {
@@ -36,6 +38,8 @@ const {
     overdueCheckinCount,
     overdueCheckoutCount,
     monthlyRevenues,
+    runningRevenue,
+    runningCollectables,
 } = defineProps<DashboardProps>();
 
 const form = useForm({
@@ -107,13 +111,26 @@ function updateDashboardData() {
             id="monthly-revenue"
             class="max-w-full px-5 py-3 mt-4 border rounded-lg"
         >
-            <div class="flex items-center justify-between mt-2 mb-4 gap-x-2">
-                <p class="text-lg">
+            <div class="flex items-center text-lg justify-between mt-2 mb-4 gap-x-2">
+                <p>
                     Monthly Revenue for
                     <span class="font-bold">
                         {{ formatYear(form.monthly_revenue_year) }}
                     </span>
                 </p>
+
+                <p>Running Revenue:
+                    <span class="font-bold text-primary-500">
+                        {{ formatCurrency(runningRevenue) }}
+                    </span>
+                </p>
+
+                <p>Running Collectables:
+                    <span class="font-bold text-red-500">
+                        {{ formatCurrency(runningCollectables) }}
+                    </span>
+                </p>
+
                 <YearPicker v-model="form.monthly_revenue_year" />
             </div>
 
@@ -129,7 +146,7 @@ function updateDashboardData() {
                     class="w-full pl-5"
                     :data="monthlyRevenues"
                     index="name"
-                    :categories="['revenue']"
+                    :categories="['revenue', 'collectables']"
                     :y-formatter="
                         (tick, i) => {
                             return typeof tick === 'number'
