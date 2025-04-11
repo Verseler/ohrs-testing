@@ -23,18 +23,29 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import { Home, ShieldUser } from "lucide-vue-next";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Separator } from "@/Components/ui/separator";
 import InputPassword from "@/Components/ui/input/InputPassword.vue";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import SearchableSelect from "@/Components/SearchableSelect.vue";
 
 type CreateUserProps = {
     offices: Office[];
 };
 
 const { offices } = defineProps<CreateUserProps>();
+
+const officeOptions = computed(() => {
+    if(!offices || offices.length <= 0) return [];
+
+    return offices.map((office) => ({
+        value: office.id,
+        label: office.name,
+    }));
+
+});
 
 const form = useForm({
     name: "",
@@ -112,25 +123,13 @@ function submit() {
             <!-- Office Field -->
             <div>
                 <Label for="office">Office</Label>
-                <Select
-                    id="office"
+                <SearchableSelect
                     v-model="form.office_id"
-                >
-                    <SelectTrigger :invalid="!!form.errors.office_id">
-                        <SelectValue placeholder="Select office" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectItem
-                                v-for="office in offices"
-                                :Key="office.id"
-                                :value="office.id"
-                            >
-                                {{ office.name }}
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
+                    :options="officeOptions"
+                    option-label="name"
+                    option-value="id"
+                    placeholder="Select office"
+                />
                 <InputError v-if="form.errors.office_id">
                     {{ form.errors.office_id }}
                 </InputError>
@@ -143,7 +142,7 @@ function submit() {
                 <Label for="role">Role</Label>
                 <Select id="role" v-model="form.role">
                     <SelectTrigger :invalid="!!form.errors.role">
-                        <SelectValue placeholder="Select office" />
+                        <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
