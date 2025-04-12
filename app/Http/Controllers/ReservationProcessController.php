@@ -155,7 +155,7 @@ class ReservationProcessController extends Controller
 
         // Office acronym codes
         $officeCodes = [
-            'Regional Office 10' => 'RO',
+            'Region 10' => 'RO',
             'PENRO Camiguin' => 'TCAM',
             'PENRO Misamis Oriental' => 'ILPLS',
         ];

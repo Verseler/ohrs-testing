@@ -15,7 +15,7 @@ class OfficeSeeder extends Seeder
     {
         $offices = [
             // NCR (National Capital Region)
-            ['name' => 'Central Office', 'has_hostel' => false],
+            ['name' => 'Centr', 'has_hostel' => false],
             ['name' => 'NCR', 'has_hostel' => false],
             ['name' => 'MEO North', 'has_hostel' => false],
             ['name' => 'MEO East', 'has_hostel' => false],
@@ -44,7 +44,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Sabangan', 'has_hostel' => false],
 
             // Region 1
-            ['name' => 'Regional Office 1', 'has_hostel' => false],
+            ['name' => 'Region 1', 'has_hostel' => false],
             ['name' => 'PENRO Ilocos Norte', 'has_hostel' => false],
             ['name' => 'CENRO Laoag', 'has_hostel' => false],
             ['name' => 'CENRO Bangui', 'has_hostel' => false],
@@ -58,7 +58,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Alaminos', 'has_hostel' => false],
 
             // Region 2
-            ['name' => 'Regional Office 2', 'has_hostel' => false],
+            ['name' => 'Region 2', 'has_hostel' => false],
             ['name' => 'PENRO Batanes', 'has_hostel' => false],
             ['name' => 'PENRO Cagayan', 'has_hostel' => false],
             ['name' => 'CENRO Alcala', 'has_hostel' => false],
@@ -79,7 +79,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Nagtipunan', 'has_hostel' => false],
 
             // Region 3
-            ['name' => 'Regional Office 3', 'has_hostel' => false],
+            ['name' => 'Region 3', 'has_hostel' => false],
             ['name' => 'PENRO Aurora', 'has_hostel' => false],
             ['name' => 'CENRO Casiguran', 'has_hostel' => false],
             ['name' => 'CENRO Dingalan', 'has_hostel' => false],
@@ -132,7 +132,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Taytay', 'has_hostel' => false],
 
             // Region 5
-            ['name' => 'Regional Office 5', 'has_hostel' => false],
+            ['name' => 'Region 5', 'has_hostel' => false],
             ['name' => 'PENRO Albay', 'has_hostel' => false],
             ['name' => 'CENRO Guinobatan', 'has_hostel' => false],
             ['name' => 'PENRO Camarines Norte', 'has_hostel' => false],
@@ -147,7 +147,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'PENRO Sorsogon', 'has_hostel' => false],
 
             // Region 6
-            ['name' => 'Regional Office 6', 'has_hostel' => false],
+            ['name' => 'Region 6', 'has_hostel' => false],
             ['name' => 'PENRO Aklan', 'has_hostel' => false],
             ['name' => 'CENRO Boracay', 'has_hostel' => false],
             ['name' => 'PENRO Ilo-Ilo', 'has_hostel' => false],
@@ -166,7 +166,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Mambusao', 'has_hostel' => false],
 
             // Region 7
-            ['name' => 'Regional Office 7', 'has_hostel' => false],
+            ['name' => 'Region 7', 'has_hostel' => false],
             ['name' => 'PENRO Cebu', 'has_hostel' => false],
             ['name' => 'CENRO Cebu City', 'has_hostel' => false],
             ['name' => 'CENRO Argao', 'has_hostel' => false],
@@ -179,7 +179,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Siquijor', 'has_hostel' => false],
 
             // Region 8
-            ['name' => 'Regional Office 8', 'has_hostel' => false],
+            ['name' => 'Region 8', 'has_hostel' => false],
             ['name' => 'PENRO Leyte', 'has_hostel' => false],
             ['name' => 'CENRO Palo', 'has_hostel' => false],
             ['name' => 'CENRO Baybay', 'has_hostel' => false],
@@ -199,7 +199,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'PENRO Biliran', 'has_hostel' => false],
 
             // Region 9
-            ['name' => 'Regional Office 9', 'has_hostel' => false],
+            ['name' => 'Region 9', 'has_hostel' => false],
             ['name' => 'PENRO Zamboanga del Sur', 'has_hostel' => false],
             ['name' => 'CENRO Guipos', 'has_hostel' => false],
             ['name' => 'CENRO Ramon Magsaysay', 'has_hostel' => false],
@@ -214,7 +214,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Zamboanga City', 'has_hostel' => false],
 
             // Region 10
-            ['name' => 'Regional Office 10', 'has_hostel' => true],
+            ['name' => 'Region 10', 'hostel_name' => 'Region 10 Hostel', 'has_hostel' => true],
             ['name' => 'PENRO Bukidnon', 'has_hostel' => false],
             ['name' => 'CENRO Manolo Fortich', 'has_hostel' => false],
             ['name' => 'CENRO Valencia', 'has_hostel' => false],
@@ -224,15 +224,15 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Ozamis', 'has_hostel' => false],
             ['name' => 'CENRO Oroquieta', 'has_hostel' => false],
             ['name' => 'PENRO Misamis Oriental', 'has_hostel' => false],
-            ['name' => 'CENRO Initao', 'has_hostel' => true],
+            ['name' => 'CENRO Initao', 'hostel_name' => 'Initao-Libertad PLS hostel', 'has_hostel' => true],
             ['name' => 'CENRO Gingoog', 'has_hostel' => false],
-            ['name' => 'PENRO Camiguin', 'has_hostel' => true],
+            ['name' => 'PENRO Camiguin', 'hostel_name' => 'Camiguin Hostel', 'has_hostel' => true],
             ['name' => 'PENRO Lanao del Norte', 'has_hostel' => false],
             ['name' => 'CENRO Iligan', 'has_hostel' => false],
             ['name' => 'CENRO Kalambugan', 'has_hostel' => false],
 
             // Region 11
-            ['name' => 'Regional Office 11', 'has_hostel' => false],
+            ['name' => 'Region 11', 'has_hostel' => false],
             ['name' => 'PENRO Davao Oriental', 'has_hostel' => false],
             ['name' => 'CENRO Mati', 'has_hostel' => false],
             ['name' => 'CENRO Baganga', 'has_hostel' => false],
@@ -251,7 +251,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'PENRO Davao Occidental', 'has_hostel' => false],
 
             // Region 12
-            ['name' => 'Regional Office 12', 'has_hostel' => false],
+            ['name' => 'Region 12', 'has_hostel' => false],
             ['name' => 'PENRO Cotabato', 'has_hostel' => false],
             ['name' => 'CENRO Midsayap', 'has_hostel' => false],
             ['name' => 'CENRO Matalam', 'has_hostel' => false],
@@ -266,7 +266,7 @@ class OfficeSeeder extends Seeder
             ['name' => 'CENRO Glan', 'has_hostel' => false],
 
             // Region 13 (Caraga)
-            ['name' => 'Regional Office 13', 'has_hostel' => false],
+            ['name' => 'Region 13', 'has_hostel' => false],
             ['name' => 'PENRO Agusan del Norte', 'has_hostel' => false],
             ['name' => 'CENRO Nasipit', 'has_hostel' => false],
             ['name' => 'CENRO Tubay', 'has_hostel' => false],
@@ -287,6 +287,7 @@ class OfficeSeeder extends Seeder
         foreach ($offices as $office) {
             Office::create([
                 'name' => $office['name'],
+                'hostel_name' => $office['hostel_name'] ?? null,
                 'has_hostel' => $office['has_hostel'],
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
