@@ -2,11 +2,18 @@
 import Header from "@/Components/Header.vue";
 import { Head, router, useForm, usePage } from "@inertiajs/vue3";
 import type { PageProps } from "@/types";
+import type { Office } from "@/Pages/Admin/Office/office.types";
 import SearchCodeForm from "@/Pages/Guest/CheckReservationStatus/Partials/SearchCodeForm.vue";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Button } from "@/Components/ui/button";
+import ReservationItem from "@/Pages/Guest/CheckReservationStatus/Partials/ReservationItem.vue";
+
+type CheckReservationStatusProps = {
+    hostels: {value: number; label: string}[];
+}
+
+const { hostels } = defineProps<CheckReservationStatusProps>();
 
 const page = usePage<PageProps>();
 
@@ -17,18 +24,20 @@ const reservations = computed<Reservation[] | null>(() => {
 
 const searchForm = useForm({
     code: "",
+    hostel_id: hostels?.[0]?.value || null
 });
 
-function checkReservation(code: string) {
-    router.visit(route("reservation.checkStatus", { code: code }), {
-        method: "get",
-    });
-}
+watch(() => searchForm.hostel_id, () => {
+    page.props.response_data = null;
+});
+
 
 function submitSearch() {
     if(!searchForm.code) return;
 
-    searchForm.get(route("reservation.search", { search: searchForm.code }));
+    searchForm.get(route("reservation.search", { search: searchForm.code, hostel_id: searchForm.hostel_id }), {
+        preserveState: true
+    });
 }
 </script>
 
@@ -38,7 +47,7 @@ function submitSearch() {
     <div class="w-full min-h-screen">
         <Header />
 
-        <div class="max-w-2xl px-4 py-12 mx-auto">
+        <div class="px-4 py-12 mx-auto max-w-3xl">
             <div class="mb-8 text-center">
                 <h1 class="mb-2 text-2xl font-bold text-gray-900">
                     Check Your Reservation Status
@@ -50,10 +59,12 @@ function submitSearch() {
             </div>
 
             <SearchCodeForm
-                v-model="searchForm.code"
+                v-model:code="searchForm.code"
+                v-model:hostelId="searchForm.hostel_id"
                 :error="page.props.flash.error ?? ''"
                 :loading="searchForm.processing"
                 :submit="submitSearch"
+                :hostels="hostels"
             />
 
             <Card
@@ -64,31 +75,12 @@ function submitSearch() {
                     <CardTitle> Search Results </CardTitle>
                 </CardHeader>
                 <CardContent class="space-y-2.5 max-h-[16rem] overflow-y-auto">
-                    <div
+                    <ReservationItem
                         v-for="reservation in reservations"
                         :key="reservation.id"
-                        class="flex items-center justify-between"
-                    >
-                        <p>
-                            {{ reservation.code }}
-                            <span
-                             v-if="reservation.min_check_in_date && reservation.max_check_out_date"
-                             class="block text-xs text-blue-500 md:inline-block">
-                                [{{ reservation.min_check_in_date }}
-                                <span class="text-neutral-500">to</span>
-                                {{ reservation.max_check_out_date }}]
-                            </span>
-                        </p>
-                        <Button
-                            @click="
-                                checkReservation(reservation.code)
-                            "
-                            variant="outline"
-                            class="border-primary-500 text-primary-500 hover:bg-primary-50 hover:text-primary-600"
-                        >
-                            Check Status
-                        </Button>
-                    </div>
+                        :reservation="reservation"
+                        :hostels="hostels"
+                    />
                 </CardContent>
             </Card>
         </div>

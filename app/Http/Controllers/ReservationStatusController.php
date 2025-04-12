@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Office;
 use App\Models\Reservation;
 use App\Models\StayDetails;
 use Illuminate\Http\Request;
@@ -166,7 +167,11 @@ class ReservationStatusController extends Controller
     //Check Reservation Status for Guests
     public function checkStatusForm()
     {
-        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus');
+        $hostels = Office::select('id as value', 'name as label')->where('has_hostel', true)->get();
+
+        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus', [
+            'hostels' => $hostels
+        ]);
     }
 
     public function checkStatus(string $code)
@@ -210,7 +215,7 @@ class ReservationStatusController extends Controller
     }
 
 
-    public function search($search)
+    public function search($search, $hostel_id)
     {
         if (empty($search)) {
             return response()->json([
@@ -239,6 +244,7 @@ class ReservationStatusController extends Controller
                 $query->where('code', 'ILIKE', "%{$search}%")
                     ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
             })
+            ->where('hostel_office_id', $hostel_id)
             ->get();
 
         if ($reservations->isEmpty()) {

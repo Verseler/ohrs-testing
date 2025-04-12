@@ -6,6 +6,7 @@ use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\OtpController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReservationAssignBedsController;
 use App\Http\Controllers\RoomController;
@@ -34,7 +35,7 @@ Route::post('/reservation', [ReservationProcessController::class, 'create'])->na
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
 Route::get('/reservation/status/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
-Route::get('reservation/search/{search}', [ReservationStatusController::class, 'search'])->name('reservation.search');
+Route::get('reservation/search/{search}/{hostel_id}', [ReservationStatusController::class, 'search'])->name('reservation.search');
 
 //* Admin Reservation
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -131,3 +132,4 @@ Route::middleware(['auth', 'verified', 'role:system_admin'])->group(function () 
 });
 
 require __DIR__ . '/auth.php';
+
