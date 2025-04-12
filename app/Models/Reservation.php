@@ -24,7 +24,9 @@ class Reservation extends Model
         'id_type',
         'employee_id',
         'purpose_of_stay',
-        'general_status'
+        'general_status',
+        'modify_token',
+        'modify_token_expires_at'
     ];
 
     public function guests()
@@ -63,7 +65,7 @@ class Reservation extends Model
        return $this->stayDetails()->with(['bed.room.eligibleGenderSchedules', 'guest']);
    }
 
-   public function recomputeBillings() 
+   public function recomputeBillings()
    {
         $newTotalBillings = $this->guests->sum('stayDetails.individual_billings');
         $this->total_billings = $newTotalBillings;

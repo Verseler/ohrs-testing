@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EditReservationController;
 use App\Http\Controllers\UpdateReservationCheckoutController;
 use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
@@ -26,16 +27,25 @@ Route::get('/', function () {
     return Inertia::render('LandingPage', [
         'hostels' => $hostels
     ]);
-});
+})->name('landingPage');
 Route::get('/rooms/available-beds', [RoomController::class, 'getAvailableRooms'])->name('room.checkAvailableBeds');
 
-//* Guest Reservation Process
+//* Guest Reservation
 Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
 Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
 Route::get('/reservation/status/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
 Route::get('reservation/search/{search}/{hostel_id}', [ReservationStatusController::class, 'search'])->name('reservation.search');
+
+//* Guest Modify Reservation
+Route::post('/reservation/request-edit', [EditReservationController::class, 'requestEdit'])->name('reservation.request-edit');
+Route::get('/reservation/verify-edit/{reservation_id}/{token}', [EditReservationController::class, 'verifyEdit'])->name('reservation.verifyEdit');
+Route::put('/reservation/edit', [EditReservationController::class, 'edit'])->name('reservation.edit');
+Route::get('/reservation/otp', [OtpController::class, 'form'])->name('reservation.otpForm');
+Route::post('/reservation/otp', [OtpController::class, 'verify'])->name('reservation.otpVerify');
+
+
 
 //* Admin Reservation
 Route::middleware(['auth', 'verified'])->group(function () {
