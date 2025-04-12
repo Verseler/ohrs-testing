@@ -4,11 +4,10 @@ import { formatCurrency, formatDateString, obscureName } from "@/lib/utils";
 import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
 import { getStatusConfig } from "@/Pages/Guest/CheckReservationStatus/helper";
-import { usePoll, Head, router, useForm, usePage } from "@inertiajs/vue3";
+import { usePoll, Head, useForm, usePage } from "@inertiajs/vue3";
 import { computed, onMounted, ref } from "vue";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
-import { showSuccess } from "@/Composables/useFlash";
 import { toast } from "vue-sonner";
 import { PageProps } from "@/types";
 
@@ -46,17 +45,10 @@ function openRequestRebookConfirmation() {
     requestRebookConfirmation.value = true;
 }
 
-function requestEdit() {
-   form.post(route('reservation.request-edit'));
+function requestModify(action: string) {
+    form.post(route('reservation.requestModify', { action }));
 }
 
-function requestCancel() {
-//    form.post(route('reservation.request-cancel'));
-}
-
-function requestRebook() {
-//    form.post(route('reservation.request-rebook'));
-}
 
 onMounted(() => {
     console.log(page);
@@ -239,7 +231,7 @@ onMounted(() => {
       <Alert
             :open="requestEditConfirmation"
             @update:open="requestEditConfirmation = $event"
-            :onConfirm="requestEdit"
+            :onConfirm="() => requestModify('edit')"
             title="Are you sure you want to edit the reservation?"
             description="A code will be sent to your email for confirmation."
             confirm-label="Confirm"
@@ -248,7 +240,7 @@ onMounted(() => {
         <Alert
             :open="requestCancelConfirmation"
             @update:open="requestCancelConfirmation = $event"
-            :onConfirm="requestCancel"
+            :onConfirm="() => requestModify('cancel')"
             title="Are you sure you want to cancel the reservation?"
             description="A code will be sent to your email for confirmation."
             confirm-label="Confirm"
@@ -257,7 +249,7 @@ onMounted(() => {
         <Alert
             :open="requestRebookConfirmation"
             @update:open="requestRebookConfirmation = $event"
-            :onConfirm="requestRebook"
+            :onConfirm="() => requestModify('rebook')"
             title="Are you sure you want to rebook the reservation?"
             description="A code will be sent to your email for confirmation."
             confirm-label="Confirm"

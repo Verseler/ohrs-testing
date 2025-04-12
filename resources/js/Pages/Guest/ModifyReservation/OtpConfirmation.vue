@@ -6,15 +6,16 @@ import PinInput from '@/Components/ui/pin-input/PinInput.vue'
 import { useForm } from '@inertiajs/vue3'
 import { PinInputGroup, PinInputInput, PinInputSeparator } from '@/Components/ui/pin-input'
 import Header from '@/Components/Header.vue'
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { showSuccess } from '@/Composables/useFlash'
 
 type OtpConfirmationProps = {
     action: 'edit' | 'cancel' | 'rebook';
     reservation_id: number;
+    email: string;
 }
 
-const { action, reservation_id } = defineProps<OtpConfirmationProps>();
+const { action, reservation_id, email } = defineProps<OtpConfirmationProps>();
 
 const form = useForm({
     token: ['', '', '', '', '', ''],
@@ -31,16 +32,15 @@ onMounted(() => {
 function handleComplete() {
     const tokenString = form.token.join('');
 
-    console.log('act');
     switch(action) {
         case 'edit':
            form.get(route('reservation.verifyEdit', { reservation_id: reservation_id, token: tokenString }));
             break;
         case 'cancel':
-            // router.visit(route('reservation.cancel', { id: id }));
+            form.get(route('reservation.verifyCancel', { reservation_id: reservation_id, token: tokenString }));
             break;
         case 'rebook':
-            // router.visit(route('reservation.rebook', { id: id }));
+            // form.get(route('reservation.verifyRebook', { reservation_id: reservation_id, token: tokenString }));
             break;
     }
 }
@@ -58,8 +58,7 @@ function handleComplete() {
         <Mail class="mx-auto w-6 h-6" />
         <CardTitle class="text-2xl">Email Verification</CardTitle>
         <CardDescription>
-            We've sent a verification code to verselerkerr.handuman@gmail.com
-          <!-- We've sent a verification code to {{ maskedEmail }} -->
+          We've sent a verification code to {{ email }}
         </CardDescription>
       </CardHeader>
 

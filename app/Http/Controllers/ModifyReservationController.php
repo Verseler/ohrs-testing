@@ -7,13 +7,15 @@ use App\Models\Reservation;
 use App\Models\StayDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class EditReservationController extends Controller
+class ModifyReservationController extends Controller
 {
-    public function requestEdit(Request $request) {
+    public function requestModify(Request $request) {
         $validated = $request->validate([
-            'reservation_code' => ['required', 'string', 'exists:reservations,code']
+            'reservation_code' => ['required', 'string', 'exists:reservations,code'],
+            'action' => ['required', 'string', Rule::in(['edit', 'cancel', 'rebook'])]
         ]);
 
         $reservation = Reservation::where('code', $validated['reservation_code'])
@@ -32,7 +34,7 @@ class EditReservationController extends Controller
                 SendModifyReservationTokenEmail::dispatch($reservation->email, $details);
           
                 session([
-                    'action' => 'edit',
+                    'action' => $validated['action'],
                     'email' => $reservation->email,
                     'reservation_id' => $reservation->id
                 ]);
@@ -115,6 +117,76 @@ class EditReservationController extends Controller
            ->route('reservation.checkStatus', ['code' => $reservation->code])
            ->with('success', 'Reservation updated successfully');
    }
+
+   public function verifyCancel($reservation_id, string $token) {
+        $reservation = Reservation::where('general_status', 'pending')
+            ->orWhere('general_status', 'confirmed')
+            ->findOrFail($reservation_id);
+
+            if ($reservation->modify_token !== $token ||
+            now()->gt($reservation->modify_token_expires_at)) {
+            abort(403, 'Invalid or expired token');
+            }
+
+        try {
+            DB::transaction(function () use ($reservation) {
+                // Clear token after successful verification
+                $reservation->update([
+                    'modify_token' => null,
+                    'modify_token_expires_at' => null
+                ]);
+
+                $reservation = Reservation::with([
+                    'guests',
+                    'hostelOffice',
+                    'stayDetails.guest'
+                ])->findOrFail($reservation->id);
+
+                $this->cancelReservation($reservation->id);
+            });
+        }
+        catch(\Exception $e) {
+            return redirect()->back()->with('errors', $e->getMessage());
+        }
+
+
+        return redirect()
+        ->route('reservation.checkStatus', ['code' => $reservation->code])
+        ->with('success', 'Reservation updated successfully');
+   }
+
+    private function cancelReservation(int $id)
+    {
+        try {
+            DB::transaction(function () use ($id) {
+                $reservation = Reservation::with(['stayDetails', 'guests'])
+                    ->findOrFail($id);
+
+                // Delete all bed-guest associations for this reservation
+                if ($reservation->stayDetails->isNotEmpty()) {
+                    $reservation->stayDetails()->delete();
+                }
+
+                // Delete all guests associated with this reservation
+                if ($reservation->guests->isNotEmpty()) {
+                    $reservation->guests()->delete();
+                }
+
+                // Update reservation status
+                $reservation->general_status = 'canceled';
+                $reservation->stayDetails()->update([
+                    'status' => 'canceled',
+                    'individual_billings' => 0
+                ]);
+                $reservation->total_billings = 0;
+                $reservation->remaining_balance = 0;
+                $reservation->save();
+            });
+        } catch (\Exception $e) {
+            return redirect()->route('reservation.show', ['id' => $id])
+                ->with('error', 'Failed to cancel reservation: ' . $e->getMessage());
+        }
+    }
 
 
    private function generateToken(Reservation $reservation) {

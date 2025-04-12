@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EditReservationController;
+use App\Http\Controllers\ModifyReservationController;
 use App\Http\Controllers\UpdateReservationCheckoutController;
 use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
@@ -38,10 +38,12 @@ Route::get('/reservation/status/form', [ReservationStatusController::class, 'che
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
 Route::get('reservation/search/{search}/{hostel_id}', [ReservationStatusController::class, 'search'])->name('reservation.search');
 
-//* Guest Modify Reservation
-Route::post('/reservation/request-edit', [EditReservationController::class, 'requestEdit'])->name('reservation.request-edit');
-Route::get('/reservation/verify-edit/{reservation_id}/{token}', [EditReservationController::class, 'verifyEdit'])->name('reservation.verifyEdit');
-Route::put('/reservation/edit', [EditReservationController::class, 'edit'])->name('reservation.edit');
+//* Guest Modify Reservation    
+Route::post('/reservation/request-modify', [ModifyReservationController::class, 'requestModify'])->name('reservation.requestModify');
+Route::get('/reservation/verify-edit/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyEdit'])->name('reservation.verifyEdit');
+Route::post('/reservation/request-cancel', [ModifyReservationController::class, 'requestCancel'])->name('reservation.requestCancel');
+Route::get('/reservation/verify-cancel/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyCancel'])->name('reservation.verifyCancel');
+Route::put('/reservation/edit', [ModifyReservationController::class, 'edit'])->name('reservation.edit');
 Route::get('/reservation/otp', [OtpController::class, 'form'])->name('reservation.otpForm');
 Route::post('/reservation/otp', [OtpController::class, 'verify'])->name('reservation.otpVerify');
 
