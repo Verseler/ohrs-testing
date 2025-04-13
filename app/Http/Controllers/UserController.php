@@ -112,7 +112,7 @@ class UserController extends Controller
                 'id' => ['required', 'exists:users,id'],
                 'name' => ['required', 'string', 'max:20'],
                 'office_id' => ['required', 'exists:offices,id'],
-                'role' => ['required', Rule::in(['admin', 'super_admin'])],
+                'role' => ['required', Rule::in(['admin', 'super_admin', 'system_admin'])],
             ]
         );
 
