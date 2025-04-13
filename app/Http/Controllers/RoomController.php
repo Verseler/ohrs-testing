@@ -170,6 +170,19 @@ class RoomController extends Controller
                     throw new \Exception('Room name already exists.');
                 }
 
+                // Check if room has current or future reservations before changing gender
+                if ($validated['eligible_gender'] !== $room->eligible_gender) {
+                    $hasReservations = $room->beds()
+                        ->whereHas('stayDetails.guest.reservation', function ($query) {
+                            $query->where('check_out_date', '>=', Carbon::today());
+                        })
+                        ->exists();
+
+                    if ($hasReservations) {
+                        throw new \Exception('Cannot change room gender as it has current or future reservations.');
+                    }
+                }
+
                 // Update Room Info (Always allowed)
                 $room->update([
                     'name' => $validated['name'],
