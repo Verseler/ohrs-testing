@@ -131,7 +131,7 @@ class GenerateReportController extends Controller
         $revenueReport = $payments->map(function ($payment) {
             $checkInDate = Carbon::parse($payment->reservation->min_check_in_date);
             $checkOutDate = Carbon::parse($payment->reservation->max_check_out_date);
-            $lengthOfStay = $checkInDate->diffInDays($checkOutDate);
+            $lengthOfStay = (int)$checkInDate->diffInDays($checkOutDate);
 
             if ($lengthOfStay == 0) {
                 $lengthOfStay = 1;
@@ -187,7 +187,7 @@ class GenerateReportController extends Controller
         $collectableReport = $reservations->map(function ($reservation) {
             $checkInDate = Carbon::parse($reservation->min_check_in_date);
             $checkOutDate = Carbon::parse($reservation->max_check_out_date);
-            $lengthOfStay = $checkInDate->diffInDays($checkOutDate);
+            $lengthOfStay = (int)$checkInDate->diffInDays($checkOutDate);
 
             if ($lengthOfStay == 0) {
                 $lengthOfStay = 1;
