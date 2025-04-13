@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendReservationCancelledEmail;
 use App\Models\Office;
 use App\Models\Reservation;
 use App\Models\StayDetails;
@@ -171,6 +172,13 @@ class ReservationStatusController extends Controller
                 $reservation->total_billings = 0;
                 $reservation->remaining_balance = 0;
                 $reservation->save();
+
+                  //Send reservation code to email
+                  $details = [
+                    'title' => 'Reservation Cancellation Notice',
+                    'content' => $reservation->code,
+                ];
+                SendReservationCancelledEmail::dispatch($reservation->email, $details);
             });
         } catch (\Exception $e) {
             return redirect()->route('reservation.show', ['id' => $id])
