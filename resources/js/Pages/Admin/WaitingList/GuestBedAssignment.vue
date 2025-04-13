@@ -13,11 +13,10 @@ import {
     BreadcrumbPage,
 } from "@/Components/ui/breadcrumb";
 import BackLink from "@/Components/BackLink.vue";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import AssignGuestList from "@/Pages/Admin/WaitingList/Partials/AssignGuestList.vue";
 import { Bed } from "@/Pages/Admin/Room/room.types";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
-import { showSuccess } from "@/Composables/useFlash";
 import { Separator } from "@/Components/ui/separator";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
 import ReservationOverview from "@/Pages/Admin/WaitingList/Partials/ReservationOverview.vue";
@@ -39,8 +38,6 @@ function showCancelConfirmation() {
 function cancelReservation() {
     router.put(route("reservation.cancel", { id: reservation.id }));
 }
-
-onMounted(() => showSuccess());
 </script>
 
 <template>
@@ -92,14 +89,14 @@ onMounted(() => showSuccess());
 
             <Separator class="my-4 md:hidden" />
 
-            <div class="max-w-md mx-auto">
+            <div class="mx-auto max-w-md">
                 <ReservationOverview :reservation="reservation" />
 
                 <Button
                     @click="showCancelConfirmation"
                     type="button"
                     variant="outline"
-                    class="w-full mt-4 text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
+                    class="mt-4 w-full text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
                 >
                     <XCircle />
                     Cancel Reservation
