@@ -242,7 +242,10 @@ class ReservationStatusController extends Controller
             ])
             ->where(function ($query) use ($search) {
                 $query->where('code', 'ILIKE', "%{$search}%")
-                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
+                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%")
+                    ->orWhereHas('guests', function($query) use ($search) {
+                        $query->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
+                    });
             })
             ->where('hostel_office_id', $hostel_id)
             ->get();
