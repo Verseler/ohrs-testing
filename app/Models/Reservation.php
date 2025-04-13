@@ -54,6 +54,40 @@ class Reservation extends Model
         return $this->hasMany(StayDetails::class);
     }
 
+     // Relationship to get all rebooks where this is the previous reservation
+     public function rebooksAsPrevious()
+     {
+         return $this->hasMany(RebookReservation::class, 'prev_reservation_id');
+     }
+
+     // Relationship to get all rebooks where this is the new reservation
+     public function rebooksAsNew()
+     {
+         return $this->hasMany(RebookReservation::class, 'new_reservation_id');
+     }
+
+     // Get the previous reservation (through rebook)
+     public function previousReservation()
+     {
+         return $this->belongsToMany(
+             Reservation::class,
+             'rebook_reservations',
+             'new_reservation_id',
+             'prev_reservation_id'
+         );
+     }
+
+     // Get the new reservation (through rebook)
+     public function newReservation()
+     {
+         return $this->belongsToMany(
+             Reservation::class,
+             'rebook_reservations',
+             'prev_reservation_id',
+             'new_reservation_id'
+         );
+     }
+
 
    public function reservedBeds()
    {

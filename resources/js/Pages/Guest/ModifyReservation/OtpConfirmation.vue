@@ -40,7 +40,7 @@ function handleComplete() {
             form.get(route('reservation.verifyCancel', { reservation_id: reservation_id, token: tokenString }));
             break;
         case 'rebook':
-            // form.get(route('reservation.verifyRebook', { reservation_id: reservation_id, token: tokenString }));
+            form.get(route('reservation.verifyRebook', { reservation_id: reservation_id, token: tokenString }));
             break;
     }
 }
@@ -51,14 +51,14 @@ function handleComplete() {
 <div class="w-full min-h-screen">
     <Header />
 
-  <div class="grid place-content-center p-4 mt-40">
+  <div class="grid p-4 mt-40 place-content-center">
 
-    <Card class="py-6 w-full max-w-md">
+    <Card class="relative w-full max-w-md py-6">
       <CardHeader class="space-y-1 text-center">
-        <Mail class="mx-auto w-6 h-6" />
+        <Mail class="w-6 h-6 mx-auto" />
         <CardTitle class="text-2xl">Email Verification</CardTitle>
         <CardDescription>
-          We've sent a verification code to {{ email }}
+          We've sent a verification code to <span class='text-primary-700'>{{ email }}</span>. If you don't see the verification code in your inbox, please check your spam or junk folder.
         </CardDescription>
       </CardHeader>
 
@@ -69,7 +69,7 @@ function handleComplete() {
               Enter the 6-digit code sent to your email
             </div>
 
-            <div class="flex gap-2 justify-center">
+            <div class="flex justify-center gap-2">
                 <PinInput
                     id="pin-input"
                     v-model="form.token"
@@ -79,7 +79,7 @@ function handleComplete() {
                 <PinInputGroup class="gap-1">
                     <template v-for="(id, index) in 6" :key="id">
                     <PinInputInput
-                        class="rounded-md border"
+                        class="border rounded-md"
                         :index="index"
                     />
                     <template v-if="index !== 5">

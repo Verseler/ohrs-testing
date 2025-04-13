@@ -16,6 +16,7 @@ use App\Http\Controllers\ReservationProcessController;
 use App\Http\Controllers\ReservationStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
+use App\Mail\ModifyReservationTokenMail;
 use App\Models\Office;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -38,11 +39,12 @@ Route::get('/reservation/status/form', [ReservationStatusController::class, 'che
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
 Route::get('reservation/search/{search}/{hostel_id}', [ReservationStatusController::class, 'search'])->name('reservation.search');
 
-//* Guest Modify Reservation    
+//* Guest Modify Reservation
 Route::post('/reservation/request-modify', [ModifyReservationController::class, 'requestModify'])->name('reservation.requestModify');
 Route::get('/reservation/verify-edit/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyEdit'])->name('reservation.verifyEdit');
-Route::post('/reservation/request-cancel', [ModifyReservationController::class, 'requestCancel'])->name('reservation.requestCancel');
 Route::get('/reservation/verify-cancel/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyCancel'])->name('reservation.verifyCancel');
+Route::get('/reservation/modify-rebook/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyRebook'])->name('reservation.verifyRebook');
+Route::post('/reservation/rebook', [ModifyReservationController::class, 'rebook'])->name('reservation.rebook');
 Route::put('/reservation/edit', [ModifyReservationController::class, 'edit'])->name('reservation.edit');
 Route::get('/reservation/otp', [OtpController::class, 'form'])->name('reservation.otpForm');
 Route::post('/reservation/otp', [OtpController::class, 'verify'])->name('reservation.otpVerify');
