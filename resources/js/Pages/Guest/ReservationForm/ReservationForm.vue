@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, useForm } from "@inertiajs/vue3";
-import Header from "@/Components/Header.vue";
 import { Table, TableCell, TableRow, TableBody } from "@/Components/ui/table";
 import TableSectionHeading from "@/Pages/Guest/ReservationForm/Partials/TableSectionHeading.vue";
 import { Textarea } from "@/Components/ui/textarea";
@@ -21,6 +20,7 @@ import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import type { Gender } from "@/Pages/Guest/guest.types";
 import { validIds } from "@/Pages/Guest/ReservationForm/data";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 type ReservationFormProps = {
     hostelOffice: Office;
@@ -66,8 +66,7 @@ function submit() {
 <template>
     <Head title="Reservation Form" />
 
-    <div class="w-full min-h-screen">
-        <Header />
+    <GuestLayout>
         <div class="container px-2 py-4 mx-auto md:p-8">
             <form @submit.prevent="showConfirmation">
                 <Table class="overflow-hidden">
@@ -261,14 +260,13 @@ function submit() {
                 </Table>
             </form>
         </div>
-    </div>
-
-    <Alert
-        :open="confirmation"
-        @update:open="confirmation = $event"
-        :onConfirm="submit"
-        title="Are you sure you want to submit this reservation?"
-        description="Please confirm that all the details are correct before proceeding."
-        confirm-label="Confirm"
-    />
+        <Alert
+            :open="confirmation"
+            @update:open="confirmation = $event"
+            :onConfirm="submit"
+            title="Are you sure you want to submit this reservation?"
+            description="Please confirm that all the details are correct before proceeding."
+            confirm-label="Confirm"
+        />
+    </GuestLayout>
 </template>

@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import Header from "@/Components/Header.vue";
-import { Head, router, useForm, usePage } from "@inertiajs/vue3";
+import { Head, useForm, usePage } from "@inertiajs/vue3";
 import type { PageProps } from "@/types";
-import type { Office } from "@/Pages/Admin/Office/office.types";
 import SearchCodeForm from "@/Pages/Guest/CheckReservationStatus/Partials/SearchCodeForm.vue";
 import { computed, watch } from "vue";
 import { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import ReservationItem from "@/Pages/Guest/CheckReservationStatus/Partials/ReservationItem.vue";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 type CheckReservationStatusProps = {
     hostels: {value: number; label: string}[];
@@ -44,10 +43,8 @@ function submitSearch() {
 <template>
     <Head title="Check Reservation Status" />
 
-    <div class="w-full min-h-screen">
-        <Header />
-
-        <div class="px-4 py-12 mx-auto max-w-3xl">
+    <GuestLayout>
+        <div class="max-w-3xl px-4 py-12 mx-auto">
             <div class="mb-8 text-center">
                 <h1 class="mb-2 text-2xl font-bold text-gray-900">
                     Check Your Reservation Status
@@ -84,5 +81,5 @@ function submitSearch() {
                 </CardContent>
             </Card>
         </div>
-    </div>
+    </GuestLayout>
 </template>
