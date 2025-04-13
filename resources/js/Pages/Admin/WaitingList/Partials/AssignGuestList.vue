@@ -133,7 +133,7 @@ function submit() {
 
 <template>
     <div class="space-y-2">
-        <div class="flex items-center justify-between">
+        <div class="flex justify-between items-center">
             <p class="text-2xl font-bold text-primary-600">Guests</p>
             <LinkButton
                 variant="outline"
@@ -150,15 +150,15 @@ function submit() {
         <div
             v-for="(guest, index) in form.guests"
             :key="guest.id"
-            class="grid items-center grid-cols-8 gap-x-2"
+            class="grid grid-cols-1 items-center md:gap-2 md:grid-cols-8"
         >
-            <div class="flex justify-between col-span-5 gap-x-2">
+            <div class="flex flex-col gap-x-2 justify-between md:flex-row md:col-span-5">
                 <p
-                    class="flex items-center flex-1 w-full px-2 capitalize border rounded-md"
+                    class="flex flex-1 items-center px-2 w-full capitalize rounded-md border min-h-12 md:min-h-max"
                 >
                     {{ guest.name }}
                 </p>
-                <p class="flex items-center px-3 text-sm border rounded-md">
+                <p class="flex items-center px-3 text-sm rounded-md border min-h-12 md:min-h-max">
                     <span class='text-blue-500'>{{ formatDateString(guest.check_in_date) }}</span>
                      <span class='mx-1'>to</span>
                      <span class='text-red-500'>{{ formatDateString(guest.check_out_date) }}</span>
@@ -175,7 +175,7 @@ function submit() {
                 @update:modelValue="(value) => onBedSelect(guest.id, Number(value))"
             >
                 <SelectTrigger
-                    class="h-12 col-span-3 rounded-sm shadow-none border-primary-700"
+                    class="col-span-3 h-12 rounded-sm shadow-none border-primary-700"
                     :invalid="(form.errors as any)[`guests.${index}.bed_id`]"
                 >
                     <SelectValue placeholder="Select bed">{{
@@ -192,7 +192,7 @@ function submit() {
                             :key="bed.id"
                             :value="bed.id"
                         >
-                            <div class="flex items-center justify-between">
+                            <div class="flex justify-between items-center">
                                 <span class="block text-sm">
                                     {{ `${bed.room.name} - ${bed.name}` }}
                                 </span>
