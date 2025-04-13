@@ -111,7 +111,7 @@ class GenerateReportController extends Controller
         $endDate = $selectedDate->copy()->endOfMonth();
 
         $payments = Payment::with(['reservation.guests', 'reservation.stayDetails'])
-            ->with('reservation', function ($query) {
+            ->whereHas('reservation', function ($query) {
                 $query->addSelect([
                     'min_check_in_date' => StayDetails::select('check_in_date')
                         ->whereColumn('reservation_id', 'reservations.id')
