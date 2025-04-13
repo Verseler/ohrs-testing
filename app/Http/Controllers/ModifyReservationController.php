@@ -10,7 +10,7 @@ use App\Models\RebookReservation;
 use App\Models\Reservation;
 use App\Models\StayDetails;
 use App\Models\User;
-use App\Notifications\NewReservationNotification;
+use App\Notifications\ModifyReservationNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -66,15 +66,6 @@ class ModifyReservationController extends Controller
             abort(403, 'Invalid or expired token');
         }
 
-        // Clear token after successful verification
-        $reservation->update([
-            'modify_token' => null,
-            'modify_token_expires_at' => null
-        ]);
-
-        // Store verification in session
-        session()->put("reservation_edit_verified_{$reservation->id}", true);
-
         $reservation = Reservation::with([
             'guests',
             'hostelOffice',
@@ -101,12 +92,6 @@ class ModifyReservationController extends Controller
 
         try {
             DB::transaction(function () use ($validated, $reservation) {
-                // Check if verification is exist or not expired
-                if (!session()->get("reservation_edit_verified_{$reservation->id}")) {
-                    abort(403, 'Verification required');
-                }
-
-
                 foreach ($validated['stay_details'] as $stayDetail) {
                     StayDetails::where([
                         ['id', '=', $stayDetail['id']],
@@ -117,6 +102,13 @@ class ModifyReservationController extends Controller
                             'check_out_date' => $stayDetail['check_out_date']
                         ]);
                 }
+
+                //send notification to admin
+                $admins = User::where('office_id', $reservation->hostel_office_id)->get();
+                Notification::send(
+                    $admins,
+                    new ModifyReservationNotification('edited', $reservation)
+                );
             });
         } catch (\Exception $e) {
             return redirect()->back()->with('errors', $e->getMessage());
@@ -155,6 +147,13 @@ class ModifyReservationController extends Controller
                 ])->findOrFail($reservation->id);
 
                 $this->cancelReservation($reservation->id);
+
+                //send notification to admin
+                $admins = User::where('office_id', $reservation->hostel_office_id)->get();
+                Notification::send(
+                    $admins,
+                    new ModifyReservationNotification('canceled', $reservation)
+                );
             });
         } catch (\Exception $e) {
             return redirect()->back()->with('errors', $e->getMessage());
@@ -170,18 +169,13 @@ class ModifyReservationController extends Controller
     public function verifyRebook($reservation_id, string $token)
     {
         $reservation = Reservation::where('general_status', 'confirmed')->findOrFail($reservation_id);
+
         if (
             $reservation->modify_token !== $token ||
             now()->gt($reservation->modify_token_expires_at)
         ) {
             abort(403, 'Invalid or expired token');
         }
-
-        // Clear token after successful verification
-        $reservation->update([
-            'modify_token' => null,
-            'modify_token_expires_at' => null
-        ]);
 
         // Store verification in session
         session()->put("reservation_rebook_verified_{$reservation->id}", true);
@@ -238,6 +232,7 @@ class ModifyReservationController extends Controller
                 'guests.*.check_out_date.date' => 'Invalid date.',
             ]
         );
+
         try {
             DB::transaction(function () use ($validated) {
                 //Cancel old reservation
@@ -287,19 +282,21 @@ class ModifyReservationController extends Controller
                     ]);
                 }
 
-
+                
                 // Store reservation details in the session
                 session([
                     'reservation_id' => $reservation->id,
                     'total_guests' => count($validated['guests'])
                 ]);
 
+
                 //send notification to admin
-                $admins = User::where('office_id', $hostelOffice->id)->get();
+                $admins = User::where('office_id', $reservation->hostel_office_id)->get();
                 Notification::send(
                     $admins,
-                    new NewReservationNotification($reservation)
+                    new ModifyReservationNotification('rebook', $reservation)
                 );
+
 
                 //Send reservation code to email
                 $details = [
@@ -311,7 +308,7 @@ class ModifyReservationController extends Controller
                 //Create a reference from old to new reservation
                 RebookReservation::create([
                     'prev_reservation_id' => $prevReservation->id,
-                    'new_reservation_id' => $reservation
+                    'new_reservation_id' => $reservation->id
                 ]);
             });
         } catch (\Exception $e) {
