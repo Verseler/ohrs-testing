@@ -49,7 +49,6 @@ import GenderBadge from "@/Components/GenderBadge.vue";
 import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
 import LinkButton from "@/Components/LinkButton.vue";
 import { InputDate } from "@/Components/ui/input";
-import { useFlashSuccessOnMount } from "@/Composables/useFlash";
 
 usePoll(20000);
 
@@ -136,8 +135,6 @@ function handleDeleteRoom() {
         },
     });
 }
-
-useFlashSuccessOnMount();
 </script>
 
 <template>
@@ -159,7 +156,7 @@ useFlashSuccessOnMount();
 
         <!-- Filter and Sort -->
         <div
-            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
                 <SelectField
@@ -188,7 +185,7 @@ useFlashSuccessOnMount();
             </div>
 
             <div
-                class="items-center space-y-2 gap-x-2 md:space-y-0 md:ml-auto md:flex md:h-9"
+                class="gap-x-2 items-center space-y-2 md:space-y-0 md:ml-auto md:flex md:h-9"
             >
                 <div class="relative">
                     <Label
