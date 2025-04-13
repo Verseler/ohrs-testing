@@ -97,8 +97,6 @@ watch(
     debounce(applyFilter, 300)
 );
 
-onMounted(() => showSuccess());
-
 //delete confirmation
 const selectedUser = ref<User | null>(null);
 
@@ -144,7 +142,7 @@ function deleteUser() {
 
         <!-- Search, Filter and Sort -->
         <div
-            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
                 <SelectField

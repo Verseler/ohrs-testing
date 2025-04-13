@@ -33,11 +33,10 @@ import type {
 import type { LaravelPagination } from "@/types";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import Searchbox from "@/Components/Searchbox.vue";
-import { computed, onMounted, watch } from "vue";
+import { computed, watch } from "vue";
 import TableOrderToggle from "@/Components/ui/table/TableOrderToggle.vue";
 import { debounce, formatDateString, formatDateTimeString } from "@/lib/utils";
 import { usePoll } from "@inertiajs/vue3";
-import { showSuccess } from "@/Composables/useFlash";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
 import { data } from "@/Pages/Admin/WaitingList/data";
 import SelectField from "@/Components/SelectField.vue";
@@ -87,8 +86,6 @@ watch(
     [() => form.search, () => form.sort_by, () => form.sort_order],
     debounce(applyFilter, 300)
 );
-
-onMounted(() => showSuccess());
 </script>
 
 <template>
