@@ -39,16 +39,34 @@ class ReservationStatusController extends Controller
             'selected_guest_id' => ['required', 'exists:guests,id']
         ]);
 
-        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
-            ->with('guests.stayDetails')
-            ->findOrFail($validated['reservation_id']);
+       try {
+            $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+                ->with('guests.stayDetails')
+                ->findOrFail($validated['reservation_id']);
 
+            $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
 
-        $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
+            $guest->stayDetails()->update([
+                'status' => $validated['status']
+            ]);
 
-        $guest->stayDetails()->update([
-            'status' => $validated['status']
-        ]);
+            // Check if this was the last guest with the previous status
+            $previousStatusCount = $reservation->guests->filter(function($g) use ($guest) {
+                return $g->stayDetails->status === $guest->stayDetails->status;
+            })->count();
+
+            if ($previousStatusCount === 0) {
+                // Update reservation general_status to next status
+                $statusOrder = ['confirmed', 'checked_in', 'checked_out'];
+                $currentIndex = array_search($reservation->general_status, $statusOrder);
+                if ($currentIndex !== false && isset($statusOrder[$currentIndex + 1])) {
+                    $reservation->update(['general_status' => $statusOrder[$currentIndex + 1]]);
+                }
+            }
+       }
+       catch(\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to update reservation status: ' . $e->getMessage());
+       }
 
         return to_route('reservation.show', ['id' => $reservation->id])
             ->with('success', 'Reservation status updated successfully.');
