@@ -15,7 +15,7 @@ class OfficeSeeder extends Seeder
     {
         $offices = [
             // NCR (National Capital Region)
-            ['name' => 'Centr', 'has_hostel' => false],
+            ['name' => 'Central Office', 'has_hostel' => false],
             ['name' => 'NCR', 'has_hostel' => false],
             ['name' => 'MEO North', 'has_hostel' => false],
             ['name' => 'MEO East', 'has_hostel' => false],
