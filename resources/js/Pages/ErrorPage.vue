@@ -2,30 +2,52 @@
 import BackLink from "@/Components/BackLink.vue";
 import { computed } from "vue";
 
-const props = defineProps({ status: Number });
+const props = defineProps({ status: [Number, String] });
 
 const title = computed(() => {
     return {
-        503: "503: Service Unavailable",
-        500: "500: Server Error",
-        404: "404: Page Not Found",
+        400: "400: Bad Request",
+        401: "401: Unauthorized",
+        402: "402: Payment Required",
         403: "403: Forbidden",
-    }[props.status];
+        404: "404: Page Not Found",
+        405: "405: Method Not Allowed",
+        408: "408: Request Timeout",
+        413: "413: Payload Too Large",
+        415: "415: Unsupported Media Type",
+        422: "422: Unprocessable Entity",
+        429: "429: Too Many Requests",
+        500: "500: Server Error",
+        502: "502: Bad Gateway",
+        503: "503: Service Unavailable",
+        504: "504: Gateway Timeout",
+    }[props.status] || `Error ${props.status}`;
 });
 
 const description = computed(() => {
     return {
-        503: "Sorry, we are doing some maintenance. Please check back soon.",
-        500: "Whoops, something went wrong on our servers.",
-        404: "Sorry, the page you are looking for could not be found.",
+        400: "Sorry, there was a problem with your request.",
+        401: "Sorry, you need to log in to access this page.",
+        402: "Sorry, payment is required to complete this action.",
         403: "Sorry, you are forbidden from accessing this page.",
-    }[props.status];
+        404: "Sorry, the page you are looking for could not be found.",
+        405: "Sorry, this action is not allowed.",
+        408: "Sorry, the request took too long to complete.",
+        413: "Sorry, the data you sent is too large.",
+        415: "Sorry, we don't support that file format.",
+        422: "Sorry, we couldn't process your information.",
+        429: "Sorry, you're making too many requests. Please slow down.",
+        500: "Whoops, something went wrong on our servers.",
+        502: "Sorry, we're having trouble connecting to upstream services.",
+        503: "Sorry, we are doing some maintenance. Please check back soon.",
+        504: "Sorry, one of our services is responding too slowly.",
+    }[props.status] || "Sorry, something went wrong. Please try again later.";
 });
 </script>
 
 <template>
     <main
-        class="relative grid min-h-screen px-6 py-24 bg-white place-items-center sm:py-32 lg:px-8"
+        class="grid relative place-items-center px-6 py-24 min-h-screen bg-white sm:py-32 lg:px-8"
     >
         <div class="mb-20 text-center">
             <h1
@@ -38,10 +60,10 @@ const description = computed(() => {
             >
                 {{ description }}
             </p>
-            <div class="flex items-center justify-center mt-10 gap-x-6">
+            <div class="flex gap-x-6 justify-center items-center mt-10">
                 <a
                     href="/"
-                    class="rounded-md bg-primary-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                    class="px-3.5 py-2.5 text-sm font-semibold text-white rounded-md bg-primary-600 shadow-xs hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                     >Go back home</a
                 >
             </div>
