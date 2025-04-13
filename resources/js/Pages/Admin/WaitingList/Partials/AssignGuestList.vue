@@ -86,6 +86,14 @@ const onBedSelect = (guestId: number, bedId: number) => {
     // First, clear previous selection if any
     const previousGuest = form.guests.find(g => g.id === guestId);
 
+    // Track previous bed if it exists
+    const previousBedId = previousGuest?.bed_id;
+    let previousBedRoomId: number | null = null;
+    if (previousBedId) {
+        const previousBed = modifiedBeds.value[guestId]?.find(b => b.id === previousBedId);
+        previousBedRoomId = previousBed?.room.id || null;
+    }
+
     if (previousGuest) {
         previousGuest.bed_id = bedId;
     }
@@ -114,6 +122,25 @@ const onBedSelect = (guestId: number, bedId: number) => {
                 }
             }
         });
+    }
+
+    // Check if we need to revert any room's eligible_gender back to "any"
+    if (previousBedRoomId) {
+        const isRoomStillSelected = form.guests.some(g => {
+            const guestBed = modifiedBeds.value[g.id]?.find(b => b.id === g.bed_id);
+            return guestBed?.room.id === previousBedRoomId;
+        });
+
+        if (!isRoomStillSelected) {
+            // Revert all beds in this room back to "any" gender
+            Object.keys(modifiedBeds.value).forEach(guestKey => {
+                modifiedBeds.value[Number(guestKey)].forEach(bed => {
+                    if (bed.room.id === previousBedRoomId) {
+                        bed.room.eligible_gender = "any";
+                    }
+                });
+            });
+        }
     }
 
     // Update assigned beds list
