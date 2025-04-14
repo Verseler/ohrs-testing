@@ -138,10 +138,11 @@ class ReservationStatusController extends Controller
                 }
             }
         }
-        $reservation->general_status = $validated['status'];
-        $reservation->stayDetails()->update([
+
+        $reservation->stayDetails()->where('status', $reservation->general_status)->update([
             'status' => $validated['status']
         ]);
+        $reservation->general_status = $validated['status'];
         $reservation->save();
 
         return to_route('reservation.show', ['id' => $reservation->id])
