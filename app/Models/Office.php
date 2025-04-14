@@ -11,15 +11,10 @@ class Office extends Model
     use HasFactory;
 
     protected $fillable = [
-        'region_id',
         'name',
         'has_hostel',
+        'hostel_name'
     ];
-
-    public function region()
-    {
-        return $this->belongsTo(Region::class);
-    }
 
     public function users()
     {

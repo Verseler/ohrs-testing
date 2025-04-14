@@ -4,15 +4,15 @@ import PageHeader from "@/Components/PageHeader.vue";
 import Button from "@/Components/ui/button/Button.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import type { Notification } from "@/Pages/Admin/Notification/notification.types";
-import { LaravelPagination } from "@/types";
 import { Head, router, usePoll } from "@inertiajs/vue3";
 import { Bell, CheckIcon } from "lucide-vue-next";
 import NotificationListItem from "@/Pages/Admin/Notification/Partials/NotificationListItem.vue";
+import { WhenVisible } from "@inertiajs/vue3";
 
 usePoll(5000);
 
 type NotificationListProps = {
-    notifications: LaravelPagination<Notification>;
+    notifications: Notification[];
     unreadCount: number;
 };
 
@@ -35,7 +35,7 @@ const markAllAsRead = (): void => {
     <Head title="Notifications" />
 
     <AuthenticatedLayout>
-        <div class="flex items-center justify-between md:my-2">
+        <div class="flex justify-between items-center md:my-2">
             <PageHeader class="!my-0">
                 <template #icon><Bell /></template>
                 <template #title>Notifications</template>
@@ -46,7 +46,7 @@ const markAllAsRead = (): void => {
 
         <div>
             <!-- Page header -->
-            <div class="flex items-center justify-between my-3">
+            <div class="flex justify-between items-center my-3">
                 <div>
                     <span class="text-gray-600">You have </span>
                     <span class="font-medium">{{ unreadCount }} unread</span>
@@ -65,13 +65,19 @@ const markAllAsRead = (): void => {
                 </div>
             </div>
 
-            <div class="space-y-3">
-                <NotificationListItem
-                    v-for="notification in notifications.data"
-                    :notification="notification"
-                    @mark-as-read="markAsRead"
-                />
-            </div>
+            <WhenVisible data="notifications">
+                <template #fallback>
+                    <div class="mt-16 w-full italic text-center text-neutral-500">Loading...</div>
+                </template>
+
+                <div class="space-y-3">
+                    <NotificationListItem
+                        v-for="notification in notifications"
+                        :notification="notification"
+                        @mark-as-read="markAsRead"
+                    />
+                </div>
+            </WhenVisible>
         </div>
     </AuthenticatedLayout>
 </template>

@@ -136,7 +136,7 @@ watch(
                                 {{ `${guest.first_name} ${guest.last_name}` }}
                             </TableCell>
                             <TableCell>
-                                <GenderBadge :gender="guest.gender as Gender" />
+                                <GenderBadge :gender="guest.gender" />
                             </TableCell>
                             <TableCell>
                                 {{ guest.office }}

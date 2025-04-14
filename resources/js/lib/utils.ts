@@ -2,6 +2,7 @@ import type { Updater } from '@tanstack/vue-table'
 import type { Ref } from 'vue'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { UserRole } from '@/types'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -174,4 +175,17 @@ export function obscureName(first_name: string, last_name: string): string {
 
     // Return the combined secure name
     return `${secureFirstName} ${secureLastName}`;
+}
+
+
+export function roleLabel(role: UserRole): string {
+    switch (role) {
+        case "system_admin":
+            return "system admin";
+        case "super_admin":
+            return "super admin";
+        case "admin":
+        default:
+            return "admin";
+    }
 }

@@ -19,12 +19,17 @@ class ReservationProcessController extends Controller
 {
     public function form(Request $request)
     {
-        $hostelOffice = Office::with('region')->where('has_hostel', true)
+        $hostelOffice = Office::where('has_hostel', true)
             ->findOrFail($request->hostel_office_id);
 
-        $offices = Office::with('region')
-            ->get()
-            ->map(fn($office) => "{$office->name} - {$office->region->name}")
+        $offices = Office::get()
+            ->map(function($office) {
+                if($office->name == 'Central Office') {
+                    return $office->name;
+                }
+
+                return $office->name;
+            })
             ->toArray();
 
         return Inertia::render('Guest/ReservationForm/ReservationForm', [
@@ -38,7 +43,7 @@ class ReservationProcessController extends Controller
         $validated = $request->validate(
             [
                 'first_name' => ['required', 'string', 'max:255'],
-                'middle_initial' => ['nullable', 'string', 'max:1'],
+                'middle_initial' => ['required', 'string', 'max:1'],
                 'last_name' => ['required', 'string', 'max:255'],
                 'phone' => ['required', 'size:10', 'regex:/(9)[0-9]{9}/'],
                 'email' => ['required', 'email', 'max:255'],
@@ -83,14 +88,14 @@ class ReservationProcessController extends Controller
                     'remaining_balance' => 0,
                     'payment_type' => 'full_payment',
                     'first_name' => $validated['first_name'],
-                    'middle_initial' => $validated['middle_initial'] ?? null,
+                    'middle_initial' => $validated['middle_initial'],
                     'last_name' => $validated['last_name'],
                     'phone' => $validated['phone'],
-                    'email' => $validated['email'] ?? null,
+                    'email' => $validated['email'],
                     'hostel_office_id' => $hostelOffice->id,
                     'id_type' => $validated['id_type'],
                     'employee_id' => $validated['employee_id'],
-                    'purpose_of_stay' => $validated['purpose_of_stay'] ?? null,
+                    'purpose_of_stay' => $validated['purpose_of_stay'],
                 ]);
 
                 //create guests
@@ -150,9 +155,9 @@ class ReservationProcessController extends Controller
 
         // Office acronym codes
         $officeCodes = [
-            'Regional Office' => 'RO',
-            'PENRO Camiguin' => 'PC',
-            'PENRO Misamis Oriental' => 'PMO',
+            'Region 10' => 'RO',
+            'PENRO Camiguin' => 'TCAM',
+            'PENRO Misamis Oriental' => 'ILPLS',
         ];
 
         // Default code if office not found
@@ -195,17 +200,16 @@ class ReservationProcessController extends Controller
 
                 $reservation = Reservation::findOrFail($reservationId);
                 $stayRange = $reservation->getStayDateRange();
-                $hostelOffice = Office::with('region')->findOrFail($reservation->hostel_office_id);
-                $regionName = $hostelOffice->region->name;
+                $hostelOffice = Office::findOrFail($reservation->hostel_office_id);
 
                 $reservationDetails = [
                     'from' => $stayRange['min_check_in_date'],
                     'to' => $stayRange['max_check_out_date'],
                     'code' => $reservation->code,
-                    'hostel_office_name' => "Region $regionName - $hostelOffice->name",
+                    'hostel_office_name' => $hostelOffice->name,
                     'total_guests' => $totalGuests
                 ];
-        
+
             });
         } catch (\Exception $e) {
             return redirect()->back()->with('errors', 'An error occurred while processing your reservation.');

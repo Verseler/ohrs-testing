@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->boolean('has_hostel')->default(false);
-            $table->foreignId('region_id')->constrained()->cascadeOnDelete();
+            $table->string('hostel_name')->nullable();
             $table->timestamps();
         });
 

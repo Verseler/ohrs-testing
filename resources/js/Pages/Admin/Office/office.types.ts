@@ -1,22 +1,13 @@
-export type Region = {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
-
 export type Office = {
     id: number;
-    region_id: number;
-    region: Region;
     name: string;
     has_hostel: boolean;
+    hostel_name?: string | undefined;
     created_at: string;
     updated_at: string;
 }
 
 export type OfficeFilters = {
-    region_id: number;
     search: string | undefined;
     sort_by: string | undefined;
     sort_order: 'asc' | 'desc';

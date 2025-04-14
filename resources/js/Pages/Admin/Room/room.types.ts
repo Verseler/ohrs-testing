@@ -14,8 +14,9 @@ export type RoomFilters = {
 }
 
 export type EligibleGenderSchedule = {
-    start_date: Date;
-    end_date: Date;
+    id: number;
+    start_date: Date | string;
+    end_date: Date | string;
     eligible_gender: Gender;
     room_id: number;
 }

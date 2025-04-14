@@ -29,30 +29,19 @@ import type { LaravelPagination } from "@/types/index";
 import type {
     Office,
     OfficeFilters,
-    Region,
 } from "@/Pages/Admin/Office/office.types";
 import { Head, Link, router, useForm } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import PopoverLinkField from "@/Components/ui/popover/PopoverLinkField.vue";
 import { debounce } from "@/lib/utils";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
 import { usePoll } from "@inertiajs/vue3";
 import { data } from "@/Pages/Admin/Office/data";
 import SelectField from "@/Components/SelectField.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import Breadcrumbs from "@/Components/Breadcrumbs.vue";
-import { showError } from "@/Composables/useFlash";
 import ClearFilterButton from "@/Components/ui/table/ClearFilterButton.vue";
 
 usePoll(5000);
@@ -60,27 +49,24 @@ usePoll(5000);
 type OfficeManagementProps = {
     offices: LaravelPagination<Office>;
     filters: OfficeFilters;
-    regions: Region[];
 };
 
-const { offices, filters, regions } = defineProps<OfficeManagementProps>();
+const { offices, filters } = defineProps<OfficeManagementProps>();
 
 const selectedOffice = ref<Office | null>(null);
 
 const form = useForm<Partial<OfficeFilters>>({
-    region_id: filters.region_id,
     search: filters.search,
     sort_by: filters.sort_by,
     sort_order: filters.sort_order ?? "asc",
 });
 
 const formHasValue = computed(
-    () => form.region_id || form.search || form.sort_by
+    () =>  form.search || form.sort_by
 );
 
 //Room Filter
 function clearFilter() {
-    form.region_id = undefined;
     form.search = undefined;
     form.sort_by = undefined;
     form.sort_order = "asc";
@@ -96,16 +82,12 @@ function applyFilter() {
 
 watch(
     [
-        () => form.region_id,
         () => form.search,
         () => form.sort_by,
         () => form.sort_order,
     ],
     debounce(applyFilter, 300)
 );
-
-//display error
-onMounted(() => showError());
 
 //Delete Confirmation Dialog
 const deleteConfirmation = ref(false);
@@ -148,27 +130,9 @@ function handleDeleteOffice() {
 
         <!-- Search, Filter and Sort -->
         <div
-            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
+            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
-                <Select v-model="form.region_id">
-                    <SelectTrigger class="md:w-40">
-                        <SelectValue placeholder="Select a region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Region</SelectLabel>
-                            <SelectItem
-                                v-for="region in regions"
-                                :key="region.id"
-                                :value="region.id"
-                            >
-                                {{ region.name }}
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-
                 <SelectField
                     v-model="form.sort_by"
                     :items="data.sortBy"
@@ -206,9 +170,6 @@ function handleDeleteOffice() {
                             v-for="office in offices.data"
                             :key="office.id"
                         >
-                            <TableCell>
-                                {{ office.region.name }}
-                            </TableCell>
                             <TableCell class="font-medium">
                                 {{ office.name }}
                             </TableCell>

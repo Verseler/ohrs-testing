@@ -50,11 +50,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
             <div>
                 <Label class="text-neutral-700"> Hostel Location </Label>
                 <p class="font-medium">
-                    {{
-                        `Region
-                            ${reservation?.hostel_office?.region?.name} -
-                            ${reservation?.hostel_office?.name}` || "-"
-                    }}
+                    {{ reservation?.hostel_office?.name || "-" }}
                 </p>
             </div>
 

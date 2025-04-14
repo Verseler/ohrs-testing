@@ -27,7 +27,6 @@ import {
     getDaysDifference,
 } from "@/lib/utils";
 import { computed, ref } from "vue";
-import StatusBadge from "@/Components/StatusBadge.vue";
 import { Separator } from "@/Components/ui/separator";
 import { Label } from "@/Components/ui/label";
 import { Button } from "@/Components/ui/button";
@@ -58,15 +57,6 @@ const form = useForm<ExtendForm>({
 const selectedGuest = computed(() => {
     if (!form.guest_id) return null;
     return reservation.guests.find(guest => guest.id === form.guest_id) || null;
-});
-
-const checkInDatePlusOne = computed(() => {
-    if(!selectedGuest.value) return;
-
-    const checkInDate = new Date(selectedGuest.value.stay_details.check_in_date);
-    checkInDate.setDate(checkInDate.getDate() + 1);
-
-    return checkInDate;
 });
 
 const lessThenOldCheckOut = computed(
@@ -181,7 +171,7 @@ function submitExtendReservation() {
                         <Label class="mt-4"> Select Guest </Label>
                         <Select v-model="form.guest_id">
                             <SelectTrigger
-                                class="mt-2 h-12 rounded-sm shadow-none border-primary-700"
+                                class="h-12 mt-2 rounded-sm shadow-none border-primary-700"
 
                             >
                                 <SelectValue placeholder="Select a guest" />
@@ -245,7 +235,7 @@ function submitExtendReservation() {
                             </Label>
                             <InputDate
                                 v-model="form.new_check_out_date"
-                                :min="checkInDatePlusOne"
+                                :min="selectedGuest.stay_details.check_in_date"
                                 :invalid="!!form.errors.new_check_out_date"
                             />
                             <div class="grid grid-cols-3 gap-2 md:grid-cols-6">
@@ -313,7 +303,7 @@ function submitExtendReservation() {
                             v-if="additionalDays > 0"
                             class="p-4 space-y-3 rounded-lg bg-muted/50"
                         >
-                            <div class="flex justify-between items-center">
+                            <div class="flex items-center justify-between">
                                 <h3 class="font-medium">Extension Summary</h3>
                                 <Badge
                                     variant="outline"
@@ -407,7 +397,7 @@ function submitExtendReservation() {
                             >
                                 <Loader2Icon
                                     v-if="form.processing"
-                                    class="mr-2 w-4 h-4 animate-spin"
+                                    class="w-4 h-4 mr-2 animate-spin"
                                 />
                                 Extend Reservation
                             </Button>
@@ -427,3 +417,4 @@ function submitExtendReservation() {
         />
     </AuthenticatedLayout>
 </template>
+

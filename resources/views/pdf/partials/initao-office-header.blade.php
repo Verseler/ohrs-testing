@@ -7,7 +7,7 @@
         <td style="text-align: center; vertical-align: middle; border: none !important; line-height: 1.2;">
             <div style="font-size: 13px;">Republic of the Philippines</div>
             <div style="font-size: 13px;">COMMUNITY ENVIRONMENT AND NATURAL RESOURCES OFFICE</div>
-            <h3 style="font-size: 16px; margin: 0;">Initao</h3>
+            <h3 style="font-size: 16px; margin: 0;">Initao-Libertad Protected Landscape and Seascape</h3>
             <div style="font-size: 13px;">Jampason, Initao, Misamis Oriental</div>
         </td>
         <td style="width: 90px; vertical-align: middle; border: none !important;">

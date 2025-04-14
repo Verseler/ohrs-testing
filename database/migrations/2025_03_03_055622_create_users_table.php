@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name')->unique();
             $table->string('password');
-            $table->enum('role', ['admin', 'super_admin'])->default('admin');
+            $table->enum('role', ['admin', 'super_admin', 'system_admin'])->default('admin');
             $table->foreignId('office_id')->constrained()->cascadeOnDelete();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
@@ -40,7 +40,7 @@ return new class extends Migration {
         //Add a default super admin
         DB::table('users')->insert([
             'name' => 'verselerf_handuman',
-            'role' => 'super_admin',
+            'role' => 'system_admin',
             'office_id' => 176,
             'password' => bcrypt('denrregionx'),
         ]);

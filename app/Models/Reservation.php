@@ -24,7 +24,9 @@ class Reservation extends Model
         'id_type',
         'employee_id',
         'purpose_of_stay',
-        'general_status'
+        'general_status',
+        'modify_token',
+        'modify_token_expires_at'
     ];
 
     public function guests()
@@ -52,6 +54,40 @@ class Reservation extends Model
         return $this->hasMany(StayDetails::class);
     }
 
+     // Relationship to get all rebooks where this is the previous reservation
+     public function rebooksAsPrevious()
+     {
+         return $this->hasMany(RebookReservation::class, 'prev_reservation_id');
+     }
+
+     // Relationship to get all rebooks where this is the new reservation
+     public function rebooksAsNew()
+     {
+         return $this->hasMany(RebookReservation::class, 'new_reservation_id');
+     }
+
+     // Get the previous reservation (through rebook)
+     public function previousReservation()
+     {
+         return $this->belongsToMany(
+             Reservation::class,
+             'rebook_reservations',
+             'new_reservation_id',
+             'prev_reservation_id'
+         );
+     }
+
+     // Get the new reservation (through rebook)
+     public function newReservation()
+     {
+         return $this->belongsToMany(
+             Reservation::class,
+             'rebook_reservations',
+             'prev_reservation_id',
+             'new_reservation_id'
+         );
+     }
+
 
    public function reservedBeds()
    {
@@ -63,7 +99,7 @@ class Reservation extends Model
        return $this->stayDetails()->with(['bed.room.eligibleGenderSchedules', 'guest']);
    }
 
-   public function recomputeBillings() 
+   public function recomputeBillings()
    {
         $newTotalBillings = $this->guests->sum('stayDetails.individual_billings');
         $this->total_billings = $newTotalBillings;

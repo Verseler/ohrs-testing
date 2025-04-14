@@ -81,6 +81,20 @@ const selectorsBar = computed(() =>
         ? GroupedBar.selectors.bar
         : StackedBar.selectors.bar
 );
+
+function generateTickValues(): number[] {
+    const values: number[] = [];
+    const max = Math.max(...props.data.map((d: Data) => {
+        return Math.max(...props.categories.map(cat => d[cat] ?? 0));
+    }));
+
+    for (let i = 0; i <= max + 200; i += 200) {
+        values.push(i);
+    }
+
+    return values;
+}
+
 </script>
 
 <template>
@@ -139,6 +153,7 @@ const selectorsBar = computed(() =>
                 :tick-format="yFormatter"
                 :domain-line="false"
                 :grid-line="false"
+                :tick-values="generateTickValues()"
                 :attributes="{
                     [Axis.selectors.grid]: {
                         class: 'text-muted',

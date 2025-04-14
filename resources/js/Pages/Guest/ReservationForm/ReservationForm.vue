@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, useForm } from "@inertiajs/vue3";
-import Header from "@/Components/Header.vue";
 import { Table, TableCell, TableRow, TableBody } from "@/Components/ui/table";
 import TableSectionHeading from "@/Pages/Guest/ReservationForm/Partials/TableSectionHeading.vue";
 import { Textarea } from "@/Components/ui/textarea";
@@ -21,6 +20,7 @@ import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import type { Gender } from "@/Pages/Guest/guest.types";
 import { validIds } from "@/Pages/Guest/ReservationForm/data";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 type ReservationFormProps = {
     hostelOffice: Office;
@@ -66,24 +66,22 @@ function submit() {
 <template>
     <Head title="Reservation Form" />
 
-    <div class="w-full min-h-screen">
-        <Header />
+    <GuestLayout>
         <div class="container px-2 py-4 mx-auto md:p-8">
             <form @submit.prevent="showConfirmation">
                 <Table class="overflow-hidden">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
-                            Region {{ hostelOffice.region.name }} -
-                            {{ hostelOffice.name }} Reservation
+                            {{ hostelOffice.hostel_name || hostelOffice.name }}
                         </TableCell>
                     </TableRow>
 
                     <TableBody>
                         <TableSectionHeading>
-                            Employee Making the Reservation
+                            Contact Information of Person Making the Reservation
                         </TableSectionHeading>
 
-                        <div class="grid mb-6 lg:grid-cols-2">
+                        <div class="grid mb-8 lg:grid-cols-2">
                             <!-- Left Column -->
                             <div>
                                 <TableRow
@@ -104,7 +102,7 @@ function submit() {
                                     </TableCell>
 
                                     <TableCell class="space-y-2">
-                                        <InputLabel optional>M.I.</InputLabel>
+                                        <InputLabel>M.I.</InputLabel>
                                         <Input
                                             v-model="form.middle_initial"
                                             class="h-12 rounded-sm shadow-none border-primary-700"
@@ -147,7 +145,7 @@ function submit() {
                                             <Input
                                                 type="number"
                                                 v-model.number="form.phone"
-                                                class="pl-11 h-12 rounded-sm shadow-none border-primary-700"
+                                                class="h-12 rounded-sm shadow-none pl-11 border-primary-700"
                                                 :invalid="!!form.errors.phone"
                                             />
                                         </div>
@@ -248,7 +246,7 @@ function submit() {
                         <div class="px-2">
                             <Button
                                 type="submit"
-                                class="mt-6 w-full h-12 text-base"
+                                class="w-full h-12 mt-6 text-base"
                                 :disabled="form.processing"
                             >
                                 {{
@@ -262,14 +260,13 @@ function submit() {
                 </Table>
             </form>
         </div>
-    </div>
-
-    <Alert
-        :open="confirmation"
-        @update:open="confirmation = $event"
-        :onConfirm="submit"
-        title="Are you sure you want to submit this reservation?"
-        description="Please confirm that all the details are correct before proceeding."
-        confirm-label="Confirm"
-    />
+        <Alert
+            :open="confirmation"
+            @update:open="confirmation = $event"
+            :onConfirm="submit"
+            title="Are you sure you want to submit this reservation?"
+            description="Please confirm that all the details are correct before proceeding."
+            confirm-label="Confirm"
+        />
+    </GuestLayout>
 </template>

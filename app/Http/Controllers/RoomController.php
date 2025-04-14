@@ -95,7 +95,7 @@ class RoomController extends Controller
         ]);
 
 
-        $roomNameAlreadyExisted = Room::where('name', $validated['name'])->first();
+        $roomNameAlreadyExisted = Room::where('name', $validated['name'])->where('office_id', Auth::user()->office_id)->first();
         if ($roomNameAlreadyExisted) {
             return redirect()->back()->with('error', 'Room name already existed.');
         }
@@ -168,6 +168,19 @@ class RoomController extends Controller
                 ])->first();
                 if ($roomNameAlreadyExisted) {
                     throw new \Exception('Room name already exists.');
+                }
+
+                // Check if room has current or future reservations before changing gender
+                if ($validated['eligible_gender'] !== $room->eligible_gender) {
+                    $hasReservations = $room->beds()
+                        ->whereHas('stayDetails.guest.reservation', function ($query) {
+                            $query->where('check_out_date', '>=', Carbon::today());
+                        })
+                        ->exists();
+
+                    if ($hasReservations) {
+                        throw new \Exception('Cannot change room gender as it has current or future reservations.');
+                    }
                 }
 
                 // Update Room Info (Always allowed)
@@ -269,8 +282,69 @@ class RoomController extends Controller
             $validated['hostel_id']
         );
 
-        // Group beds by room and format results
-        $availableBedsInRooms = $availableBeds->groupBy('room_id')->map(function ($beds) use ($validated) {
+        // Generate date period
+        $period = new \DatePeriod(
+            Carbon::parse($validated['check_in_date']),
+            new \DateInterval('P1D'),
+            Carbon::parse($validated['check_out_date'])->addDay()
+        );
+
+        $dates = collect($period)->map(function($date) {
+            return $date->format('Y-m-d');
+        })->toArray();
+
+        $availableBedsInRooms = $availableBeds->groupBy('room_id')->map(function ($beds) use ($period) {
+            $room = $beds->first()->room;
+
+            // Check eligibility for each day in period
+            $eligibleGenders = collect($period)->map(function ($date) use ($room) {
+                return $room->eligibleGenderSchedules
+                    ->where('start_date', '<=', $date->format('Y-m-d'))
+                    ->where('end_date', '>=', $date->format('Y-m-d'))
+                    ->first()
+                    ?->eligible_gender ?? $room->eligible_gender;
+            });
+
+            return [
+                'id' => $room->id,
+                'name' => $room->name,
+                'eligible_gender' => $room->eligible_gender,
+                'eligible_gender_schedules' => $eligibleGenders,
+                'beds_count' => $beds->count(),
+            ];
+        })->filter()->values();
+
+        return redirect()->back()->with([
+            'response_data' => [
+                'available_beds_in_rooms' => $availableBedsInRooms,
+                'days' => $dates
+            ]
+        ]);
+    }
+
+    public function getAvailableRoomsOld(Request $request)
+    {
+        $validated = $request->validate([
+            'check_in_date' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:check_out_date'],
+            'check_out_date' => ['required', 'date', 'after_or_equal:today', 'after_or_equal:check_in_date'],
+            'hostel_id' => ['required', 'exists:offices,id'],
+        ]);
+
+        $bed = new Bed();
+        $availableBeds = $bed->availableBeds(
+            $validated['check_in_date'],
+            $validated['check_out_date'],
+            $validated['hostel_id']
+        );
+
+        // Generate date period
+        $period = new \DatePeriod(
+            \Carbon\Carbon::parse($validated['check_in_date']),
+            new \DateInterval('P1D'),
+            \Carbon\Carbon::parse($validated['check_out_date'])
+        );
+
+        $availableBedsInRooms = $availableBeds->groupBy('room_id')->map(function ($beds) use ($validated, $period) {
             $room = $beds->first()->room;
 
             // Determine eligible gender considering if there is an scheduled eligible gender
@@ -287,7 +361,7 @@ class RoomController extends Controller
             return [
                 'id' => $room->id,
                 'name' => $room->name,
-                'eligible_gender' => $eligibleGender,
+                'eligible_gender' => $room->eligible_gender, //!temporary use the default eligible gender
                 'beds_count' => $beds->count(),
             ];
         })->values();

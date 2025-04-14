@@ -1,27 +1,18 @@
 <script setup lang="ts">
-import {
-    Check,
-    Calendar,
-    Users,
-    Download,
-    Hotel,
-    ScanSearch,
-    Info,
-} from "lucide-vue-next";
+import { Check, Calendar, Users, Download, Hotel, Info } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { Separator } from "@/Components/ui/separator";
 import { Head } from "@inertiajs/vue3";
-import Header from "@/Components/Header.vue";
 import { Button } from "@/Components/ui/button";
 import * as htmlToImage from "html-to-image";
 import { toast } from "vue-sonner";
 import { onMounted } from "vue";
-import LinkButton from "@/Components/LinkButton.vue";
 import ListItem from "@/Pages/Guest/ReservationConfirmation/Partials/ListItem.vue";
 import Code from "@/Pages/Guest/ReservationConfirmation/Partials/Code.vue";
 import PendingStatus from "@/Pages/Guest/ReservationConfirmation/Partials/PendingStatus.vue";
 import { Message } from "@/Components/ui/message";
 import { formatDateString } from "@/lib/utils";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 type ReservationDetails = {
     from: string;
@@ -69,9 +60,7 @@ onMounted(() => {
 <template>
     <Head title="Reservation Confirmation" />
 
-    <div class="w-full min-h-screen">
-        <Header />
-
+    <GuestLayout>
         <div class="container max-w-xl px-4 py-2 mx-auto">
             <!-- Check Icon -->
             <div class="flex items-center justify-center mb-4">
@@ -86,28 +75,9 @@ onMounted(() => {
             <p class="mb-2 text-center text-muted-foreground text-neutral-500">
                 Your reservation has been successfully submitted. Please wait
                 while your reservation is being processed. You can check your
-                reservation status using the code below.
+                reservation status using the reservation code below.
             </p>
 
-            <LinkButton
-                :href="
-                    route('reservation.checkStatus', {
-                        code: reservation.code,
-                    })
-                "
-                size="lg"
-                class="w-full mb-1 bg-blue-500 hover:bg-blue-600 animate-bounce"
-            >
-                <ScanSearch /> Check Reservation Status
-            </LinkButton>
-
-            <Message
-                severity="info"
-                class="flex items-center justify-center mb-2 text-sm gap-x-2"
-            >
-                <Info class="size-3.5" /> A copy of your reservation code has
-                been sent to your email.
-            </Message>
             <Card id="confirmation" class="rounded-sm shadow">
                 <CardHeader class="pb-4 text-center">
                     <h2 class="mb-2 text-sm font-semibold text-neutral-500">
@@ -154,6 +124,14 @@ onMounted(() => {
                 </CardContent>
             </Card>
 
+            <Message
+                severity="info"
+                class="flex items-center justify-center my-2 text-sm gap-x-2"
+            >
+                <Info class="size-3.5" /> A copy of your reservation code has
+                been sent to your email.
+            </Message>
+
             <Button
                 @click="downloadConfirmation"
                 variant="outline"
@@ -163,5 +141,5 @@ onMounted(() => {
                 <Download />Download Reservation Code
             </Button>
         </div>
-    </div>
+    </GuestLayout>
 </template>

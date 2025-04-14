@@ -78,18 +78,18 @@
 
 <body>
     <header style="text-align: center; line-height: 1; margin-bottom: 12px;">
-        @if(str_contains($officeName, 'Regional Office'))
+        @if(str_contains($officeName, 'Region 10'))
         @include('pdf.partials.regional-office-header')
-        @elseif(str_contains($officeName, 'Camiguin'))
+        @elseif(str_contains($officeName, 'PENRO Camiguin'))
         @include('pdf.partials.camiguin-office-header')
-        @elseif(str_contains($officeName, 'Initao'))
+        @elseif(str_contains($officeName, 'CENRO Initao'))
         @include('pdf.partials.initao-office-header')
         @endif
 
         <div style="display: block; border-top: 1px solid #949494; padding-top: 8px; line-height: 1.2;">
             <h1 style="font-size: 18px; margin: 0;">ONLINE HOSTEL RESERVATION SYSTEM</h1>
             <div style="font-size: 13px; margin: 0;">
-                Monthly Report for
+                Revenue monthly Report for
                 {{ \Carbon\Carbon::parse($selectedDate ??
                 now())->format('F Y') }}
             </div>

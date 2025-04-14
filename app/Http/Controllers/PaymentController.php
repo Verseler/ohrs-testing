@@ -133,6 +133,10 @@ class PaymentController extends Controller
             'reason' => ['required', 'string'],
         ]);
 
+        if(Auth::user()->role !== 'super_admin' && Auth::user()->role !== 'system_admin') {
+            return redirect('/');
+        }
+
         try {
             DB::transaction(function () use ($validated) {
                 $reservation = Reservation::findOrFail($validated['reservation_id']);

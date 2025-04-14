@@ -2,5 +2,6 @@ export type Month = 'Jan' | 'Feb' | 'Mar' | 'Apr' | 'May' | 'Jun' | 'Jul' | 'Aug
 
 export type MonthlyRevenue = {
     name: Month;
+    collectables: number;
     revenue: number;
 }

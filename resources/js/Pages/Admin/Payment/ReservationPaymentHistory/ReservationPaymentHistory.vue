@@ -8,14 +8,12 @@ import {
     CardTitle,
 } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/Components/ui/dialog";
+import Dialog from "@/Components/ui/dialog/Dialog.vue";
+import DialogContent from "@/Components/ui/dialog/DialogContent.vue";
+import DialogHeader from "@/Components/ui/dialog/DialogHeader.vue";
+import DialogFooter from "@/Components/ui/dialog/DialogFooter.vue";
+import DialogTitle from "@/Components/ui/dialog/DialogTitle.vue";
+import DialogDescription from "@/Components/ui/dialog/DialogDescription.vue";
 import { ReceiptIcon, History, Home, Maximize } from "lucide-vue-next";
 import { Head } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
@@ -198,9 +196,9 @@ const closeReceiptDialog = () => {
                     <div
                         v-for="payment in reservationPaymentHistory.payments"
                         :key="payment.id"
-                        class="flex flex-col p-3 rounded-md border bg-primary-50"
+                        class="flex flex-col p-3 border rounded-md bg-primary-50"
                     >
-                        <div class="flex justify-between items-start">
+                        <div class="flex items-start justify-between">
                             <div>
                                 <div class="font-medium">Record Payment</div>
                                 <div class="text-xs text-muted-foreground">
@@ -217,7 +215,7 @@ const closeReceiptDialog = () => {
                         </div>
 
                         <div
-                            class="flex justify-between items-center pt-2 mt-2 border-t border-dashed"
+                            class="flex items-center justify-between pt-2 mt-2 border-t border-dashed"
                         >
                             <div class="flex items-center">
                                 <span class="text-xs text-muted-foreground">
@@ -237,7 +235,7 @@ const closeReceiptDialog = () => {
                     <div
                         v-for="exemptedPayment in exemptedPayments"
                         :key="exemptedPayment.id"
-                        class="flex flex-col p-3 rounded-md border bg-primary-50"
+                        class="flex flex-col p-3 border rounded-md bg-primary-50"
                     >
                         <div class="flex items-start">
                             <div>
@@ -282,10 +280,10 @@ const closeReceiptDialog = () => {
                 <!-- No Payments -->
                 <div
                     v-else
-                    class="py-8 text-center rounded-md border text-neutral-500"
+                    class="py-8 text-center border rounded-md text-neutral-500"
                 >
                     <ReceiptIcon
-                        class="mx-auto mb-2 w-10 h-10 text-muted-foreground"
+                        class="w-10 h-10 mx-auto mb-2 text-muted-foreground"
                     />
                     <p class="text-muted-foreground">
                         No payment records found for this reservation.

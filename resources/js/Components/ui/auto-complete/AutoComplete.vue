@@ -34,7 +34,7 @@ const filteredItems = computed(() => {
 const handleInput = () => {
     showSuggestions.value = true;
     selectedIndex.value = -1;
-    
+
     // Calculate position
     if (container.value) {
         const inputRect = container.value.getBoundingClientRect();
@@ -88,9 +88,8 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
             @input="handleInput"
             @keydown.down="handleArrowDown"
             @keydown.up="handleArrowUp"
-            @keydown.enter="selectItem"
             @keydown.esc="closeSuggestions"
-            class="w-full h-12 rounded-md focus:ring-primary-800"
+            class="w-full h-12 bg-transparent rounded-md focus:ring-primary-800"
             :class="{
                 'border-red-500 focus:border-red-500': invalid,
                 'border-primary-800 focus:border-primary-500': !invalid,
@@ -99,7 +98,7 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
 
         <ul
             v-if="showSuggestions && filteredItems.length > 0"
-            class="absolute z-20 w-full overflow-y-auto bg-white border rounded max-h-52"
+            class="overflow-y-auto absolute z-20 w-full max-h-52 bg-white rounded border"
             :class="{
                 'mt-1': position === 'bottom',
                 'mb-1': position === 'top',

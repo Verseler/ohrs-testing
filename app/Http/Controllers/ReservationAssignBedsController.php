@@ -22,7 +22,7 @@ class ReservationAssignBedsController extends Controller
                 $query->select('id', 'guest_id', 'check_in_date', 'check_out_date', 'status')
                     ->orderBy('check_in_date');
             },
-            'hostelOffice.region',
+            'hostelOffice',
         ])->where('hostel_office_id', Auth::user()->office_id)
             ->findOrFail($id);
 
@@ -170,7 +170,7 @@ class ReservationAssignBedsController extends Controller
                     ->with('guest');
             },
             'stayDetails.bed.room',
-            'hostelOffice.region',
+            'hostelOffice',
         ])->where(
             'hostel_office_id',
                 Auth::user()->office_id

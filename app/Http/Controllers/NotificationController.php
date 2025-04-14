@@ -10,7 +10,7 @@ class NotificationController extends Controller
     public function list()
     {
         return Inertia::render('Admin/Notification/NotificationList', [
-            'notifications' => Auth::user()->notifications()->paginate(20),
+            'notifications' => Auth::user()->notifications()->get(),
             'unreadCount' => Auth::user()->unreadNotifications()->count()
         ]);
     }

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Office;
-use App\Models\Region;
 use App\Models\User;
 use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -23,7 +22,7 @@ class UserController extends Controller
     {
         $this->authorize('view', User::class);
 
-        $query = User::query()->with('office.region');
+        $query = User::query()->with('office');
 
         // Search Filter
         if ($request->filled('search')) {
@@ -35,13 +34,6 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
-        // Region Filter
-        if ($request->filled('region_id')) {
-            $query->whereHas('office', function ($q) use ($request) {
-                $q->where('region_id', $request->region_id);
-            });
-        }
-
         // Sorting
         if ($request->filled('sort_by')) {
             $sortBy = in_array($request->sort_by, ['name', 'role']) ? $request->sort_by : 'name';
@@ -50,12 +42,10 @@ class UserController extends Controller
         }
 
         $users = $query->paginate(10)->withQueryString();
-        $regions = Region::all();
 
         return Inertia::render('Admin/User/UserManagement', [
             'users' => $users,
-            'regions' => $regions,
-            'filters' => $request->only(['search', 'role', 'region_id', 'sort_by', 'sort_order'])
+            'filters' => $request->only(['search', 'role', 'sort_by', 'sort_order'])
         ]);
     }
 
@@ -63,11 +53,9 @@ class UserController extends Controller
     {
         $this->authorize('create', User::class);
 
-        $regions = Region::all();
         $offices = Office::all();
 
         return Inertia::render('Admin/User/CreateUser', [
-            'regions' => $regions,
             'offices' => $offices
         ]);
     }
@@ -99,7 +87,7 @@ class UserController extends Controller
 
         event(new Registered($user));
 
-        return to_route('user.list');
+        return to_route('user.list')->with(['success' => 'User created successfully.']);
     }
 
     public function editForm(int $id)
@@ -107,12 +95,10 @@ class UserController extends Controller
         $this->authorize('update', User::class);
 
         $user = User::with('office')->findOrFail($id);
-        $regions = Region::all();
         $offices = Office::all();
 
         return Inertia::render('Admin/User/EditUser', [
             'user' => $user,
-            'regions' => $regions,
             'offices' => $offices
         ]);
     }
@@ -126,7 +112,7 @@ class UserController extends Controller
                 'id' => ['required', 'exists:users,id'],
                 'name' => ['required', 'string', 'max:20'],
                 'office_id' => ['required', 'exists:offices,id'],
-                'role' => ['required', Rule::in(['admin', 'super_admin'])],
+                'role' => ['required', Rule::in(['admin', 'super_admin', 'system_admin'])],
             ]
         );
 
@@ -142,7 +128,7 @@ class UserController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return to_route('user.list')->with('success', 'Successfully updated the user details.');
+        return to_route('user.list')->with(['success' => 'Successfully updated the user details.']);
     }
 
     public function delete(int $id)
@@ -153,7 +139,7 @@ class UserController extends Controller
 
         if ($user->role === 'super_admin') {
             $superAdminCount = User::where('role', 'super_admin')->count();
-            
+
             if ($superAdminCount <= 1) {
                 return redirect()->back()->with('error', 'Cannot delete the only remaining super admin account.');
             }
@@ -161,6 +147,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->back()->with('success', 'Successfully deleted the user account.');
+        return redirect()->back()->with(['success' => 'Successfully deleted the user account.']);
     }
 }

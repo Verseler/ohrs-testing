@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import Badge from "@/Components/ui/badge/Badge.vue";
-import { BadgeCheck } from "lucide-vue-next";
+import { UserRoundCheck } from "lucide-vue-next";
 import type { UserRole } from "@/types";
 import { computed } from "vue";
+import { roleLabel } from "@/lib/utils";
 
 const { role } = defineProps<{ role: UserRole }>();
 
 const severityValue = computed(() => {
     switch (role) {
-        case "admin":
-            return "info";
+        case "system_admin":
+            return "danger";
         case "super_admin":
-        default:
             return "success";
+        case "admin":
+        default:
+            return "info";
     }
 });
 </script>
@@ -23,7 +26,7 @@ const severityValue = computed(() => {
         class="h-6 px-2 font-normal gap-x-1 place-content-center min-w-16 w-max border-neutral-200"
         :severity="severityValue"
     >
-        <BadgeCheck class="size-3.5" />
-        {{ role && role === "super_admin" ? "super admin" : "admin" }}
+        <UserRoundCheck class="size-3.5" />
+        {{ roleLabel(role) }}
     </Badge>
 </template>

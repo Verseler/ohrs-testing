@@ -15,7 +15,7 @@ const model = defineModel<string | Date>();
         type="date"
         id="check-in-date"
         placeholder="pick a date"
-        class="block w-full h-12 rounded cursor-pointer border-primary-700"
+        class="block w-full h-12 bg-transparent rounded cursor-pointer border-primary-700"
         onclick="this.showPicker()"
         :class="[
             invalid ? 'border-red-500 text-red-500' : 'border-green-700',

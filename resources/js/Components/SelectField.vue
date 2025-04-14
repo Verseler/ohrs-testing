@@ -14,20 +14,21 @@ type Item = {
     label: string;
 };
 
-type SelectField = {
+type SelectFieldProps = {
     items: Item[];
     label: string;
     placeholder: string;
+    triggerClass?: string;
 };
 
-const { items, label, placeholder } = defineProps<SelectField>();
+const { items, label, placeholder, triggerClass } = defineProps<SelectFieldProps>();
 
 const model = defineModel<string | number | null>();
 </script>
 
 <template>
     <Select v-model="model">
-        <SelectTrigger class="md:w-40">
+        <SelectTrigger class="md:w-40" :class="triggerClass">
             <SelectValue :placeholder="placeholder" />
         </SelectTrigger>
         <SelectContent>

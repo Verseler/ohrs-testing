@@ -17,25 +17,30 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, InertiaForm } from "@inertiajs/vue3";
 import {  Home, Hotel } from "lucide-vue-next";
 import { Button } from "@/Components/ui/button";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select";
-import type { Office, Region } from "@/Pages/Admin/Office/office.types";
+import type { Office } from "@/Pages/Admin/Office/office.types";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import { watch } from "vue";
 
 type UpsertOfficeProps = {
     office: Office | null;
-    regions: Region[];
 }
 
-const { office, regions } = defineProps<UpsertOfficeProps>();
+const { office } = defineProps<UpsertOfficeProps>();
 
 
-type UpsertOfficeForm = Pick<Office, "name" | "has_hostel" | "region_id">;
+type UpsertOfficeForm = Pick<Office, "name" | "has_hostel" | "hostel_name">;
 
 const form: InertiaForm<Partial<UpsertOfficeForm>> = useForm({
     id: office?.id ?? undefined,
     name: office?.name ?? undefined,
-    region_id: office?.region_id ?? undefined,
     has_hostel: office?.has_hostel ?? false,
+    hostel_name: office?.hostel_name ?? undefined,
+});
+
+watch(() => form.has_hostel, () => {
+    if(!form.has_hostel) {
+        form.hostel_name = undefined;
+    }
 });
 
 function showSubmitConfirmation() {
@@ -98,30 +103,6 @@ function showSubmitConfirmation() {
                     {{ form.errors.name }}
                 </InputError>
             </div>
-            <div class="flex flex-col gap-2">
-                <Label for="name">Region</Label>
-                <Select v-model="form.region_id" :invalid="!!form.errors.region_id">
-                <SelectTrigger class="w-full h-10">
-                    <SelectValue placeholder="Select a region" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectLabel>Region</SelectLabel>
-                        <SelectItem
-                        v-for="region in regions"
-                        :key="region.id"
-                        :value="region.id"
-                        >
-                            {{ region.name }}
-                        </SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
-
-                <InputError v-if="form.errors.region_id">
-                    {{ form.errors.region_id }}
-                </InputError>
-            </div>
 
             <div class="flex flex-col gap-2">
                 <Label for="name">Has Hostel</Label>
@@ -146,6 +127,20 @@ function showSubmitConfirmation() {
                 </RadioGroup>
                 <InputError v-if="form.errors.has_hostel">
                     {{ form.errors.has_hostel }}
+                </InputError>
+            </div>
+
+            <div v-if="form.has_hostel" class="flex flex-col gap-2">
+                <Label for="hostel_name">Hostel Name</Label>
+                <Input
+                    id="hostel_name"
+                    v-model="form.hostel_name"
+                    :invalid="!!form.errors.hostel_name"
+                    autofocus
+                />
+
+                <InputError v-if="form.errors.hostel_name">
+                    {{ form.errors.hostel_name }}
                 </InputError>
             </div>
 

@@ -1,7 +1,7 @@
 import { Office } from '@/Pages/Admin/Office/office.types';
 import type { UserIcon } from 'lucide-vue-next';
 
-export type UserRole = 'admin' | 'super_admin';
+export type UserRole = 'admin' | 'super_admin' | 'system_admin';
 
 export interface User {
     id: number;

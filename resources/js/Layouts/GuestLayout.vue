@@ -1,20 +1,25 @@
-<script setup lang="ts">
-import ApplicationLogo from "@/Components/ApplicationLogo.vue";
-import { Link } from "@inertiajs/vue3";
+<script setup>
+import Header from "@/Components/Header.vue";
+import { Toaster } from "@/Components/ui/sonner";
+import {
+    useFlashError,
+    useFlashSuccess,
+    useFlashErrorOnMount,
+    useFlashSuccessOnMount,
+} from "@/Composables/useFlash";
+
+useFlashError();
+useFlashSuccess();
+useFlashSuccessOnMount();
+useFlashErrorOnMount();
 </script>
 
 <template>
-    <div
-        class="flex flex-col items-center min-h-screen pt-14 md:pt-6 md:bg-neutral-100 sm:justify-center sm:pt-0"
-    >
-        <Link href="/">
-            <ApplicationLogo class="size-28" />
-        </Link>
+    <main class="w-full min-h-screen">
+        <Header />
 
-        <div
-            class="w-full p-4 mt-6 overflow-hidden bg-white md:p-6 md:shadow-md sm:max-w-md sm:rounded-lg"
-        >
-            <slot />
-        </div>
-    </div>
+        <slot />
+
+        <Toaster />
+    </main>
 </template>

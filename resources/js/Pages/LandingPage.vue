@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Head } from "@inertiajs/vue3";
-import Header from "@/Components/Header.vue";
 import type { Office } from "@/Pages/Admin/Office/office.types";
 import HostelCard from "@/Components/HostelCard.vue";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 type LandingPageProps = {
     hostels: Office[];
@@ -14,9 +14,7 @@ const { hostels } = defineProps<LandingPageProps>();
 <template>
     <Head title="Reservation Form" />
 
-    <div class="w-full min-h-screen">
-        <Header />
-
+    <GuestLayout>
         <div class="max-w-4xl px-4 py-12 mx-auto">
             <div class="mb-10 text-center">
                 <h1 class="mb-2 text-2xl font-bold text-gray-900">
@@ -35,10 +33,7 @@ const { hostels } = defineProps<LandingPageProps>();
                     <HostelCard
                         v-for="hostel in hostels"
                         :key="hostel.id"
-                        :hostel-id="hostel.id"
-                        :has-hostel="hostel.has_hostel"
-                        :hostel-name="hostel.name"
-                        :region-name="hostel.region.name"
+                        :hostel="hostel"
                     />
                 </template>
                 <p v-else class="text-sm italic text-neutral-500">
@@ -53,5 +48,5 @@ const { hostels } = defineProps<LandingPageProps>();
                 <p>Experiencing problems? Contact our support team.</p>
             </div>
         </div>
-    </div>
+    </GuestLayout>
 </template>

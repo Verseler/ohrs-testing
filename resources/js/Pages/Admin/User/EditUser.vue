@@ -21,39 +21,38 @@ import {
 } from "@/Components/ui/select";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
-import type { Office, Region } from "@/Pages/Admin/Office/office.types";
+import type { Office } from "@/Pages/Admin/Office/office.types";
 import { Home, ShieldUser } from "lucide-vue-next";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { Separator } from "@/Components/ui/separator";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import { Button } from "@/Components/ui/button";
 import { User } from "@/types";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import SearchableSelect from "@/Components/SearchableSelect.vue";
 
 type EditUserProps = {
     user: User;
-    regions: Region[];
     offices: Office[];
 };
 
-const { user, offices, regions } = defineProps<EditUserProps>();
+const { user, offices } = defineProps<EditUserProps>();
+
+const officeOptions = computed(() => {
+    if(!offices || offices.length <= 0) return [];
+
+    return offices.map((office) => ({
+        value: office.id,
+        label: office.name,
+    }));
+
+});
 
 const form = useForm<Partial<User>>({
     id: user?.id,
     name: user?.name,
     office_id: user?.office_id,
     role: user?.role,
-});
-
-const selectedRegionId = ref<Region["id"]>(user?.office.region_id);
-
-const officesInARegion = computed(() =>
-    offices.filter((office) => office.region_id === selectedRegionId.value)
-);
-
-//clear selected office if region is changed
-watch(selectedRegionId, () => {
-    form.office_id = undefined;
 });
 
 //Confirmation Dialog
@@ -105,7 +104,7 @@ function submit() {
             <template #title>Edit User</template>
         </PageHeader>
 
-        <form @submit.prevent="showConfirmation" class="max-w-lg space-y-6">
+        <form @submit.prevent="showConfirmation" class="space-y-6 max-w-lg">
             <!-- Name Field -->
             <div class="flex flex-col gap-2">
                 <Label for="name">Username</Label>
@@ -121,53 +120,16 @@ function submit() {
                 </InputError>
             </div>
 
-            <!-- Region Field -->
-            <div class="flex flex-col gap-2">
-                <Label for="region">Region</Label>
-                <Select id="region" v-model="selectedRegionId">
-                    <SelectTrigger :invalid="!!form.errors.office_id">
-                        <SelectValue placeholder="Select region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectItem
-                                v-for="region in regions"
-                                :Key="region.id"
-                                :value="region.id"
-                            >
-                                {{ region.name }}
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-                <InputError v-if="form.errors.office_id">
-                    {{ form.errors.office_id }}
-                </InputError>
-            </div>
-
             <!-- Office Field -->
             <div>
                 <Label for="office">Office</Label>
-                <Select
-                    id="office"
+                <SearchableSelect
                     v-model="form.office_id"
-                    :disabled="Boolean(selectedRegionId) === false"
-                >
-                    <SelectTrigger :invalid="!!form.errors.office_id">
-                        <SelectValue placeholder="Select office" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectItem
-                                v-for="office in officesInARegion"
-                                :Key="office.id"
-                                :value="office.id"
-                            >
-                                {{ office.name }}
-                            </SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
+                    :options="officeOptions"
+                    option-label="name"
+                    option-value="id"
+                    placeholder="Select office"
+                />
                 <InputError v-if="form.errors.office_id">
                     {{ form.errors.office_id }}
                 </InputError>
@@ -176,7 +138,7 @@ function submit() {
             <Separator />
 
             <!-- Role Field -->
-            <div>
+            <div v-if="form.role !== 'system_admin'">
                 <Label for="role">Role</Label>
                 <Select id="role" v-model="form.role">
                     <SelectTrigger :invalid="!!form.errors.role">

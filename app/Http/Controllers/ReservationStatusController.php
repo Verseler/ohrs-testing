@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendReservationCancelledEmail;
+use App\Models\Office;
 use App\Models\Reservation;
 use App\Models\StayDetails;
 use Illuminate\Http\Request;
@@ -38,16 +40,34 @@ class ReservationStatusController extends Controller
             'selected_guest_id' => ['required', 'exists:guests,id']
         ]);
 
-        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
-            ->with('guests.stayDetails')
-            ->findOrFail($validated['reservation_id']);
+       try {
+            $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+                ->with('guests.stayDetails')
+                ->findOrFail($validated['reservation_id']);
 
+            $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
 
-        $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
+            $guest->stayDetails()->update([
+                'status' => $validated['status']
+            ]);
 
-        $guest->stayDetails()->update([
-            'status' => $validated['status']
-        ]);
+            // Check if this was the last guest with the previous status
+            $previousStatusCount = $reservation->guests->filter(function($g) use ($guest) {
+                return $g->stayDetails->status === $guest->stayDetails->status;
+            })->count();
+
+            if ($previousStatusCount === 0) {
+                // Update reservation general_status to next status
+                $statusOrder = ['confirmed', 'checked_in', 'checked_out'];
+                $currentIndex = array_search($reservation->general_status, $statusOrder);
+                if ($currentIndex !== false && isset($statusOrder[$currentIndex + 1])) {
+                    $reservation->update(['general_status' => $statusOrder[$currentIndex + 1]]);
+                }
+            }
+       }
+       catch(\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to update reservation status: ' . $e->getMessage());
+       }
 
         return to_route('reservation.show', ['id' => $reservation->id])
             ->with('success', 'Reservation status updated successfully.');
@@ -152,6 +172,13 @@ class ReservationStatusController extends Controller
                 $reservation->total_billings = 0;
                 $reservation->remaining_balance = 0;
                 $reservation->save();
+
+                  //Send reservation code to email
+                  $details = [
+                    'title' => 'Reservation Cancellation Notice',
+                    'content' => $reservation->code,
+                ];
+                SendReservationCancelledEmail::dispatch($reservation->email, $details);
             });
         } catch (\Exception $e) {
             return redirect()->route('reservation.show', ['id' => $id])
@@ -166,12 +193,16 @@ class ReservationStatusController extends Controller
     //Check Reservation Status for Guests
     public function checkStatusForm()
     {
-        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus');
+        $hostels = Office::select('id as value', 'name as label')->where('has_hostel', true)->get();
+
+        return Inertia::render('Guest/CheckReservationStatus/CheckReservationStatus', [
+            'hostels' => $hostels
+        ]);
     }
 
     public function checkStatus(string $code)
     {
-        $reservation = Reservation::with(['hostelOffice.region'])
+        $reservation = Reservation::with(['hostelOffice'])
             ->select(
                 'id',
                 'code',
@@ -210,7 +241,7 @@ class ReservationStatusController extends Controller
     }
 
 
-    public function search($search)
+    public function search($search, $hostel_id)
     {
         if (empty($search)) {
             return response()->json([
@@ -237,8 +268,12 @@ class ReservationStatusController extends Controller
             ])
             ->where(function ($query) use ($search) {
                 $query->where('code', 'ILIKE', "%{$search}%")
-                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
+                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%")
+                    ->orWhereHas('guests', function($q) use ($search) {
+                        $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
+                    });
             })
+            ->where('hostel_office_id', $hostel_id)
             ->get();
 
         if ($reservations->isEmpty()) {
