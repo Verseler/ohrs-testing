@@ -30,7 +30,7 @@ const reservations = computed(() => {
 });
 
 const searchForm = useForm({
-    code: "",
+    search: "",
     hostel_id: hostels?.[0]?.value || null
 });
 
@@ -40,10 +40,10 @@ watch(() => searchForm.hostel_id, () => {
 
 
 function submitSearch() {
-    if(!searchForm.code) return;
-
-    searchForm.get(route("reservation.search", { search: searchForm.code, hostel_id: searchForm.hostel_id }), {
-        preserveState: true
+    searchForm.get(route("reservation.search"), {
+        preserveScroll: true,
+        preserveState: true,
+        replace: true,
     });
 }
 </script>
@@ -64,9 +64,9 @@ function submitSearch() {
             </div>
 
             <SearchCodeForm
-                v-model:code="searchForm.code"
+                v-model:search="searchForm.search"
                 v-model:hostelId="searchForm.hostel_id"
-                :error="page.props.flash.error ?? ''"
+                :error="searchForm.errors?.search || ''"
                 :loading="searchForm.processing"
                 :submit="submitSearch"
                 :hostels="hostels"

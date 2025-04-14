@@ -13,7 +13,7 @@ type SearchCodeFormProps = {
 
 const { error, loading, submit, hostels } = defineProps<SearchCodeFormProps>();
 
-const code = defineModel<string>('code');
+const code = defineModel<string>('search');
 const hostelId = defineModel<number | null>('hostelId');
 </script>
 

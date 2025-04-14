@@ -247,9 +247,14 @@ class ReservationStatusController extends Controller
     }
 
 
-    public function search($search, $hostel_id)
+    public function search(Request $request)
     {
-        if (empty($search)) {
+        $validated = $request->validate([
+            'search' => ['required', 'string', 'max:255'],
+            'hostel_id' => ['required', 'exists:offices,id'],
+        ]);
+
+        if (empty($validated['search'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Search term cannot be empty',
@@ -272,14 +277,14 @@ class ReservationStatusController extends Controller
                     ->orderByDesc('check_out_date')
                     ->limit(1)
             ])
-            ->where(function ($query) use ($search) {
-                $query->where('code', 'ILIKE', "%{$search}%")
-                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%")
-                    ->orWhereHas('guests', function($q) use ($search) {
-                        $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
+            ->where('hostel_office_id', $validated['hostel_id'])
+            ->where(function ($query) use ($validated) {
+                $query->where('code', 'ILIKE', "%{$validated['search']}%")
+                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$validated['search']}%")
+                    ->orWhereHas('guests', function($q) use ($validated) {
+                        $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$validated['search']}%");
                     });
             })
-            ->where('hostel_office_id', $hostel_id)
             ->get();
 
         if ($reservations->isEmpty()) {

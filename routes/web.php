@@ -16,7 +16,6 @@ use App\Http\Controllers\ReservationProcessController;
 use App\Http\Controllers\ReservationStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
-use App\Mail\ModifyReservationTokenMail;
 use App\Models\Office;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -36,8 +35,8 @@ Route::get('/reservation', [ReservationProcessController::class, 'form'])->name(
 Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
 Route::get('/reservation/status/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
+Route::get('reservation/search', [ReservationStatusController::class, 'search'])->name('reservation.search');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
-Route::get('reservation/search/{search}/{hostel_id}', [ReservationStatusController::class, 'search'])->name('reservation.search');
 
 //* Guest Modify Reservation
 Route::post('/reservation/request-modify', [ModifyReservationController::class, 'requestModify'])->name('reservation.requestModify');
