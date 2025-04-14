@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import Dialog from "@/Components/ui/dialog/Dialog.vue";
 import DialogContent from "@/Components/ui/dialog/DialogContent.vue";
 import DialogHeader from "@/Components/ui/dialog/DialogHeader.vue";
@@ -17,6 +17,7 @@ import { Label } from "@/Components/ui/label";
 import { InputError } from "@/Components/ui/input";
 import InputDate from "@/Components/ui/input/InputDate.vue";
 import { formatDate } from "@/lib/utils";
+import axios from "axios";
 
 type AvailableBedInRoom = {
     id: number;
@@ -26,11 +27,6 @@ type AvailableBedInRoom = {
     beds_count: number;
 };
 
-type ResponseData = {
-    available_beds_in_rooms: AvailableBedInRoom[];
-    days: string[];
-};
-
 type BedAvailabilityCheckerProps = {
     hostelId: number;
 };
@@ -38,16 +34,6 @@ type BedAvailabilityCheckerProps = {
 const { hostelId } = defineProps<BedAvailabilityCheckerProps>();
 
 const page = usePage<PageProps>();
-
-const response = computed(() => {
-    const response = page.props.response_data as ResponseData;
-    return response || null;
-});
-
-const availableRooms = computed(
-    () => response.value?.available_beds_in_rooms || []
-);
-const days = computed(() => response.value?.days || []);
 
 const isDialogOpen = ref(false);
 
@@ -63,12 +49,38 @@ const form = useForm({
     check_out_date: undefined,
 });
 
-function searchAvailableBeds() {
-    form.get(route("room.checkAvailableBeds"), {
-        preserveScroll: true,
-        preserveState: true,
-        replace: true,
+const loading = ref(false);
+const errorMessage = ref<string | null>(null);
+const availableBedInRooms = ref<AvailableBedInRoom[]>([]);
+const days = ref<string[]>([]);
+
+async function searchAvailableBeds() {
+    if (!form.check_in_date || !form.check_out_date) return;
+
+    loading.value = true;
+    errorMessage.value = null;
+    availableBedInRooms.value = [];
+
+try {
+    const response = await axios.get(route('room.checkAvailableBeds'), {
+        params: {
+            hostel_id: form.hostel_id,
+            check_in_date: form.check_in_date,
+            check_out_date: form.check_out_date
+        }
     });
+
+    if (response.data.success) {
+        availableBedInRooms.value = response.data.data?.available_beds_in_rooms as AvailableBedInRoom[];
+        days.value = response.data.data?.days as string[];
+    } else {
+        errorMessage.value = response.data.message;
+    }
+} catch (error) {
+    errorMessage.value = 'An error occurred while searching';
+} finally {
+    loading.value = false;
+}
 }
 
 function closeDialog() {
@@ -135,13 +147,13 @@ function resetState() {
 
                 <Button
                     @click="searchAvailableBeds"
-                    :disabled="!form.check_in_date || !form.check_out_date"
-                    class="w-full mb-4 sm:w-auto"
+                    :disabled="!form.check_in_date || !form.check_out_date || loading"
+                    class="mb-4 w-full sm:w-auto"
                     size="lg"
                 >
                     <LoaderCircle
-                        v-if="form.processing"
-                        class="mr-2 size-4 animate-spin"
+                        v-if="loading"
+                        class="mr-2 animate-spin size-4"
                     />
                     Check Availability
                 </Button>
@@ -151,7 +163,7 @@ function resetState() {
                 <!-- Results Section -->
                 <div class="max-h-[400px] overflow-y-auto pr-1">
                     <div
-                        v-if="form.processing"
+                        v-if="loading"
                         class="flex justify-center py-8"
                     >
                         <LoaderCircle
@@ -161,11 +173,11 @@ function resetState() {
 
                     <template v-else>
                         <div
-                            v-if="availableRooms && availableRooms.length > 0"
-                            class="space-y-6 overflow-y-auto"
+                            v-if="availableBedInRooms && availableBedInRooms.length > 0"
+                            class="overflow-y-auto space-y-6"
                         >
                             <BedAvailableItem
-                                v-for="room in availableRooms"
+                                v-for="room in availableBedInRooms"
                                 :key="room.id"
                                 :name="room.name"
                                 :eligibleGender="room.eligible_gender"
