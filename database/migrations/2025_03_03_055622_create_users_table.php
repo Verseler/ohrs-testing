@@ -36,15 +36,6 @@ return new class extends Migration {
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-
-        //Add a default super admin
-        DB::table('users')->insert([
-            'name' => 'verselerf_handuman',
-            'role' => 'system_admin',
-            'office_id' => 176,
-            'password' => bcrypt('denrregionx'),
-        ]);
-
     }
 
     /**

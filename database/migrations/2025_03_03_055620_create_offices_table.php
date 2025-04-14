@@ -19,11 +19,6 @@ return new class extends Migration {
             $table->string('hostel_name')->nullable();
             $table->timestamps();
         });
-
-        // run seeder to add required data in the database
-        Artisan::call('db:seed', [
-            '--class' => OfficeSeeder::class
-        ]);
     }
 
     /**
