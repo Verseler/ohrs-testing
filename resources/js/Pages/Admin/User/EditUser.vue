@@ -104,7 +104,7 @@ function submit() {
             <template #title>Edit User</template>
         </PageHeader>
 
-        <form @submit.prevent="showConfirmation" class="max-w-lg space-y-6">
+        <form @submit.prevent="showConfirmation" class="space-y-6 max-w-lg">
             <!-- Name Field -->
             <div class="flex flex-col gap-2">
                 <Label for="name">Username</Label>
@@ -138,7 +138,7 @@ function submit() {
             <Separator />
 
             <!-- Role Field -->
-            <div>
+            <div v-if="form.role !== 'system_admin'">
                 <Label for="role">Role</Label>
                 <Select id="role" v-model="form.role">
                     <SelectTrigger :invalid="!!form.errors.role">

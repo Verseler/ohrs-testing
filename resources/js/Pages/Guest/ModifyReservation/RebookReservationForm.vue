@@ -13,42 +13,49 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import type { Office } from "@/Pages/Admin/Office/office.types";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
-import type { Gender } from "@/Pages/Guest/guest.types";
 import { validIds } from "@/Pages/Guest/ReservationForm/data";
+import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
+import type { Office } from "@/Pages/Admin/Office/office.types";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
 
-type ReservationFormProps = {
-    hostelOffice: Office;
+type RebookReservationFormProps = {
+    reservation: Reservation;
     offices: Office[];
 };
 
-const { hostelOffice, offices } = defineProps<ReservationFormProps>();
+const { reservation, offices } = defineProps<RebookReservationFormProps>();
 
-const DEFAULT_FIRST_GUEST = {
-    first_name: undefined as string | undefined,
-    last_name: undefined as string | undefined,
-    gender: undefined as Gender | undefined,
-    office: undefined as string | undefined,
-    check_in_date: undefined as string | undefined,
-    check_out_date: undefined as string | undefined,
-};
+const defaultGuests = computed(() => {
+    const formattedGuests = reservation.guests.map((guest) => {
+        return {
+            first_name: guest.first_name,
+            last_name: guest.last_name,
+            gender: guest.gender,
+            office: guest.office,
+            check_in_date: guest.stay_details.check_in_date,
+            check_out_date: guest.stay_details.check_out_date,
+        };
+    });
+
+    return JSON.parse(JSON.stringify(formattedGuests));
+});
 
 const form = useForm({
-    first_name: "",
-    middle_initial: undefined,
-    last_name: "",
-    phone: undefined,
-    email: "",
-    hostel_office_id: hostelOffice.id,
-    id_type: undefined,
-    employee_id: "",
-    purpose_of_stay: "",
-    guests: [DEFAULT_FIRST_GUEST],
+    prev_reservation_id: reservation.id,
+    first_name: reservation.first_name,
+    middle_initial: reservation.middle_initial,
+    last_name: reservation.last_name,
+    phone: reservation.phone,
+    email: reservation.email,
+    hostel_office_id: reservation.hostel_office.id,
+    id_type: reservation.id_type,
+    employee_id: reservation.employee_id,
+    purpose_of_stay: reservation.purpose_of_stay,
+    guests: defaultGuests.value,
 });
 
 //confirmation dialog
@@ -59,7 +66,7 @@ function showConfirmation() {
 }
 
 function submit() {
-    form.post(route("reservation.create"));
+    form.post(route("reservation.rebook"));
 }
 </script>
 
@@ -72,7 +79,11 @@ function submit() {
                 <Table class="overflow-hidden">
                     <TableRow class="border-none">
                         <TableCell class="text-2xl font-bold">
-                            {{ hostelOffice.hostel_name || hostelOffice.name }}
+                            {{
+                                reservation.hostel_office.hostel_name ||
+                                reservation.hostel_office.name
+                            }}
+                            Reservation Rebook
                         </TableCell>
                     </TableRow>
 
@@ -260,13 +271,14 @@ function submit() {
                 </Table>
             </form>
         </div>
-        <Alert
-            :open="confirmation"
-            @update:open="confirmation = $event"
-            :onConfirm="submit"
-            title="Are you sure you want to submit this reservation?"
-            description="Please confirm that all the details are correct before proceeding."
-            confirm-label="Confirm"
-        />
     </GuestLayout>
+
+    <Alert
+        :open="confirmation"
+        @update:open="confirmation = $event"
+        :onConfirm="submit"
+        title="Are you sure you want to rebook your reservation?"
+        description="This will cancel your previous reservation."
+        confirm-label="Confirm"
+    />
 </template>

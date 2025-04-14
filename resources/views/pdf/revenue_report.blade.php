@@ -78,11 +78,11 @@
 
 <body>
     <header style="text-align: center; line-height: 1; margin-bottom: 12px;">
-        @if(str_contains($officeName, 'Regional Office'))
+        @if(str_contains($officeName, 'Region 10'))
         @include('pdf.partials.regional-office-header')
-        @elseif(str_contains($officeName, 'Camiguin'))
+        @elseif(str_contains($officeName, 'PENRO Camiguin'))
         @include('pdf.partials.camiguin-office-header')
-        @elseif(str_contains($officeName, 'Initao'))
+        @elseif(str_contains($officeName, 'CENRO Initao'))
         @include('pdf.partials.initao-office-header')
         @endif
 

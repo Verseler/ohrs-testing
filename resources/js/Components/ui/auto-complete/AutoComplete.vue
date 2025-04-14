@@ -98,7 +98,7 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
 
         <ul
             v-if="showSuggestions && filteredItems.length > 0"
-            class="absolute z-20 w-full overflow-y-auto bg-white border rounded max-h-52"
+            class="overflow-y-auto absolute z-20 w-full max-h-52 bg-white rounded border"
             :class="{
                 'mt-1': position === 'bottom',
                 'mb-1': position === 'top',

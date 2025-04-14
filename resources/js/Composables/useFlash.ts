@@ -1,6 +1,6 @@
 import type { PageProps } from '@/types';
 import { usePage } from '@inertiajs/vue3';
-import { watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import { toast } from 'vue-sonner';
 const page = usePage<PageProps>();
 
@@ -17,7 +17,15 @@ export function useFlashSuccess() {
    watch(
     () => page.props.flash.success,
     () => showSuccess()
-);
+    );
+}
+
+export function useFlashSuccessOnMount() {
+    onMounted(() => showSuccess());
+}
+
+export function useFlashErrorOnMount() {
+    onMounted(() => showError());
 }
 
 export function showError() {

@@ -87,7 +87,7 @@ class UserController extends Controller
 
         event(new Registered($user));
 
-        return to_route('user.list');
+        return to_route('user.list')->with(['success' => 'User created successfully.']);
     }
 
     public function editForm(int $id)
@@ -112,7 +112,7 @@ class UserController extends Controller
                 'id' => ['required', 'exists:users,id'],
                 'name' => ['required', 'string', 'max:20'],
                 'office_id' => ['required', 'exists:offices,id'],
-                'role' => ['required', Rule::in(['admin', 'super_admin'])],
+                'role' => ['required', Rule::in(['admin', 'super_admin', 'system_admin'])],
             ]
         );
 
@@ -128,7 +128,7 @@ class UserController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
 
-        return to_route('user.list')->with('success', 'Successfully updated the user details.');
+        return to_route('user.list')->with(['success' => 'Successfully updated the user details.']);
     }
 
     public function delete(int $id)
@@ -147,6 +147,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->back()->with('success', 'Successfully deleted the user account.');
+        return redirect()->back()->with(['success' => 'Successfully deleted the user account.']);
     }
 }

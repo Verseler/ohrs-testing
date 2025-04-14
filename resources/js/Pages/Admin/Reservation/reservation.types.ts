@@ -13,10 +13,10 @@ export type Reservation = {
     remaining_balance: number;
     payment_type: PaymentType;
     first_name: string;
-    middle_initial: string | null;
+    middle_initial: string;
     last_name: string;
     phone: string;
-    email: string | null;
+    email: string;
     guests: Guest[];
     extended_reservations: ExtendedReservation[]
     hostel_office_id: number;
@@ -24,7 +24,7 @@ export type Reservation = {
     id_type: string;
     employee_id: string;
     reserved_beds: Bed[];
-    purpose_of_stay: string | null;
+    purpose_of_stay: string;
     general_status: ReservationStatus;
     min_check_in_date?: string | null;
     max_check_out_date?: string | null;

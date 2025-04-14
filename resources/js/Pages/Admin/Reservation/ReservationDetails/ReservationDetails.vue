@@ -25,9 +25,7 @@ import GuestInformation from "@/Pages/Admin/Reservation/ReservationDetails/Parti
 import ReservedBeds from "@/Pages/Admin/Reservation/ReservationDetails/Partials/ReservedBeds.vue";
 import LinkButton from "@/Components/LinkButton.vue";
 import ReservationCode from "./Partials/ReservationCode.vue";
-import { onMounted } from "vue";
 import { usePoll } from "@inertiajs/vue3";
-import { showError, showSuccess } from "@/Composables/useFlash";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
 
 usePoll(5000);
@@ -43,11 +41,6 @@ type ReservationDetailsProps = {
 };
 
 const { reservation, canExempt } = defineProps<ReservationDetailsProps>();
-
-onMounted(() => {
-    showSuccess();
-    showError();
-});
 </script>
 
 <template>

@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ModifyReservationController;
 use App\Http\Controllers\UpdateReservationCheckoutController;
 use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\OtpController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReservationAssignBedsController;
 use App\Http\Controllers\RoomController;
@@ -14,6 +16,7 @@ use App\Http\Controllers\ReservationProcessController;
 use App\Http\Controllers\ReservationStatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPasswordController;
+use App\Mail\ModifyReservationTokenMail;
 use App\Models\Office;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -25,16 +28,28 @@ Route::get('/', function () {
     return Inertia::render('LandingPage', [
         'hostels' => $hostels
     ]);
-});
+})->name('landingPage');
 Route::get('/rooms/available-beds', [RoomController::class, 'getAvailableRooms'])->name('room.checkAvailableBeds');
 
-//* Guest Reservation Process
+//* Guest Reservation
 Route::get('/reservation', [ReservationProcessController::class, 'form'])->name('reservation.form');
 Route::post('/reservation', [ReservationProcessController::class, 'create'])->name('reservation.create');
 Route::get('/reservation/confirmation', [ReservationProcessController::class, 'confirmation'])->name('reservation.confirmation');
 Route::get('/reservation/status/form', [ReservationStatusController::class, 'checkStatusForm'])->name('reservation.checkStatusForm');
 Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'checkStatus'])->name('reservation.checkStatus');
-Route::get('reservation/search/{search}', [ReservationStatusController::class, 'search'])->name('reservation.search');
+Route::get('reservation/search/{search}/{hostel_id}', [ReservationStatusController::class, 'search'])->name('reservation.search');
+
+//* Guest Modify Reservation
+Route::post('/reservation/request-modify', [ModifyReservationController::class, 'requestModify'])->name('reservation.requestModify');
+Route::get('/reservation/verify-edit/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyEdit'])->name('reservation.verifyEdit');
+Route::get('/reservation/verify-cancel/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyCancel'])->name('reservation.verifyCancel');
+Route::get('/reservation/modify-rebook/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyRebook'])->name('reservation.verifyRebook');
+Route::post('/reservation/rebook', [ModifyReservationController::class, 'rebook'])->name('reservation.rebook');
+Route::put('/reservation/edit', [ModifyReservationController::class, 'edit'])->name('reservation.edit');
+Route::get('/reservation/otp', [OtpController::class, 'form'])->name('reservation.otpForm');
+Route::post('/reservation/otp', [OtpController::class, 'verify'])->name('reservation.otpVerify');
+
+
 
 //* Admin Reservation
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -131,3 +146,4 @@ Route::middleware(['auth', 'verified', 'role:system_admin'])->group(function () 
 });
 
 require __DIR__ . '/auth.php';
+

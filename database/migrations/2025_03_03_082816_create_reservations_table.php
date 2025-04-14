@@ -26,6 +26,8 @@ return new class extends Migration {
             $table->string('employee_id');
             $table->text('purpose_of_stay');
             $table->enum('general_status', allowed: ['pending', 'confirmed', 'canceled', 'checked_in', 'checked_out'])->default('pending');
+            $table->string('modify_token')->nullable()->unique();
+            $table->timestamp('modify_token_expires_at')->nullable();
             $table->timestamps();
         });
     }

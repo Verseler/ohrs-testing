@@ -58,7 +58,7 @@ class OfficeController extends Controller
         $office->hostel_name = $validated['hostel_name'] ?? null;
         $office->save();
 
-        return redirect()->route('office.list');
+        return redirect()->route('office.list')->with(['success' => 'Office saved successfully.']);
     }
 
     public function delete($id)
@@ -70,11 +70,11 @@ class OfficeController extends Controller
             return redirect()->back()->with(['error' => 'Cannot delete office with connected users.']);
         }
         // Check if there are active reservations (not canceled or not checked out)
-        if ($office->reservations()->whereNotIn('status', ['canceled', 'checked_out'])->exists()) {
+        if ($office->reservations()->whereNotIn('general_status', ['canceled', 'checked_out'])->exists()) {
             return redirect()->back()->with(['error' => 'Cannot delete office with active reservations.']);
         }
 
         $office->delete();
-        return redirect()->back();
+        return redirect()->back()->with(['success' => 'Office deleted successfully.']);
     }
 }

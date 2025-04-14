@@ -3,6 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,5 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
             ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $exception, $request) {
+            $statusCode = $exception->getStatusCode();
+
+            return Inertia::render('ErrorPage', ['status' => $statusCode])
+                ->toResponse($request)
+                ->setStatusCode($statusCode);
+        });
     })->create();
+
+
+

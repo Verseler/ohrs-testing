@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import Header from "@/Components/Header.vue";
 import { formatCurrency, formatDateString, obscureName } from "@/lib/utils";
-import type {
-    Reservation,
-    ReservationStatus,
-} from "@/Pages/Admin/Reservation/reservation.types";
-import { usePoll } from "@inertiajs/vue3";
-import { Head } from "@inertiajs/vue3";
-import { ArrowLeft, CheckCircleIcon, ClockIcon, XCircleIcon } from "lucide-vue-next";
-import { Card, CardContent, CardHeader } from "@/Components/ui/card";
-import { computed } from "vue";
+import type { Reservation } from "@/Pages/Admin/Reservation/reservation.types";
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+} from "@/Components/ui/card";
+import { getStatusConfig } from "@/Pages/Guest/CheckReservationStatus/helper";
+import { usePoll, Head, useForm } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+import { Button } from "@/Components/ui/button";
+import Alert from "@/Components/ui/alert-dialog/Alert.vue";
+import { Separator } from "@/Components/ui/separator";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
+
+usePoll(15000);
 
 type ReservationStatusResult = {
     reservation: Reservation & {
@@ -19,198 +25,215 @@ type ReservationStatusResult = {
 
 const { reservation } = defineProps<ReservationStatusResult>();
 
-usePoll(15000);
-
-const statusConfig = computed(() => {
-    if (!reservation) return null;
-
-    const configs: Record<
-        ReservationStatus,
-        {
-            icon: any;
-            color: string;
-            borderColor: string;
-            title: string;
-            description: string;
-        }
-    > = {
-        pending: {
-            icon: ClockIcon,
-            color: "bg-yellow-100 text-yellow-800",
-            borderColor: "border-yellow-200",
-            title: "Pending",
-            description:
-                "Your reservation is waiting for approval. Please check back for updates.",
-        },
-        confirmed: {
-            icon: CheckCircleIcon,
-            color: "bg-green-100 text-green-800",
-            borderColor: "border-green-200",
-            title: "Confirmed",
-            description:
-                "Your reservation is confirmed. We look forward to your stay.",
-        },
-        checked_in: {
-            icon: CheckCircleIcon,
-            color: "bg-blue-100 text-blue-800",
-            borderColor: "border-blue-200",
-            title: "Checked In",
-            description:
-                "Your stay has commenced. We hope you enjoy your time with us.",
-        },
-        checked_out: {
-            icon: CheckCircleIcon,
-            color: "bg-blue-100 text-blue-800",
-            borderColor: "border-blue-200",
-            title: "Checked Out",
-            description:
-                "Your stay has concluded. We appreciate you choosing our hostel.",
-        },
-        canceled: {
-            icon: XCircleIcon,
-            color: "bg-red-100 text-red-800",
-            borderColor: "border-red-200",
-            title: "Canceled",
-            description: "This reservation has been canceled.",
-        },
-    };
-
-    return configs[reservation.general_status];
+const form = useForm({
+    reservation_code: reservation.code,
 });
+
+const statusConfig = computed(() =>
+    getStatusConfig(reservation?.general_status || "pending")
+);
+
+const requestEditConfirmation = ref(false);
+const requestCancelConfirmation = ref(false);
+const requestRebookConfirmation = ref(false);
+
+function openRequestEditConfirmation() {
+    requestEditConfirmation.value = true;
+}
+
+function openRequestCancelConfirmation() {
+    requestCancelConfirmation.value = true;
+}
+
+function openRequestRebookConfirmation() {
+    requestRebookConfirmation.value = true;
+}
+
+function requestModify(action: string) {
+    form.post(route("reservation.requestModify", { action }));
+}
 </script>
 
 <template>
     <Head title="Reservation Result" />
 
-    <div class="w-full min-h-screen">
-        <Header />
-
-        <div
-         v-if="reservation"
-        class="max-w-2xl p-4 mx-auto mt-20 mb-2 overflow-hidden rounded-none"
+    <GuestLayout>
+        <Card
+            v-if="reservation"
+            class="max-w-xl mx-auto mt-20 mb-2 rounded-none shadow-none md:rounded-xl md:shadow-sm"
         >
+            <!-- Status Header -->
+            <CardHeader
+                class="flex flex-col p-6 gap-y-2 rounded-tl-xl rounded-tr-xl"
+                :class="statusConfig?.color"
+            >
+                <div class="flex items-center">
+                    <component :is="statusConfig?.icon" class="w-6 h-6 mr-2" />
+                    <h2 class="text-lg font-semibold">
+                        {{ statusConfig?.title }}
+                    </h2>
+                </div>
 
-            <div class="flex justify-end mb-2">
-                <a onclick="history.back();return false;" class="flex items-center gap-2 px-4 py-2 transition-colors border rounded-md cursor-pointer text-primary-500 hover:bg-primary-50 border-primary-500"><ArrowLeft class="size-4" />Back</a>
-            </div>
+                <!-- Status Description -->
+                <p class="pl-8">{{ statusConfig?.description }}</p>
+            </CardHeader>
 
+            <!-- Limited Reservation Details -->
+            <CardContent class="p-6 space-y-4">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Booked By
+                        </h3>
+                        <p class="mt-1">
+                            {{
+                                obscureName(
+                                    reservation.first_name,
+                                    reservation.last_name
+                                )
+                            }}
+                        </p>
+                    </div>
 
-            <!-- Reservation Status Result -->
-            <Card class="shadow-none md:shadow">
-                <!-- Status Header -->
-                <CardHeader
-                    class="flex flex-col p-6 rounded-tl-lg rounded-tr-lg gap-y-2"
-                    :class="statusConfig?.color"
+                    <div v-if="reservation?.general_status !== 'canceled'">
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Number of Guests
+                        </h3>
+                        <p class="mt-1">
+                            {{ reservation?.guests_count }}
+                        </p>
+                    </div>
+
+                    <div v-if="reservation?.general_status !== 'canceled'">
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Check-in Date
+                        </h3>
+                        <p class="mt-1">
+                            {{
+                                formatDateString(
+                                    reservation?.min_check_in_date || ""
+                                )
+                            }}
+                        </p>
+                    </div>
+
+                    <div v-if="reservation?.general_status !== 'canceled'">
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Check-out Date
+                        </h3>
+                        <p class="mt-1">
+                            {{
+                                formatDateString(
+                                    reservation?.max_check_out_date || ""
+                                )
+                            }}
+                        </p>
+                    </div>
+
+                    <div
+                        v-if="
+                            reservation.general_status !== 'pending' &&
+                            reservation.general_status !== 'canceled' &&
+                            reservation.total_billings
+                        "
+                    >
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Total Billings
+                        </h3>
+                        <p class="mt-1">
+                            ₱{{ formatCurrency(reservation.total_billings) }}
+                        </p>
+                    </div>
+
+                    <div
+                        v-if="
+                            reservation.general_status !== 'pending' &&
+                            reservation.general_status !== 'canceled'
+                        "
+                    >
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Remaining Balance
+                        </h3>
+                        <p class="mt-1">
+                            ₱{{ formatCurrency(reservation.remaining_balance) }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">
+                            Hostel Location
+                        </h3>
+                        <p class="mt-1">
+                            {{ reservation.hostel_office.name }}
+                        </p>
+                    </div>
+                </div>
+            </CardContent>
+
+            <Separator
+                v-if="reservation.general_status !== 'canceled'"
+                class="my-4"
+            />
+
+            <CardFooter class="justify-end gap-3 py-4">
+                <Button
+                    v-if="reservation.general_status === 'pending'"
+                    @click="openRequestEditConfirmation"
+                    variant="outline"
+                    class="text-blue-600 border-blue-500 hover:bg-blue-50 hover:text-blue-600"
                 >
-                    <div class="flex items-center">
-                        <component :is="statusConfig?.icon" class="w-6 h-6 mr-2" />
-                        <h2 class="text-lg font-semibold">
-                            {{ statusConfig?.title }}
-                        </h2>
-                    </div>
+                    Edit Reservation
+                </Button>
 
-                    <!-- Status Description -->
-                    <p class="pl-8">{{ statusConfig?.description }}</p>
-                </CardHeader>
+                <Button
+                    v-if="reservation.general_status === 'confirmed'"
+                    @click="openRequestRebookConfirmation"
+                    variant="outline"
+                    class="text-yellow-600 border-yellow-500 hover:bg-yellow-50 hover:text-yellow-600"
+                >
+                    Rebook Reservation
+                </Button>
 
-                <!-- Limited Reservation Details -->
-                <CardContent class="p-6 space-y-4">
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-500">
-                                Booked By
-                            </h3>
-                            <p class="mt-1">
-                                {{
-                                    obscureName(
-                                        reservation.first_name,
-                                        reservation.last_name
-                                    )
-                                }}
-                            </p>
-                        </div>
+                <Button
+                    v-if="
+                        reservation.general_status === 'pending' ||
+                        reservation.general_status === 'confirmed'
+                    "
+                    @click="openRequestCancelConfirmation"
+                    variant="outline"
+                    class="text-red-600 border-red-500 hover:bg-red-50 hover:text-red-600"
+                >
+                    Cancel Reservation
+                </Button>
+            </CardFooter>
+        </Card>
 
-                        <div>
-                            <h3
-                                v-if="reservation?.general_status !== 'canceled'"
-                                class="text-sm font-medium text-gray-500"
-                            >
-                                Number of Guests
-                            </h3>
-                            <p
-                                v-if="reservation?.general_status !== 'canceled'"
-                                class="mt-1"
-                            >
-                                {{ reservation?.guests_count }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-500">
-                                Check-in Date
-                            </h3>
-                            <p class="mt-1">
-                                {{
-                                    formatDateString(
-                                        reservation?.min_check_in_date || ""
-                                    )
-                                }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-500">
-                                Check-out Date
-                            </h3>
-                            <p class="mt-1">
-                                {{
-                                    formatDateString(
-                                        reservation?.max_check_out_date || ""
-                                    )
-                                }}
-                            </p>
-                        </div>
-
-                        <div
-                            v-if="
-                                reservation.general_status !== 'pending' &&
-                                reservation.general_status !== 'canceled' &&
-                                reservation.total_billings
-                            "
-                        >
-                            <h3 class="text-sm font-medium text-gray-500">
-                                Total Billings
-                            </h3>
-                            <p class="mt-1">
-                                ₱{{ formatCurrency(reservation.total_billings) }}
-                            </p>
-                        </div>
-
-                        <div
-                            v-if="
-                                reservation.general_status !== 'pending' &&
-                                reservation.general_status !== 'canceled'
-                            "
-                        >
-                            <h3 class="text-sm font-medium text-gray-500">
-                                Remaining Balance
-                            </h3>
-                            <p class="mt-1">
-                                ₱{{ formatCurrency(reservation.remaining_balance) }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-medium text-gray-500">
-                                Hostel Location
-                            </h3>
-                            <p class="mt-1">
-                                {{ reservation.hostel_office.name }}
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    </div>
+        <Alert
+            :open="requestEditConfirmation"
+            @update:open="requestEditConfirmation = $event"
+            :onConfirm="() => requestModify('edit')"
+            title="Are you sure you want to edit the reservation?"
+            description="A code will be sent to your email for confirmation."
+            confirm-label="Confirm"
+            severity="danger"
+        />
+        <Alert
+            :open="requestCancelConfirmation"
+            @update:open="requestCancelConfirmation = $event"
+            :onConfirm="() => requestModify('cancel')"
+            title="Are you sure you want to cancel the reservation?"
+            description="A code will be sent to your email for confirmation."
+            confirm-label="Confirm"
+            severity="danger"
+        />
+        <Alert
+            :open="requestRebookConfirmation"
+            @update:open="requestRebookConfirmation = $event"
+            :onConfirm="() => requestModify('rebook')"
+            title="Are you sure you want to rebook the reservation?"
+            description="A code will be sent to your email for confirmation."
+            confirm-label="Confirm"
+            severity="danger"
+        />
+    </GuestLayout>
 </template>

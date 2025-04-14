@@ -41,7 +41,7 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                                     {{ reserved.guest.first_name }} {{ reserved.guest.last_name }}
                                 </TableCell>
                                 <TableCell>
-                                    <GenderBadge :gender="(reserved.guest.gender as Gender)" />
+                                    <GenderBadge :gender="reserved.guest.gender" />
                                 </TableCell>
                                 <TableCell>{{ reserved?.bed?.room?.name ?? '-' }}</TableCell>
                                 <TableCell>{{ reserved?.bed?.name ?? '-' }}</TableCell>

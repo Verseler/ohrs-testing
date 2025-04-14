@@ -6,7 +6,7 @@ import Input from "@/Components/ui/input/Input.vue";
 import InputPassword from "@/Components/ui/input/InputPassword.vue";
 import Label from "@/Components/ui/label/Label.vue";
 import Message from "@/Components/ui/message/Message.vue";
-import GuestLayout from "@/Layouts/GuestLayout.vue";
+import AuthLayout from "@/Layouts/AuthLayout.vue";
 import { Head, useForm } from "@inertiajs/vue3";
 
 defineProps({
@@ -29,7 +29,7 @@ function submit() {
 </script>
 
 <template>
-    <GuestLayout>
+    <AuthLayout>
         <Head title="Log in" />
 
         <Message v-if="status" severity="success">{{ status }}</Message>
@@ -74,9 +74,9 @@ function submit() {
                 </label>
             </div>
 
-            <div class="flex items-center justify-end">
+            <div class="flex justify-end items-center">
                 <Button
-                    class="w-full mt-2"
+                    class="mt-2 w-full"
                     type="submit"
                     :disabled="form.processing"
                 >
@@ -84,5 +84,5 @@ function submit() {
                 </Button>
             </div>
         </form>
-    </GuestLayout>
+    </AuthLayout>
 </template>

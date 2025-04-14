@@ -1,16 +1,8 @@
 <script setup lang="ts">
-import {
-    Check,
-    Calendar,
-    Users,
-    Download,
-    Hotel,
-    Info,
-} from "lucide-vue-next";
+import { Check, Calendar, Users, Download, Hotel, Info } from "lucide-vue-next";
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
 import { Separator } from "@/Components/ui/separator";
 import { Head } from "@inertiajs/vue3";
-import Header from "@/Components/Header.vue";
 import { Button } from "@/Components/ui/button";
 import * as htmlToImage from "html-to-image";
 import { toast } from "vue-sonner";
@@ -20,6 +12,7 @@ import Code from "@/Pages/Guest/ReservationConfirmation/Partials/Code.vue";
 import PendingStatus from "@/Pages/Guest/ReservationConfirmation/Partials/PendingStatus.vue";
 import { Message } from "@/Components/ui/message";
 import { formatDateString } from "@/lib/utils";
+import GuestLayout from "@/Layouts/GuestLayout.vue";
 
 type ReservationDetails = {
     from: string;
@@ -67,9 +60,7 @@ onMounted(() => {
 <template>
     <Head title="Reservation Confirmation" />
 
-    <div class="w-full min-h-screen">
-        <Header />
-
+    <GuestLayout>
         <div class="container max-w-xl px-4 py-2 mx-auto">
             <!-- Check Icon -->
             <div class="flex items-center justify-center mb-4">
@@ -150,5 +141,5 @@ onMounted(() => {
                 <Download />Download Reservation Code
             </Button>
         </div>
-    </div>
+    </GuestLayout>
 </template>

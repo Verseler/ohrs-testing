@@ -3,13 +3,13 @@ import Badge from "@/Components/ui/badge/Badge.vue";
 import type { Gender } from '@/Pages/Guest/guest.types';
 import { Mars, Venus, VenusAndMars } from "lucide-vue-next";
 
-const { gender } = defineProps<{ gender: Gender }>();
+const { gender } = defineProps<{ gender: Gender | Omit<Gender, 'any'> }>();
 </script>
 
 <template>
     <Badge
         variant="outline"
-        class="h-6 px-2 font-normal gap-x-1 place-content-center min-w-16 border-neutral-200"
+        class="gap-x-1 place-content-center px-2 h-6 font-normal min-w-16 border-neutral-200"
         :severity="
             gender === 'male'
                 ? 'info'
