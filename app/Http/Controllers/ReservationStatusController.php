@@ -293,10 +293,10 @@ class ReservationStatusController extends Controller
             ]);
         }
 
-        return redirect()->back()->with([
-            'response_data' => [
-                'reservations' => $reservations->values()
-            ]
+        return response()->json([
+            'success' => true,
+            'message' => 'Reservations found.',
+            'data' => $reservations->values()
         ]);
     }
 }
