@@ -43,7 +43,7 @@
         @apply w-2 bg-transparent;
     }
     ::-webkit-scrollbar:horizontal {
-        @apply h-1 bg-transparent;
+        @apply h-[0.5rem] bg-transparent;
     }
     ::-webkit-scrollbar-thumb {
         @apply rounded bg-neutral-300;
