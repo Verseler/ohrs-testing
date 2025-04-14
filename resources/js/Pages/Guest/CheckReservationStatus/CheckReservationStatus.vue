@@ -12,13 +12,21 @@ type CheckReservationStatusProps = {
     hostels: {value: number; label: string}[];
 }
 
+type ResponseData = {
+    reservations: Reservation[];
+}
+
 const { hostels } = defineProps<CheckReservationStatusProps>();
 
 const page = usePage<PageProps>();
 
-const reservations = computed<Reservation[] | null>(() => {
-    const response = page.props.response_data as Reservation[];
-    return response || null;
+const response = computed(() => {
+    const res = page.props.response_data as ResponseData;
+    return res || null;
+});
+
+const reservations = computed(() => {
+    return response.value?.reservations || [];
 });
 
 const searchForm = useForm({
@@ -44,7 +52,7 @@ function submitSearch() {
     <Head title="Check Reservation Status" />
 
     <GuestLayout>
-        <div class="max-w-3xl px-4 py-12 mx-auto">
+        <div class="px-4 py-12 mx-auto max-w-3xl">
             <div class="mb-8 text-center">
                 <h1 class="mb-2 text-2xl font-bold text-gray-900">
                     Check Your Reservation Status

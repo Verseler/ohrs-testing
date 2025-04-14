@@ -288,8 +288,10 @@ class ReservationStatusController extends Controller
             ]);
         }
 
-        return Redirect::back()->with([
-            'response_data' => $reservations
+        return redirect()->back()->with([
+            'response_data' => [
+                'reservations' => $reservations->values()
+            ]
         ]);
     }
 }
