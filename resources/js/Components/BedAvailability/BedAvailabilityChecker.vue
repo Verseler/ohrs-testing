@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogFooter,
-    DialogTitle,
-    DialogDescription,
-} from "@/Components/ui/dialog";
+import Dialog from "@/Components/ui/dialog/Dialog.vue";
+import DialogContent from "@/Components/ui/dialog/DialogContent.vue";
+import DialogHeader from "@/Components/ui/dialog/DialogHeader.vue";
+import DialogFooter from "@/Components/ui/dialog/DialogFooter.vue";
+import DialogTitle from "@/Components/ui/dialog/DialogTitle.vue";
+import DialogDescription from "@/Components/ui/dialog/DialogDescription.vue";
 import { Button } from "@/Components/ui/button";
 import { LoaderCircle } from "lucide-vue-next";
 import { Separator } from "@/Components/ui/separator";
@@ -31,7 +29,7 @@ type AvailableBedInRoom = {
 type ResponseData = {
     available_beds_in_rooms: AvailableBedInRoom[];
     days: string[];
-}
+};
 
 type BedAvailabilityCheckerProps = {
     hostelId: number;
@@ -46,7 +44,9 @@ const response = computed(() => {
     return response || null;
 });
 
-const availableRooms = computed(() => response.value?.available_beds_in_rooms || []);
+const availableRooms = computed(
+    () => response.value?.available_beds_in_rooms || []
+);
 const days = computed(() => response.value?.days || []);
 
 const isDialogOpen = ref(false);
@@ -169,7 +169,9 @@ function resetState() {
                                 :key="room.id"
                                 :name="room.name"
                                 :eligibleGender="room.eligible_gender"
-                                :eligibleGenderSchedules="room.eligible_gender_schedules"
+                                :eligibleGenderSchedules="
+                                    room.eligible_gender_schedules
+                                "
                                 :availableBeds="room.beds_count"
                                 :days="days"
                             />
