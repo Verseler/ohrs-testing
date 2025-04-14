@@ -24,8 +24,14 @@ type AvailableBedInRoom = {
     id: number;
     name: string;
     eligible_gender: Gender;
+    eligible_gender_schedules: Gender[];
     beds_count: number;
 };
+
+type ResponseData = {
+    available_beds_in_rooms: AvailableBedInRoom[];
+    days: string[];
+}
 
 type BedAvailabilityCheckerProps = {
     hostelId: number;
@@ -35,10 +41,13 @@ const { hostelId } = defineProps<BedAvailabilityCheckerProps>();
 
 const page = usePage<PageProps>();
 
-const availableRooms = computed(() => {
-    const response = page.props.response_data as AvailableBedInRoom[];
+const response = computed(() => {
+    const response = page.props.response_data as ResponseData;
     return response || null;
 });
+
+const availableRooms = computed(() => response.value?.available_beds_in_rooms || []);
+const days = computed(() => response.value?.days || []);
 
 const isDialogOpen = ref(false);
 
@@ -86,7 +95,7 @@ function resetState() {
         </Button>
 
         <Dialog :open="isDialogOpen" @update:open="isDialogOpen = $event">
-            <DialogContent class="sm:max-w-[700px]">
+            <DialogContent class="sm:max-w-[850px]">
                 <DialogHeader>
                     <DialogTitle>Available Beds</DialogTitle>
                     <DialogDescription>
@@ -95,7 +104,7 @@ function resetState() {
                 </DialogHeader>
 
                 <!-- Date Selection -->
-                <div class="grid py-1 gap-x-2 sm:grid-cols-2">
+                <div class="grid gap-x-2 sm:grid-cols-2">
                     <div>
                         <Label for="check-in-date"> Check-in Date </Label>
                         <InputDate
@@ -118,7 +127,7 @@ function resetState() {
                             :disabled="!form.check_in_date"
                             :invalid="!!form.errors.check_out_date"
                         />
-                        <InputError>
+                        <InputError v-if="!!form.errors.check_out_date">
                             {{ form.errors.check_out_date }}
                         </InputError>
                     </div>
@@ -141,7 +150,6 @@ function resetState() {
 
                 <!-- Results Section -->
                 <div class="max-h-[400px] overflow-y-auto pr-1">
-                    <h3 class="mb-2 text-lg font-semibold">Available bed/s</h3>
                     <div
                         v-if="form.processing"
                         class="flex justify-center py-8"
@@ -154,14 +162,16 @@ function resetState() {
                     <template v-else>
                         <div
                             v-if="availableRooms && availableRooms.length > 0"
-                            class="space-y-4 overflow-y-auto"
+                            class="space-y-6 overflow-y-auto"
                         >
                             <BedAvailableItem
                                 v-for="room in availableRooms"
                                 :key="room.id"
                                 :name="room.name"
                                 :eligibleGender="room.eligible_gender"
+                                :eligibleGenderSchedules="room.eligible_gender_schedules"
                                 :availableBeds="room.beds_count"
+                                :days="days"
                             />
                         </div>
                         <p
@@ -173,7 +183,7 @@ function resetState() {
                     </template>
                 </div>
 
-                <DialogFooter class="mt-4">
+                <DialogFooter class="mt-1">
                     <Button variant="outline" @click="closeDialog">
                         Close
                     </Button>

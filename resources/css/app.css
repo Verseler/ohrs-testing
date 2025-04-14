@@ -39,9 +39,11 @@
 
     ::-webkit-scrollbar-thumb {
         @apply bg-transparent shadow-sm;
-    }
-    ::-webkit-scrollbar {
+    }    ::-webkit-scrollbar {
         @apply w-2 bg-transparent;
+    }
+    ::-webkit-scrollbar:horizontal {
+        @apply h-1 bg-transparent;
     }
     ::-webkit-scrollbar-thumb {
         @apply rounded bg-neutral-300;
