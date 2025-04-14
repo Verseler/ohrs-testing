@@ -134,12 +134,6 @@ class ModifyReservationController extends Controller
 
         try {
             DB::transaction(function () use ($reservation) {
-                // Clear token after successful verification
-                $reservation->update([
-                    'modify_token' => null,
-                    'modify_token_expires_at' => null
-                ]);
-
                 $reservation = Reservation::with([
                     'guests',
                     'hostelOffice',
@@ -282,7 +276,7 @@ class ModifyReservationController extends Controller
                     ]);
                 }
 
-                
+
                 // Store reservation details in the session
                 session([
                     'reservation_id' => $reservation->id,
