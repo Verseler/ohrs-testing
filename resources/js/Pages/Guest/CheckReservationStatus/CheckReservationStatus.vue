@@ -70,7 +70,7 @@ async function submitSearch() {
                     Check Your Reservation Status
                 </h1>
                 <p class="text-gray-600">
-                    "Enter your reservation code or the name of the employee who
+                    Enter your reservation code or the name of the employee who
                     made the booking to check the status of your reservation.
                 </p>
             </div>

@@ -288,8 +288,10 @@ class ReservationStatusController extends Controller
             ->get();
 
         if ($reservations->isEmpty()) {
-            return Redirect::back()->with([
-                'error' => 'No reservations found.',
+            return response()->json([
+                'success' => false,
+                'message' => 'No reservations found.',
+                'data' => null
             ]);
         }
 
