@@ -121,8 +121,7 @@ class ModifyReservationController extends Controller
 
     public function verifyCancel($reservation_id, string $token)
     {
-        $reservation = Reservation::where('general_status', 'pending')
-            ->orWhere('general_status', 'confirmed')
+        $reservation = Reservation::whereIn('general_status', ['pending', 'confirmed'])
             ->findOrFail($reservation_id);
 
         if (
