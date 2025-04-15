@@ -26,7 +26,7 @@ import PageHeader from "@/Components/PageHeader.vue";
 import TableContainer from "@/Components/ui/table/TableContainer.vue";
 import TableRowHeader from "@/Components/ui/table/TableRowHeader.vue";
 
-type ReportType = 'revenue' | 'collectable';
+type ReportType = "revenue" | "collectable";
 
 type Report = {
     id: string;
@@ -41,11 +41,19 @@ type Report = {
 type GenerateReportProps = {
     revenueReport: Report[];
     revenueTotalAmount: number;
-    collectableReport: Pick<Report, 'bookedBy' | 'numberOfGuests' | 'numberOfDays' | 'amount' | 'id'>[];
+    collectableReport: Pick<
+        Report,
+        "bookedBy" | "numberOfGuests" | "numberOfDays" | "amount" | "id"
+    >[];
     collectableTotalAmount: number;
 };
 
-const { revenueReport, collectableReport, revenueTotalAmount, collectableTotalAmount } = defineProps<GenerateReportProps>();
+const {
+    revenueReport,
+    collectableReport,
+    revenueTotalAmount,
+    collectableTotalAmount,
+} = defineProps<GenerateReportProps>();
 
 const form = useForm({
     selected_revenue_date: new Date(),
@@ -53,31 +61,73 @@ const form = useForm({
 });
 
 function changeDate() {
-    form.get(route("report.list", { revenue_date: form.selected_revenue_date, collectable_date: form.selected_collectable_date }), {
-        preserveScroll: true,
-        preserveState: true,
-    });
+    form.get(
+        route("report.list", {
+            revenue_date: form.selected_revenue_date,
+            collectable_date: form.selected_collectable_date,
+        }),
+        {
+            preserveScroll: true,
+            preserveState: true,
+        }
+    );
 }
 
 watch(() => form.selected_revenue_date, changeDate);
 
 watch(() => form.selected_collectable_date, changeDate);
 
-function downloadReport(type: ReportType) {
+function downloadRevenueReport() {
     if (!form.selected_revenue_date) {
         return;
     }
 
-    const url = `/reports/download/${formatDate(form.selected_revenue_date)}/${type}`;
+    const url = `/reports/download/${formatDate(
+        form.selected_revenue_date
+    )}/revenue`;
     window.open(url, "_blank");
 }
 
-function printReport(type: ReportType) {
+function downloadCollectablesReport() {
+    if (!form.selected_collectable_date) {
+        return;
+    }
+
+    const url = `/reports/download/${formatDate(
+        form.selected_collectable_date
+    )}/collectable`;
+    window.open(url, "_blank");
+}
+
+function printRevenueReport() {
     if (!form.selected_revenue_date) {
         return;
     }
 
-    const url = `/reports/print/${formatDate(form.selected_revenue_date)}/${type}`;
+    const url = `/reports/print/${formatDate(
+        form.selected_revenue_date
+    )}/revenue?_=${Date.now()}`;
+
+    const pdfWindow = window.open(url, "_blank");
+
+    if (pdfWindow) {
+        pdfWindow.addEventListener("load", () => {
+            pdfWindow.print();
+        });
+    } else {
+        alert("Please allow popups for this website");
+    }
+}
+
+function printCollectablesReport() {
+    if (!form.selected_collectable_date) {
+        return;
+    }
+
+    const url = `/reports/print/${formatDate(
+        form.selected_collectable_date
+    )}/collectable?_=${Date.now()}`;
+
     const pdfWindow = window.open(url, "_blank");
 
     if (pdfWindow) {
@@ -123,14 +173,14 @@ function printReport(type: ReportType) {
 
         <!-- Revenue Table -->
         <div>
-            <div class="flex items-center justify-end mb-2 gap-x-2">
-                <h1 class="text-2xl font-bold mr-auto ps-2">Revenue</h1>
+            <div class="flex gap-x-2 justify-end items-center mb-2">
+                <h1 class="mr-auto text-2xl font-bold ps-2">Revenue</h1>
                 <MonthPicker v-model="form.selected_revenue_date" />
-                <Button @click="downloadReport('revenue')" class="md:min-w-28">
+                <Button @click="downloadRevenueReport" class="md:min-w-28">
                     <Download /><span class="hidden md:block">Download</span>
                 </Button>
                 <Button
-                    @click="printReport('revenue')"
+                    @click="printRevenueReport"
                     class="text-white bg-neutral-800 md:min-w-28 hover:bg-neutral-700 hover:text-white"
                 >
                     <Printer class="md:mr-1" />
@@ -152,8 +202,13 @@ function printReport(type: ReportType) {
                     </TableHeader>
 
                     <TableBody>
-                        <template v-if="revenueReport && revenueReport.length > 0">
-                            <TableRow v-for="report in revenueReport" :key="report.id">
+                        <template
+                            v-if="revenueReport && revenueReport.length > 0"
+                        >
+                            <TableRow
+                                v-for="report in revenueReport"
+                                :key="report.id"
+                            >
                                 <TableCell>
                                     {{ report.date }}
                                 </TableCell>
@@ -198,17 +253,16 @@ function printReport(type: ReportType) {
             </TableContainer>
         </div>
 
-
         <!-- Collectables Table -->
         <div class="mt-28">
-            <div class="flex items-center justify-end mb-2 gap-x-2">
-                <h1 class="text-2xl font-bold mr-auto ps-2">Collectables</h1>
+            <div class="flex gap-x-2 justify-end items-center mb-2">
+                <h1 class="mr-auto text-2xl font-bold ps-2">Collectables</h1>
                 <MonthPicker v-model="form.selected_collectable_date" />
-                <Button @click="downloadReport('collectable')" class="md:min-w-28">
+                <Button @click="downloadCollectablesReport" class="md:min-w-28">
                     <Download /><span class="hidden md:block">Download</span>
                 </Button>
                 <Button
-                    @click="printReport('collectable')"
+                    @click="printCollectablesReport"
                     class="text-white bg-neutral-800 md:min-w-28 hover:bg-neutral-700 hover:text-white"
                 >
                     <Printer class="md:mr-1" />
@@ -228,8 +282,16 @@ function printReport(type: ReportType) {
                     </TableHeader>
 
                     <TableBody>
-                        <template v-if="collectableReport && collectableReport.length > 0">
-                            <TableRow v-for="report in collectableReport" :key="report.id">
+                        <template
+                            v-if="
+                                collectableReport &&
+                                collectableReport.length > 0
+                            "
+                        >
+                            <TableRow
+                                v-for="report in collectableReport"
+                                :key="report.id"
+                            >
                                 <TableCell>
                                     {{ report.bookedBy }}
                                 </TableCell>

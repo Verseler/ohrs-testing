@@ -70,7 +70,7 @@ function submit() {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Create Room</BreadcrumbPage>
+                        <BreadcrumbPage>Change Password</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>

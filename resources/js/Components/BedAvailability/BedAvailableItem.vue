@@ -4,7 +4,7 @@ import { Card } from "@/Components/ui/card";
 import GenderBadge from "@/Components/GenderBadge.vue";
 import type { Gender } from "@/Pages/Guest/guest.types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
-import { formatDateString } from "@/lib/utils";
+import { formatDateStringDayMonth } from "@/lib/utils";
 
 type BedAvailableItemsProps = {
     name: string;
@@ -35,7 +35,7 @@ const { availableBeds, name, eligibleGenderSchedules, days } =
             <TableHeader>
                 <TableRow class="bg-neutral-50">
                     <TableHead v-for="day in days" class="px-2 text-center text-black border-r">
-                        {{ formatDateString(day) }}
+                        {{ formatDateStringDayMonth(day) }}
                     </TableHead>
                 </TableRow>
             </TableHeader>

@@ -58,6 +58,20 @@ export function formatDateString(date: string | Date): string {
       })
 }
 
+export function formatDateStringDayMonth(date: string | Date): string {
+    const d = typeof date === 'string' ? new Date(date) : date;
+
+    if (isNaN(d.getTime())) {
+        console.error("Invalid date input");
+        return "";
+    }
+
+    return d.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+      })
+}
+
 export function formatDateTimeString(date: string | Date): string {
     const d = typeof date === 'string' ? new Date(date) : date;
 

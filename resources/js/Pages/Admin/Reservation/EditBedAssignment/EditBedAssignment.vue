@@ -139,12 +139,6 @@ function submit() {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbLink :href="route('reservation.list')">
-                            Reservation
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
                         <BreadcrumbPage>Bed Assignment</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>

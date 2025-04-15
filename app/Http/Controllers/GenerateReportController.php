@@ -58,6 +58,7 @@ class GenerateReportController extends Controller
                 'reports' => $collectableData['reports'],
                 'totalAmount' => $collectableData['totalAmount'],
                 'officeName' => $office->name,
+                'selectedDate' => $selectedDate,
             ]);
 
             return $pdf->download("hrs-collectables-report-{$selected_date}.pdf");
@@ -68,6 +69,7 @@ class GenerateReportController extends Controller
             'reports' => $revenueData['reports'],
             'totalAmount' => $revenueData['totalAmount'],
             'officeName' => $office->name,
+            'selectedDate' => $selectedDate,
         ]);
 
         return $pdf->download("hrs-revenue-report-{$selected_date}.pdf");
@@ -89,6 +91,7 @@ class GenerateReportController extends Controller
                 'reports' => $collectableData['reports'],
                 'totalAmount' => $collectableData['totalAmount'],
                 'officeName' => $office->name,
+                'selectedDate' => $selectedDate,
             ]);
 
             return $pdf->stream("hrs-collectables-report-{$selected_date}.pdf");
@@ -99,6 +102,7 @@ class GenerateReportController extends Controller
             'reports' => $revenueData['reports'],
             'totalAmount' => $revenueData['totalAmount'],
             'officeName' => $office->name,
+            'selectedDate' => $selectedDate,
         ]);
 
         return $pdf->stream("hrs-revenue-report-{$selected_date}.pdf");

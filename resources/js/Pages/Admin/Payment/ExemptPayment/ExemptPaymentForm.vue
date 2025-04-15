@@ -230,7 +230,7 @@ function submit() {
                         </div>
 
                         <div class="grid place-content-end">
-                            <Button type="submit" size="lg" class="ml-auto">
+                            <Button type="submit" size="lg" class="ml-auto px-6 min-w-20">
                                 Confirm
                             </Button>
                         </div>

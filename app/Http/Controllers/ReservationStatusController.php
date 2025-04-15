@@ -40,30 +40,35 @@ class ReservationStatusController extends Controller
             'selected_guest_id' => ['required', 'exists:guests,id']
         ]);
 
+        $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+                    ->with('guests.stayDetails')
+                    ->findOrFail($validated['reservation_id']);
+
        try {
-            $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
-                ->with('guests.stayDetails')
-                ->findOrFail($validated['reservation_id']);
+            DB::transaction(function () use ($validated, $reservation) {
+                $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
 
-            $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
+                $guest->stayDetails()->update([
+                    'status' => $validated['status']
+                ]);
 
-            $guest->stayDetails()->update([
-                'status' => $validated['status']
-            ]);
+                // Reload stayDetails to get the updated status
+                $reservation->load('guests.stayDetails');
 
-            // Check if this was the last guest with the previous status
-            $previousStatusCount = $reservation->guests->filter(function($g) use ($guest) {
-                return $g->stayDetails->status === $guest->stayDetails->status;
-            })->count();
+                // Check if this was the last guest with the previous status
+                $previousStatusCount = $reservation->guests->filter(function($g) use ($reservation) {
+                    return $g->stayDetails->status === $reservation->general_status;
+                })->count();
 
-            if ($previousStatusCount === 0) {
-                // Update reservation general_status to next status
-                $statusOrder = ['confirmed', 'checked_in', 'checked_out'];
-                $currentIndex = array_search($reservation->general_status, $statusOrder);
-                if ($currentIndex !== false && isset($statusOrder[$currentIndex + 1])) {
-                    $reservation->update(['general_status' => $statusOrder[$currentIndex + 1]]);
+                if ($previousStatusCount == 0) {
+                    // Update reservation general_status to next status
+                    $statusOrder = ['confirmed', 'checked_in', 'checked_out'];
+                    $currentIndex = array_search($reservation->general_status, $statusOrder);
+                    if ($currentIndex !== false && isset($statusOrder[$currentIndex + 1])) {
+                        $reservation->update(['general_status' => $statusOrder[$currentIndex + 1]]);
+                    }
                 }
-            }
+            });
        }
        catch(\Exception $e) {
         return redirect()->back()->with('error', 'Failed to update reservation status: ' . $e->getMessage());
@@ -133,10 +138,11 @@ class ReservationStatusController extends Controller
                 }
             }
         }
-        $reservation->general_status = $validated['status'];
-        $reservation->stayDetails()->update([
+
+        $reservation->stayDetails()->where('status', $reservation->general_status)->update([
             'status' => $validated['status']
         ]);
+        $reservation->general_status = $validated['status'];
         $reservation->save();
 
         return to_route('reservation.show', ['id' => $reservation->id])
@@ -241,9 +247,14 @@ class ReservationStatusController extends Controller
     }
 
 
-    public function search($search, $hostel_id)
+    public function search(Request $request)
     {
-        if (empty($search)) {
+        $validated = $request->validate([
+            'search' => ['required', 'string', 'max:255'],
+            'hostel_id' => ['required', 'exists:offices,id'],
+        ]);
+
+        if (empty($validated['search'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Search term cannot be empty',
@@ -266,24 +277,28 @@ class ReservationStatusController extends Controller
                     ->orderByDesc('check_out_date')
                     ->limit(1)
             ])
-            ->where(function ($query) use ($search) {
-                $query->where('code', 'ILIKE', "%{$search}%")
-                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%")
-                    ->orWhereHas('guests', function($q) use ($search) {
-                        $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$search}%");
+            ->where('hostel_office_id', $validated['hostel_id'])
+            ->where(function ($query) use ($validated) {
+                $query->where('code', 'ILIKE', "%{$validated['search']}%")
+                    ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$validated['search']}%")
+                    ->orWhereHas('guests', function($q) use ($validated) {
+                        $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'ILIKE', "%{$validated['search']}%");
                     });
             })
-            ->where('hostel_office_id', $hostel_id)
             ->get();
 
         if ($reservations->isEmpty()) {
-            return Redirect::back()->with([
-                'error' => 'No reservations found.',
+            return response()->json([
+                'success' => false,
+                'message' => 'No reservations found.',
+                'data' => null
             ]);
         }
 
-        return Redirect::back()->with([
-            'response_data' => $reservations
+        return response()->json([
+            'success' => true,
+            'message' => 'Reservations found.',
+            'data' => $reservations->values()
         ]);
     }
 }

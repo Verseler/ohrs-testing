@@ -121,8 +121,7 @@ class ModifyReservationController extends Controller
 
     public function verifyCancel($reservation_id, string $token)
     {
-        $reservation = Reservation::where('general_status', 'pending')
-            ->orWhere('general_status', 'confirmed')
+        $reservation = Reservation::whereIn('general_status', ['pending', 'confirmed'])
             ->findOrFail($reservation_id);
 
         if (
@@ -370,7 +369,7 @@ class ModifyReservationController extends Controller
         $officeCodes = [
             'Region 10' => 'RO',
             'PENRO Camiguin' => 'TCAM',
-            'PENRO Misamis Oriental' => 'ILPLS',
+            'CENRO Initao' => 'ILPLS',
         ];
 
         // Default code if office not found

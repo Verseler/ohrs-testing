@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 
-class OtpController extends Controller
+class OTPController extends Controller
 {
     public function form() {
         return Inertia::render('Guest/ModifyReservation/OtpConfirmation', [

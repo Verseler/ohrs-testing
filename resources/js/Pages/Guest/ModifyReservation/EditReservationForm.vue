@@ -110,6 +110,7 @@ function showConfirmation() {
                         type="button"
                         @click="cancel"
                         size="lg"
+                        class="w-24 px-4"
                         >Cancel</Button
                     >
                     <Button type="submit" class="w-44" size="lg"
