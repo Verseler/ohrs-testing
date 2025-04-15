@@ -370,7 +370,7 @@ class ModifyReservationController extends Controller
         $officeCodes = [
             'Region 10' => 'RO',
             'PENRO Camiguin' => 'TCAM',
-            'PENRO Misamis Oriental' => 'ILPLS',
+            'CENRO Initao' => 'ILPLS',
         ];
 
         // Default code if office not found
