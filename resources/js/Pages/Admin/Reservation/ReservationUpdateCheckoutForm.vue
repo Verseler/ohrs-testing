@@ -399,7 +399,7 @@ function submitExtendReservation() {
                                     v-if="form.processing"
                                     class="w-4 h-4 mr-2 animate-spin"
                                 />
-                                Extend Reservation
+                                Update Reservation
                             </Button>
                         </div>
                     </form>
