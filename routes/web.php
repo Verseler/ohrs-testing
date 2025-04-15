@@ -7,7 +7,7 @@ use App\Http\Controllers\GenerateReportController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OfficeController;
-use App\Http\Controllers\OtpController;
+use App\Http\Controllers\OTPController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReservationAssignBedsController;
 use App\Http\Controllers\RoomController;
@@ -40,13 +40,12 @@ Route::get('/reservation/status/{code}', [ReservationStatusController::class, 'c
 
 //* Guest Modify Reservation
 Route::post('/reservation/request-modify', [ModifyReservationController::class, 'requestModify'])->name('reservation.requestModify');
-Route::get('/reservation/verify-edit/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyEdit'])->name('reservation.verifyEdit');
-Route::get('/reservation/verify-cancel/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyCancel'])->name('reservation.verifyCancel');
-Route::get('/reservation/modify-rebook/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyRebook'])->name('reservation.verifyRebook');
 Route::post('/reservation/rebook', [ModifyReservationController::class, 'rebook'])->name('reservation.rebook');
 Route::put('/reservation/edit', [ModifyReservationController::class, 'edit'])->name('reservation.edit');
-Route::get('/reservation/otp', [OtpController::class, 'form'])->name('reservation.otpForm');
-Route::post('/reservation/otp', [OtpController::class, 'verify'])->name('reservation.otpVerify');
+Route::get('/reservation/otp', [OTPController::class, 'form'])->name('reservation.otpForm');
+Route::get('/reservation/modify-rebook/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyRebook'])->name('reservation.verifyRebook');
+Route::get('/reservation/verify-cancel/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyCancel'])->name('reservation.verifyCancel');
+Route::get('/reservation/verify-edit/{reservation_id}/{token}', [ModifyReservationController::class, 'verifyEdit'])->name('reservation.verifyEdit');
 
 
 
