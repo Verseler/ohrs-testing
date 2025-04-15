@@ -10,6 +10,8 @@ const { optional = false, class: className } = defineProps<InputLabelProps>();
 </script>
 
 <template>
-    <Label :class="className"><slot /></Label>
+    <div class="flex gap-x-1 items-center">
+        <Label :class="className"><slot /></Label>
     <span v-if="optional === false" class="text-red-500">*</span>
+    </div>
 </template>
