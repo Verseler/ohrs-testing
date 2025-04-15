@@ -67,9 +67,7 @@ const form = useForm<Partial<UserFilters>>({
     sort_order: filters?.sort_order ?? "asc",
 });
 
-const formHasValue = computed(
-    () => form.role || form.search || form.sort_by
-);
+const formHasValue = computed(() => form.role || form.search || form.sort_by);
 
 //User Filter
 function clearFilter() {
@@ -142,7 +140,7 @@ function deleteUser() {
 
         <!-- Search, Filter and Sort -->
         <div
-            class="flex flex-col-reverse gap-2 justify-between mb-2 md:flex-row"
+            class="flex flex-col-reverse justify-between gap-2 mb-2 md:flex-row"
         >
             <div class="flex flex-col gap-2 md:flex-row">
                 <SelectField
@@ -231,6 +229,9 @@ function deleteUser() {
                                                 <Lock />Change Password
                                             </PopoverLinkField>
                                             <PopoverField
+                                                v-if="
+                                                    user.role !== 'system_admin'
+                                                "
                                                 @click="
                                                     showDeleteConfirmation(user)
                                                 "
