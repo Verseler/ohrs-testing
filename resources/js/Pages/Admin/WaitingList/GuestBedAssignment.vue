@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { GuestAssignment, ReservationWithBeds } from "@/Pages/Admin/Reservation/reservation.types";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { CalendarCheck, Home } from "lucide-vue-next";
+import { CalendarCheck, Home, XCircleIcon } from "lucide-vue-next";
 import PageHeader from "@/Components/PageHeader.vue";
 import { Head, router } from "@inertiajs/vue3";
 import {
@@ -98,7 +98,7 @@ function cancelReservation() {
                     variant="outline"
                     class="mt-4 w-full text-base text-red-500 border-red-500 min-h-12 hover:bg-red-50 hover:text-red-600"
                 >
-                    <XCircle />
+                    <XCircleIcon />
                     Cancel Reservation
                 </Button>
             </div>
