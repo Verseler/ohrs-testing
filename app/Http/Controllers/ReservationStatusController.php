@@ -46,6 +46,34 @@ class ReservationStatusController extends Controller
 
        try {
             DB::transaction(function () use ($validated, $reservation) {
+                //prevent checking in if there are previous reservations with unpaid balances or not pay later
+                if ($validated['status'] === 'checked_in') {
+                    $reservation = Reservation::where('hostel_office_id', Auth::user()->office_id)
+                        ->with('stayDetails.bed')
+                        ->findOrFail($validated['reservation_id']);
+
+                    $reservedBedIds = $reservation->stayDetails->pluck('bed_id')->toArray();
+
+                    // Check for previous reservations of the same beds with unpaid balances
+                    if (!empty($reservedBedIds)) {
+                        $previousReservations = Reservation::where('hostel_office_id', Auth::user()->office_id)
+                            ->whereIn('general_status', ['checked_in', 'checked_out'])
+                            ->where(function ($query) {
+                                $query->where('remaining_balance', '>', 0)
+                                    ->where('payment_type', '!=', 'pay_later');
+                            })
+                            ->whereHas('stayDetails', function ($query) use ($reservedBedIds) {
+                                $query->whereIn('bed_id', $reservedBedIds);
+                            })
+                            ->whereNot('id', $reservation->id)
+                            ->get();
+
+                        if (count($previousReservations) > 0) {
+                            throw new \Exception('Cannot check in due to previous unpaid or not pay later reservations on the same beds.');
+                        }
+                    }
+                }
+
                 $guest = $reservation->guests()->findOrFail($validated['selected_guest_id']);
 
                 $guest->stayDetails()->update([
@@ -122,7 +150,7 @@ class ReservationStatusController extends Controller
             // Check for previous reservations of the same beds with unpaid balances
             if (!empty($reservedBedIds)) {
                 $previousReservations = Reservation::where('hostel_office_id', Auth::user()->office_id)
-                    ->whereNotIn('general_status', ['pending', 'canceled'])
+                    ->whereIn('general_status', ['checked_in', 'checked_out'])
                     ->where(function ($query) {
                         $query->where('remaining_balance', '>', 0)
                             ->where('payment_type', '!=', 'pay_later');
@@ -138,7 +166,7 @@ class ReservationStatusController extends Controller
                 }
             }
         }
-
+        dd('success');
         $reservation->stayDetails()->where('status', $reservation->general_status)->update([
             'status' => $validated['status']
         ]);
