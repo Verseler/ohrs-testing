@@ -1,46 +1,38 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
-interface Props {
-    items: string[];
+interface Props<T> {
+    items: T[];
     placeholder?: string;
     invalid?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props<T>>(), {
     placeholder: "",
     invalid: false,
 });
 
-const model = defineModel<string>();
+const model = defineModel<T>();
 
 const emit = defineEmits<{
-    (event: "item-selected", value: string): void;
+    (event: "item-selected", value: T): void;
 }>();
 
 const selectedIndex = ref(-1);
 const showSuggestions = ref(false);
 const container = ref<HTMLElement | null>(null);
-const position = ref<'top' | 'bottom'>('bottom');
 
 const filteredItems = computed(() => {
     if (!model.value) return [];
-    const searchTerm = model.value.toLowerCase();
+    const searchTerm = model.value.toString().toLowerCase();
     return props.items.filter((item) =>
-        item.toLowerCase().includes(searchTerm)
+        String(item).toLowerCase().includes(searchTerm)
     );
 });
 
 const handleInput = () => {
     showSuggestions.value = true;
     selectedIndex.value = -1;
-
-    // Calculate position
-    if (container.value) {
-        const inputRect = container.value.getBoundingClientRect();
-        const spaceBelow = window.innerHeight - inputRect.bottom;
-        position.value = spaceBelow < 200 ? 'top' : 'bottom';
-    }
 };
 
 const handleArrowDown = () => {
@@ -55,7 +47,7 @@ const handleArrowUp = () => {
     }
 };
 
-const selectItem = (item?: string) => {
+const selectItem = (item?: T) => {
     const selectedItem = item || filteredItems.value[selectedIndex.value];
     if (selectedItem) {
         model.value = selectedItem;
@@ -98,16 +90,11 @@ onBeforeUnmount(() => window.removeEventListener("click", handleClickOutside));
 
         <ul
             v-if="showSuggestions && filteredItems.length > 0"
-            class="overflow-y-auto absolute z-20 w-full max-h-52 bg-white rounded border"
-            :class="{
-                'mt-1': position === 'bottom',
-                'mb-1': position === 'top',
-                'bottom-full': position === 'top',
-            }"
+            class="overflow-y-auto absolute bottom-full z-20 mb-1 w-full max-h-52 bg-white rounded border"
         >
             <li
                 v-for="(item, index) in filteredItems"
-                :key="item"
+                :key="String(item)"
                 @click="selectItem(item)"
                 :class="{ selected: index === selectedIndex }"
                 class="px-4 py-2 cursor-pointer hover:bg-gray-100"
