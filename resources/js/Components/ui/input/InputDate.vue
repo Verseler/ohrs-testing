@@ -17,6 +17,7 @@ const model = defineModel<string | Date>();
         placeholder="pick a date"
         class="block w-full h-12 bg-transparent rounded cursor-pointer border-primary-700"
         onclick="this.showPicker()"
+        :disabled="disabled"
         :class="[
             invalid ? 'border-red-500 text-red-500' : 'border-green-700',
             disabled && 'opacity-50',
