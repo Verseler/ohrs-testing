@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendRemainingBalanceMail;
 use App\Models\Bed;
 use App\Models\Guest;
 use App\Models\Payment;
@@ -100,6 +101,13 @@ class PaymentController extends Controller
         DB::transaction(function () use ($reservation) {
             $reservation->payment_type = 'pay_later';
             $reservation->save();
+
+            SendRemainingBalanceMail::dispatch($reservation->email, [
+                'title' => 'Outstanding Balance Notice',
+                'reservation_code' => $reservation->code,
+                'remaining_balance' => $reservation->remaining_balance,
+                'date' => now()->format('F j, Y')
+            ]);
         });
 
         return to_route('reservation.show', ['id' => $reservation->id])->with('success', 'Successfully change to pay later.');
