@@ -17,15 +17,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             OfficeSeeder::class
-            //RoomSeeder::class,
-            //BedSeeder::class
         ]);
 
         User::factory()->create([
-            'name' => 'verselerf_handuman',
+            'name' => 'system_admin',
             'role' => 'system_admin',
             'office_id' => 176,
-            'password' => bcrypt('1010101010'),
+            'password' => bcrypt('denr1234'),
         ]);
     }
 }
