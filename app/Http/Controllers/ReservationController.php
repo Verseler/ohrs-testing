@@ -26,7 +26,14 @@ class ReservationController extends Controller
             'sort_order' => ['nullable', Rule::in(['asc', 'desc'])],
         ]);
 
-        $query = Reservation::with(relations: ['guests', 'hostelOffice', 'stayDetails'])
+        $query = Reservation::with(relations: [
+            'guests',
+            'hostelOffice',
+            'stayDetails',
+            'stayDetails.bed.room' => function ($query) {
+                $query->select('id', 'name');
+            },
+        ])
             ->where('hostel_office_id', Auth::user()->office_id)
             ->whereNot('general_status', 'pending')
             ->addSelect([

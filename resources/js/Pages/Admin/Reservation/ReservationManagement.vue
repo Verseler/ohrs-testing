@@ -22,6 +22,7 @@ import type {
     ReservationFilters,
     ReservationStatus,
     Reservation as ReservationWithBeds,
+    StayDetails,
 } from "@/Pages/Admin/Reservation/reservation.types";
 import type { LaravelPagination } from "@/types/index";
 import {
@@ -51,6 +52,7 @@ usePoll(10000);
 type Reservation = Omit<ReservationWithBeds, "host_office_id"> & {
     host_office: Office;
     majorityStatus: ReservationStatus;
+    stay_details: StayDetails[];
 };
 
 type ReservationManagementProps = {
@@ -199,6 +201,11 @@ watch(
                             </TableCell>
                             <TableCell class="font-medium">
                                 {{ reservation.guests.length }}
+                            </TableCell>
+                            <TableCell class="space-y-1 font-medium">
+                                <div v-for="reserved in reservation.stay_details" :key="reserved.bed.room_id" class="gap-1 px-2 py-0.5 w-max text-xs text-center rounded border">
+                                    {{ reserved.bed.room.name }} - {{ reserved.bed.name }}
+                                </div>
                             </TableCell>
                             <TableCell>
                                 <PaymentTypeBadge

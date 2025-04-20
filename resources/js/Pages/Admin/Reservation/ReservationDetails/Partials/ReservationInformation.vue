@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PaymentTypeBadge from "@/Components/PaymentTypeBadge.vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Label } from "@/Components/ui/label";
 import { Separator } from "@/Components/ui/separator";
@@ -40,6 +41,14 @@ const { reservation } = defineProps<{ reservation: ReservationWithBeds }>();
                             "
                         >
                             ₱{{ formatCurrency(reservation.remaining_balance) }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="mb-1 text-sm">
+                            Payment Type
+                        </p>
+                        <p class="font-medium">
+                            <PaymentTypeBadge :payment-type="reservation.payment_type" />
                         </p>
                     </div>
                 </div>

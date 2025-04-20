@@ -92,3 +92,6 @@ export type GuestAssignment = {
     gender: Gender;
     bed_id: number | null;
 }
+
+
+export type ReservationType = "solo" | "group"

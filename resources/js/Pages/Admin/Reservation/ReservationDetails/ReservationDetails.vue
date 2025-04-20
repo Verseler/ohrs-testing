@@ -27,6 +27,7 @@ import LinkButton from "@/Components/LinkButton.vue";
 import ReservationCode from "./Partials/ReservationCode.vue";
 import { usePoll } from "@inertiajs/vue3";
 import { SidebarTrigger } from "@/Components/ui/sidebar";
+import StatusBadge from "@/Components/StatusBadge.vue";
 
 usePoll(5000);
 
@@ -84,10 +85,11 @@ const { reservation, canExempt } = defineProps<ReservationDetailsProps>();
             <div class="flex flex-col gap-3">
                 <!-- Header with status badge -->
                 <div>
-                    <div class="flex gap-4 items-center">
+                    <div class="flex gap-3 items-center">
                         <ReservationCode>
                             {{ reservation.code }}
                         </ReservationCode>
+                        <StatusBadge :status="reservation.general_status" />
                     </div>
 
                     <div class="flex flex-wrap gap-2 justify-end mt-4">

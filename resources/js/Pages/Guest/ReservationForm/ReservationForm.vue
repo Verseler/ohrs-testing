@@ -3,8 +3,9 @@ import { Head, useForm } from "@inertiajs/vue3";
 import { Table, TableCell, TableRow, TableBody } from "@/Components/ui/table";
 import TableSectionHeading from "@/Pages/Guest/ReservationForm/Partials/TableSectionHeading.vue";
 import { Textarea } from "@/Components/ui/textarea";
-import { Input, InputError } from "@/Components/ui/input";
+import { Input, InputDate, InputError } from "@/Components/ui/input";
 import InputLabel from "@/Components/ui/input/InputLabel.vue";
+import { RadioGroup, RadioGroupItem } from "@/Components/ui/radio-group";
 import {
     Select,
     SelectContent,
@@ -14,13 +15,17 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 import type { Office } from "@/Pages/Admin/Office/office.types";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import GuestsDetailsInput from "@/Pages/Guest/ReservationForm/Partials/GuestsDetailsInput.vue";
 import { Button } from "@/Components/ui/button";
 import Alert from "@/Components/ui/alert-dialog/Alert.vue";
 import type { Gender } from "@/Pages/Guest/guest.types";
 import { validIds } from "@/Pages/Guest/ReservationForm/data";
 import GuestLayout from "@/Layouts/GuestLayout.vue";
+import { Label } from "@/Components/ui/label";
+import type { ReservationType } from "@/Pages/Admin/Reservation/reservation.types";
+import { formatDate } from "@/lib/utils";
+import { AutoComplete } from "@/Components/ui/auto-complete";
 
 type ReservationFormProps = {
     hostelOffice: Office;
@@ -51,6 +56,18 @@ const form = useForm({
     guests: [DEFAULT_FIRST_GUEST],
 });
 
+const reservationType = ref<ReservationType>('solo');
+
+watch([
+() => form.first_name,
+() => form.last_name
+], () => {
+    if (reservationType.value === 'solo') {
+        form.guests[0].first_name = form.first_name || '';
+        form.guests[0].last_name = form.last_name || '';
+    }
+});
+
 //confirmation dialog
 const confirmation = ref(false);
 
@@ -59,6 +76,13 @@ function showConfirmation() {
 }
 
 function submit() {
+    //if reservation type is solo make sure the name matched
+    if (reservationType.value === 'solo') {
+        form.guests[0].first_name = form.first_name || '';
+        form.guests[0].last_name = form.last_name || '';
+        
+    }
+
     form.post(route("reservation.create"));
 }
 </script>
@@ -78,10 +102,27 @@ function submit() {
 
                     <TableBody>
                         <TableSectionHeading>
+                            Reservation Type
+                        </TableSectionHeading>
+                        <RadioGroup
+                                v-model="reservationType"
+                                class="mx-3 mb-6"
+                            >
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="solo" value="solo" />
+                                    <Label for="solo">Solo</Label>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <RadioGroupItem id="group" value="group" />
+                                    <Label for="group">Group</Label>
+                                </div>
+                            </RadioGroup>
+
+                        <TableSectionHeading>
                             Contact Information of Person Making the Reservation
                         </TableSectionHeading>
 
-                        <div class="grid mb-8 lg:grid-cols-2">
+                        <div class="grid mb-6 lg:grid-cols-2">
                             <!-- Left Column -->
                             <div>
                                 <TableRow
@@ -145,7 +186,7 @@ function submit() {
                                             <Input
                                                 type="number"
                                                 v-model.number="form.phone"
-                                                class="h-12 rounded-sm shadow-none pl-11 border-primary-700"
+                                                class="pl-11 h-12 rounded-sm shadow-none border-primary-700"
                                                 :invalid="!!form.errors.phone"
                                             />
                                         </div>
@@ -200,6 +241,40 @@ function submit() {
                                         </InputError>
                                     </TableCell>
                                 </TableRow>
+
+                                <TableRow v-if="reservationType === 'solo'" class="grid md:grid-cols-2">
+                                    <TableCell class="space-y-2">
+                                        <InputLabel>Check In</InputLabel>
+                                        <InputDate
+                                            v-model="form.guests[0].check_in_date"
+                                            :invalid="!!(form.errors as Record<string, string>)[`guests.0.check_in_date`]"
+                                            :min="formatDate(new Date())"
+                                            :max="form.guests[0].check_out_date"
+                                        />
+                                        <InputError
+                                            v-if="!!(form.errors as Record<string, string>)[`guests.0.check_in_date`]"
+                                        >
+                                            {{ (form.errors as Record<string, string>)[`guests.0.check_in_date`] }}
+                                        </InputError>
+                                    </TableCell>
+
+                                    <TableCell class="space-y-2">
+                                        <InputLabel>Check Out</InputLabel>
+                                        <InputDate
+                                            v-model="form.guests[0].check_out_date"
+                                            :invalid="
+                                                !!(form.errors as Record<string, string>)[`guests.0.check_out_date`]
+                                            "
+                                            :min="form.guests[0].check_in_date"
+                                            :disabled="!form.guests[0].check_in_date"
+                                        />
+                                        <InputError
+                                            v-if="!!(form.errors as Record<string, string>)[`guests.0.check_out_date`]"
+                                        >
+                                            {{ (form.errors as Record<string, string>)[`guests.0.check_out_date`] }}
+                                        </InputError>
+                                    </TableCell>
+                                </TableRow>
                             </div>
 
                             <!-- Right Column -->
@@ -234,19 +309,56 @@ function submit() {
                                         {{ form.errors.purpose_of_stay }}
                                     </InputError>
                                 </TableCell>
+
+                                <TableRow v-if="reservationType === 'solo'" class="grid md:grid-cols-2">
+                                    <TableCell class="space-y-2">
+                                        <InputLabel>Gender</InputLabel>
+
+                                        <Select class="flex-1" v-model="form.guests[0].gender">
+                                            <SelectTrigger
+                                                class="h-12 rounded-md shadow-none border-primary-800"
+                                                :invalid="!!(form.errors as Record<string, string>)[`guests.0.gender`]"
+                                            >
+                                                <SelectValue placeholder="Select a gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="male"> Male </SelectItem>
+                                                    <SelectItem value="female"> Female </SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+
+                                        <InputError v-if="!!(form.errors as Record<string, string>)[`guests.0.gender`]">
+                                            {{ (form.errors as Record<string, string>)[`guests.0.gender`] }}
+                                        </InputError>
+                                    </TableCell>
+
+                                    <TableCell class="space-y-2">
+                                        <InputLabel>Office</InputLabel>
+                                        <AutoComplete
+                                            v-model="form.guests[0].office as (Office | undefined)"
+                                            :items="offices"
+                                            :invalid="!!(form.errors as Record<string, string>)[`guests.0.office`]"
+                                        />
+                                        <InputError v-if="!!(form.errors as Record<string, string>)[`guests.0.office`]">
+                                            {{ (form.errors as Record<string, string>)[`guests.0.office`] }}
+                                        </InputError>
+                                    </TableCell>
+                                </TableRow>
                             </div>
                         </div>
 
-                        <TableSectionHeading>
+                        <TableSectionHeading v-if="reservationType === 'group'">
                             Guests Details
                         </TableSectionHeading>
 
-                        <GuestsDetailsInput :form="form" :offices="offices" />
+                        <GuestsDetailsInput v-if="reservationType === 'group'" :form="form" :offices="offices" />
 
                         <div class="px-2">
                             <Button
                                 type="submit"
-                                class="w-full h-12 mt-6 text-base"
+                                class="mt-6 w-full h-12 text-base"
                                 :disabled="form.processing"
                             >
                                 {{

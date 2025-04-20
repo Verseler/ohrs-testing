@@ -31,6 +31,7 @@ export const data = {
         "Total Billings",
         "Remaining Balance",
         "Number of Guests",
+        "Reserved Beds",
         "Payment Type",
         "Status",
         ""

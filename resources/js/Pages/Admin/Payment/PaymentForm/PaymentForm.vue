@@ -152,6 +152,17 @@ function submitPayLater() {
         </PageHeader>
 
         <div class="max-w-2xl">
+            <div class="flex justify-end mb-2">
+                <Button
+                    v-if="reservation.payment_type === 'full_payment'"
+                    variant="outline"
+                    @click="showPayLaterConfirmation"
+                    type="button"
+                >
+                    <CreditCard /> Pay Later
+                </Button>
+            </div>
+
             <Card>
                 <CardHeader>
                     <CardTitle
@@ -330,15 +341,6 @@ function submitPayLater() {
                 </CardContent>
                 <CardFooter v-if="reservation.remaining_balance > 0">
                     <div class="flex gap-x-2 justify-end pt-3 w-full border-t">
-                        <Button
-                            v-if="reservation.payment_type === 'full_payment'"
-                            variant="outline"
-                            @click="showPayLaterConfirmation"
-                            type="button"
-                        >
-                            <CreditCard /> Pay Later
-                        </Button>
-
                         <Button @click="showPaymentConfirmation" type="button">
                             <CreditCard /> Record Payment
                         </Button>
