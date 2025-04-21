@@ -166,7 +166,6 @@ class ReservationStatusController extends Controller
                 }
             }
         }
-        dd('success');
         $reservation->stayDetails()->where('status', $reservation->general_status)->update([
             'status' => $validated['status']
         ]);
